@@ -196,19 +196,19 @@ jobs:
         # REMAINING ranges (VNET_B_LIST may be a single prefix or, per Amit's
         # sizing, TWO prefixes: Foundry /25 for the agent subnet + /27 for the PE
         # subnet). Both seds inject an HCL list, so one or many prefixes are fine.
-        sed -i -E "/\"{org}-vnet-aishared-/,/^  \}/ s|(address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${VNET_A_LIST}]|" "$TFVARS_FILE"
-        sed -i -E "/\"{org}-vnet-aifoundry-/,/^  \}/ s|(address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${VNET_B_LIST}]|" "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-vnet-aishared-/,/^  \}/ s|(address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${VNET_A_LIST}]|" "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-vnet-aifoundry-/,/^  \}/ s|(address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${VNET_B_LIST}]|" "$TFVARS_FILE"
 
         # Class A subnets.
-        sed -i -E "/\"{org}-snet-pe-aishared-/,/^      \}/   s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${PE_SUBNET}\2|"        "$TFVARS_FILE"
-        sed -i -E "/\"{org}-snet-agw-aishared-/,/^      \}/  s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${AGW_SUBNET}\2|"       "$TFVARS_FILE"
-        sed -i -E "/\"{org}-snet-apim-aishared-/,/^      \}/ s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${APIM_SUBNET}\2|"      "$TFVARS_FILE"
-        sed -i -E "/\"{org}-snet-vm-aishared-/,/^      \}/   s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${VM_SUBNET}\2|"        "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-pe-aishared-/,/^      \}/   s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${PE_SUBNET}\2|"        "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-agw-aishared-/,/^      \}/  s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${AGW_SUBNET}\2|"       "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-apim-aishared-/,/^      \}/ s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${APIM_SUBNET}\2|"      "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-vm-aishared-/,/^      \}/   s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${VM_SUBNET}\2|"        "$TFVARS_FILE"
 
         # Foundry subnets (Class B when a Class B range is given, otherwise
         # carved from Class A - the prefixes are applied as provided either way).
-        sed -i -E "/\"{org}-snet-agt-aifoundry-/,/^      \}/ s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${FOUNDRY_AGT_SUBNET}\2|" "$TFVARS_FILE"
-        sed -i -E "/\"{org}-snet-pe-aifoundry-/,/^      \}/  s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${FOUNDRY_PE_SUBNET}\2|"   "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-agt-aifoundry-/,/^      \}/ s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${FOUNDRY_AGT_SUBNET}\2|" "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-pe-aifoundry-/,/^      \}/  s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${FOUNDRY_PE_SUBNET}\2|"   "$TFVARS_FILE"
 
         # Bastion CIDR: replace ONLY the {bastion_cidr} placeholder (the VM subnet
         # Allow-Bastion-RDP-SSH rule). Do NOT touch other source_address_prefix
