@@ -55,9 +55,12 @@ jobs:
         # Map human-readable region name to short code + Azure location. Hub IPs
         # (DNS resolver, bastion) come from repo variables, not hardcoded here.
         case "$REGION" in
-          "Malaysia West")  REGION_CODE="myw"; LOCATION="malaysiawest" ;;
-          "Southeast Asia") REGION_CODE="sea"; LOCATION="southeastasia" ;;
-          *)                REGION_CODE=$(echo "$REGION" | tr '[:upper:]' '[:lower:]' | tr ' ' '-'); LOCATION=$(echo "$REGION" | tr '[:upper:]' '[:lower:]' | tr -d ' ') ;;
+          "Malaysia West")     REGION_CODE="myw"; LOCATION="malaysiawest" ;;
+          "Southeast Asia")    REGION_CODE="sea"; LOCATION="southeastasia" ;;
+          "East Asia")         REGION_CODE="ea";  LOCATION="eastasia" ;;
+          "Indonesia Central") REGION_CODE="idc"; LOCATION="indonesiacentral" ;;
+          "East US")           REGION_CODE="eu";  LOCATION="eastus" ;;
+          *)                   REGION_CODE=$(echo "$REGION" | tr '[:upper:]' '[:lower:]' | tr ' ' '-'); LOCATION=$(echo "$REGION" | tr '[:upper:]' '[:lower:]' | tr -d ' ') ;;
         esac
 
         ORG=$(awk '/^### Organisation Code$/{getline; getline; print; exit}' issue.txt | xargs)

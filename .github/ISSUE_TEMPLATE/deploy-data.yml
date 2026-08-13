@@ -42,8 +42,11 @@ body:
       label: Region
       description: Select Azure region
       options:
-        - Malaysia West
         - Southeast Asia
+        - Malaysia West
+        - East Asia
+        - Indonesia Central
+        - East US
     validations:
       required: true
 
