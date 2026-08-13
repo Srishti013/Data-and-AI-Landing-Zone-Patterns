@@ -185,13 +185,13 @@ existing_private_dns_zones = {
 key_vault_keys = {
   "sa-aishared-kv" = {
     name                = "mbb-cmk-sa-aishared-{env}-{region_code}-{iterator}"
-    key_vault_name      = "mbbkvaishared{env}{region_code}{iterator}"
-    resource_group_name = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
+    resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   "sa-aifoundry-kv" = {
     name                = "mbb-cmk-sa-aifoundry-{env}-{region_code}-{iterator}"
-    key_vault_name      = "mbbkvaishared{env}{region_code}{iterator}"
-    resource_group_name = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
+    resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   # AI Foundry ACCOUNT CMK - housed in the DEDICATED AI Foundry Key Vault
   # (mbb-kv-aifoundry), matching ex/dev-ai-latest (its account encryption.
@@ -200,23 +200,23 @@ key_vault_keys = {
   # with the working MYW reference.
   "aif-aifoundry-kv" = {
     name                = "mbb-cmk-aif-aifoundry-{env}-{region_code}-{iterator}"
-    key_vault_name      = "mbbkvaifoundry{env}{region_code}{iterator}"
-    resource_group_name = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    key_vault_name      = "{org}kvaifoundry{env}{region_code}{iterator}"
+    resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   "cosmos-aicommon-kv" = {
     name                = "mbb-cmk-cosmos-aicommon-{env}-{region_code}-{iterator}"
-    key_vault_name      = "mbbkvaishared{env}{region_code}{iterator}"
-    resource_group_name = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
+    resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   "redis-aicommon-kv" = {
     name                = "mbb-cmk-redis-aicommon-{env}-{region_code}-{iterator}"
-    key_vault_name      = "mbbkvaishared{env}{region_code}{iterator}"
-    resource_group_name = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
+    resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   "acr-aishared-kv" = {
     name                = "mbb-cmk-cr-aishared-{env}-{region_code}-{iterator}"
-    key_vault_name      = "mbbkvaishared{env}{region_code}{iterator}"
-    resource_group_name = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
+    resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
 }
 
