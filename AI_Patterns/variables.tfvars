@@ -59,10 +59,10 @@ existing_private_dns_zones = {
 #
 # PREREQUISITES before activating (cannot be satisfied in Terraform alone):
 #   1. The pipeline service principal needs Network Contributor on BOTH this
-#      spoke VNet and the hub VNet `mbb-vnet-pvt-network-pd-{region_code}-01`
-#      (in `mbb-plt-sub-network-prd-{region_code}-01`) for the peering + the
+#      spoke VNet and the hub VNet `{org}-vnet-pvt-network-pd-{region_code}-01`
+#      (in `{org}-plt-sub-network-prd-{region_code}-01`) for the peering + the
 #      in-code reverse peering.
-#   2. The SPN needs read on `mbb-rg-private-network-pd-{region_code}-01` and
+#   2. The SPN needs read on `{org}-rg-private-network-pd-{region_code}-01` and
 #      Private DNS Zone Contributor to register the private endpoint A-records.
 #   3. Confirm each private DNS zone below actually exists in that hub RG for
 #      the target region before referencing it from a `dns_zone_keys`.
@@ -70,9 +70,9 @@ existing_private_dns_zones = {
 # Usage - register a private endpoint into a zone by adding `dns_zone_keys` to
 # that endpoint entry in the resource blocks below, e.g. a Key Vault PE:
 #   "pe" = {
-#     name          = "mbb-pe-kv-aishared-{env}-{region_code}-{iterator}"
-#     vnet_key      = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-#     subnet_key    = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+#     name          = "{org}-pe-kv-aishared-{env}-{region_code}-{iterator}"
+#     vnet_key      = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+#     subnet_key    = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
 #     dns_zone_keys = ["vault_core"]
 #   }
 # ---------------------------------------------------------------------------
@@ -80,21 +80,21 @@ existing_private_dns_zones = {
 # # Add this entry inside the `subscriptions` map above to point the network
 # # provider at the platform network subscription (resolved by display name):
 # #   network_sub = {
-# #     subscription_name = "mbb-plt-sub-network-prd-{region_code}-01"
+# #     subscription_name = "{org}-plt-sub-network-prd-{region_code}-01"
 # #   }
 
 # # Hub VNet(s) this spoke peers to. A VNet peering's `hub_key` refers to a key
 # # in this map.
 # hub_virtual_networks = {
 #   "hub" = {
-#     name                = "mbb-vnet-pvt-network-pd-{region_code}-01"
-#     resource_group_name = "mbb-rg-private-network-pd-{region_code}-01"
+#     name                = "{org}-vnet-pvt-network-pd-{region_code}-01"
+#     resource_group_name = "{org}-rg-private-network-pd-{region_code}-01"
 #   }
 # }
 
 # # Resource group (in the network subscription) that holds the shared private
 # # DNS zones.
-# existing_private_dns_zones_rg_name = "mbb-rg-private-network-pd-{region_code}-01"
+# existing_private_dns_zones_rg_name = "{org}-rg-private-network-pd-{region_code}-01"
 
 # # Shared private DNS zones to register private endpoints into. Reference these
 # # keys from a private endpoint's `dns_zone_keys`. Only include zones confirmed
@@ -128,7 +128,7 @@ existing_private_dns_zones = {
 #   1. Add a `keys` map to the relevant entry in `key_vaults` below so the
 #      Key Vault module creates the CMK key, e.g.:
 #        keys = {
-#          "cmk" = { name = "mbb-key-aishared-{env}-{region_code}-{iterator}", key_type = "RSA", key_size = 2048 }
+#          "cmk" = { name = "{org}-key-aishared-{env}-{region_code}-{iterator}", key_type = "RSA", key_size = 2048 }
 #        }
 #   2. Declare a User Managed Identity in `user_managed_identities` to be the
 #      CMK identity (or reuse an existing one).
@@ -136,17 +136,17 @@ existing_private_dns_zones = {
 #      Intelligence / Cosmos / AI Foundry CMK blocks via data sources):
 #        key_vault_keys = {
 #          "cmk" = {
-#            name                = "mbb-key-aishared-{env}-{region_code}-{iterator}"
-#            key_vault_name      = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
-#            resource_group_name = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+#            name                = "{org}-key-aishared-{env}-{region_code}-{iterator}"
+#            key_vault_name      = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
+#            resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 #          }
 #        }
 #   4. Grant the UMI the crypto role on the Key Vault via
 #      `role_assignments_config_cmk` (scope_key = a `key_vaults` map key):
 #        role_assignments_config_cmk = {
 #          "cmk" = {
-#            umi_key              = "mbb-id-aishared-{env}-{region_code}-{iterator}"
-#            scope_key            = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+#            umi_key              = "{org}-id-aishared-{env}-{region_code}-{iterator}"
+#            scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
 #            role_definition_name = "Key Vault Crypto Service Encryption User"
 #          }
 #        }
@@ -157,8 +157,8 @@ existing_private_dns_zones = {
 #        # literal key name; key_version null => latest, auto-rotates):
 #        customer_managed_key = {
 #          key_vault_key             = "cmk"
-#          key_name                  = "mbb-key-aishared-{env}-{region_code}-{iterator}"
-#          user_assigned_identity_ref = "mbb-id-aishared-{env}-{region_code}-{iterator}"
+#          key_name                  = "{org}-key-aishared-{env}-{region_code}-{iterator}"
+#          user_assigned_identity_ref = "{org}-id-aishared-{env}-{region_code}-{iterator}"
 #        }
 #        # AI Search / Document Intelligence / Managed Redis (umi_key on the
 #        # resource entry supplies the identity):
@@ -166,7 +166,7 @@ existing_private_dns_zones = {
 #        # SQL Server TDE - set on the sql_servers entry (no block):
 #        tde_key_name = "cmk"
 #        # AI Foundry account - on the ai_foundry_accounts entry:
-#        encryption = { key_vault_key = "cmk", umi_key = "mbb-id-aishared-{env}-{region_code}-{iterator}" }
+#        encryption = { key_vault_key = "cmk", umi_key = "{org}-id-aishared-{env}-{region_code}-{iterator}" }
 #        # Cosmos DB - on the cosmosdb_accounts entry (umi_key already present):
 #        customer_managed_key = { key_vault_key = "cmk" }
 #
@@ -194,8 +194,8 @@ key_vault_keys = {
     resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   # AI Foundry ACCOUNT CMK - housed in the DEDICATED AI Foundry Key Vault
-  # (mbb-kv-aifoundry), matching ex/dev-ai-latest (its account encryption.
-  # key_vault_key = mbb-kv-aifoundry / cmk_key = {org}-cmk-aif-aifoundry). Kept
+  # ({org}-kv-aifoundry), matching ex/dev-ai-latest (its account encryption.
+  # key_vault_key = {org}-kv-aifoundry / cmk_key = {org}-cmk-aif-aifoundry). Kept
   # SEPARATE from the shared KV so the Foundry account's CMK setup is byte-parity
   # with the working MYW reference.
   "aif-aifoundry-kv" = {
@@ -224,20 +224,20 @@ key_vault_keys = {
 # service can wrap/unwrap the CMK. scope_key is a `key_vaults` map key.
 role_assignments_config_cmk = {
   "cmk-sa-aishared" = {
-    umi_key              = "mbb-id-sa-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-sa-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
   "cmk-sa-aifoundry" = {
-    umi_key              = "mbb-id-sa-aifoundry-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-sa-aifoundry-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
   # AI Foundry account UMI needs the crypto role on the DEDICATED Foundry KV
-  # (mbb-kv-aifoundry) that now holds the account CMK key (parity move).
+  # ({org}-kv-aifoundry) that now holds the account CMK key (parity move).
   "cmk-aif-aifoundry" = {
-    umi_key              = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aifoundry-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aifoundry-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
   # REQUIRED for gpt-5.1 / Foundry-agent content-safety validation on a
@@ -248,48 +248,48 @@ role_assignments_config_cmk = {
   # gpt-5.1 model-deployment validation path performs a key data-plane operation
   # that needs Crypto User -> without it the deployment fails 400 "Failed to
   # validate policies for model gpt-5.1/2025-11-13". dev-ai-latest ai_rbac grants
-  # BOTH roles to mbb-id-aif-aifoundry on the Foundry KV (comment there: "Required
+  # BOTH roles to {org}-id-aif-aifoundry on the Foundry KV (comment there: "Required
   # for Foundry agent creation when the account uses a Customer Managed Key").
   "cmk-aif-aifoundry-crypto-user" = {
-    umi_key              = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aifoundry-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aifoundry-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto User"
   }
   "cmk-cosmos-aicommon" = {
-    umi_key              = "mbb-id-cosmos-aicommon-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-cosmos-aicommon-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
   "cmk-redis-aicommon" = {
-    umi_key              = "mbb-id-redis-aicommon-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-redis-aicommon-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
   "cmk-cr-aishared" = {
-    umi_key              = "mbb-id-cr-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-cr-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
   "cmk-rsv-aishared" = {
-    umi_key              = "mbb-uami-rsv-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-uami-rsv-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
   "cmk-bvault-aishared" = {
-    umi_key              = "mbb-uami-bvault-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-uami-bvault-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
   "cmk-bvault-aifoundry" = {
-    umi_key              = "mbb-uami-bvault-aifoundry-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-aifoundry-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-uami-bvault-aifoundry-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aifoundry-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
 }
 
 # =============================================================================
 # AI Foundry base RBAC (shared Foundry identity, control plane).
-# Grants the shared AI Foundry identity (mbb-id-aif-aishared, used by the
+# Grants the shared AI Foundry identity ({org}-id-aif-aishared, used by the
 # Foundry account and both projects) the control-plane roles it needs on the
 # aishared / aicommon resource groups. Mirrors the AI Landing Zone reference
 # (ai_rbac) for the shared Foundry identity; app-layer AEA/ESPI grants are
@@ -298,28 +298,28 @@ role_assignments_config_cmk = {
 # =============================================================================
 role_assignments_config_foundry = {
   "aif-aishared_on_aishared_rg_search" = {
-    umi_key              = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Search Service Contributor"
   }
   "aif-aishared_on_aishared_rg_cosmos_operator" = {
-    umi_key              = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Cosmos DB Operator"
   }
   "aif-aishared_on_aicommon_rg_cosmos_operator" = {
-    umi_key              = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
     role_definition_name = "Cosmos DB Operator"
   }
   "aif-aishared_on_aishared_rg_blob_contributor" = {
-    umi_key              = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Storage Blob Data Contributor"
   }
   "aif-aishared_on_aishared_rg_blob_owner" = {
-    umi_key              = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Storage Blob Data Owner"
   }
 }
@@ -332,14 +332,14 @@ role_assignments_config_foundry = {
 # =============================================================================
 cosmosdb_sql_role_assignments = {
   "aif-aishared_on_cosmos-aicommon" = {
-    resource_group_key = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
-    account_key        = "mbb-cosmos-aicommon-{env}-{region_code}-{iterator}"
-    umi_key            = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
+    account_key        = "{org}-cosmos-aicommon-{env}-{region_code}-{iterator}"
+    umi_key            = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
   }
 }
 
 resource_groups = {
-  "mbb-rg-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-rg-aishared-{env}-{region_code}-{iterator}" = {
     # Naming variables
     env                = ""
     org                = ""
@@ -368,7 +368,7 @@ resource_groups = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_resource_group"
+    product_name        = "{org}_resource_group"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -383,7 +383,7 @@ resource_groups = {
     budget_limit         = "10000"
   }
 
-  "mbb-rg-aicommon-{env}-{region_code}-{iterator}" = {
+  "{org}-rg-aicommon-{env}-{region_code}-{iterator}" = {
     # Naming variables
     env                = ""
     org                = ""
@@ -412,7 +412,7 @@ resource_groups = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_resource_group"
+    product_name        = "{org}_resource_group"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -429,7 +429,7 @@ resource_groups = {
 
   # --- REMOVED FROM THIS DEPLOYMENT (AEA/ESPI resource groups) ---
   /*
-  "mbb-rg-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-rg-aea-{env}-{region_code}-{iterator}" = {
     # Naming variables
     env                = ""
     org                = ""
@@ -458,7 +458,7 @@ resource_groups = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_resource_group"
+    product_name        = "{org}_resource_group"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -473,7 +473,7 @@ resource_groups = {
     budget_limit         = "10000"
   }
 
-  "mbb-rg-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-rg-espi-{env}-{region_code}-{iterator}" = {
     # Naming variables
     env                = ""
     org                = ""
@@ -502,7 +502,7 @@ resource_groups = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_resource_group"
+    product_name        = "{org}_resource_group"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -520,7 +520,7 @@ resource_groups = {
 }
 
 virtual_networks = {
-  "mbb-vnet-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-vnet-aishared-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -554,7 +554,7 @@ virtual_networks = {
     region              = ""
     description         = "VNET for Data & AI patterns"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-{region_code}-ID01-00001"
+    app_id              = "{org}-{region_code}-ID01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -567,19 +567,19 @@ virtual_networks = {
     last_vm_accessed    = "TBD"
 
     address_space      = []
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # VNet peering to the platform hub network. `hub_key` refers to a key in
     # `hub_virtual_networks`; the module resolves the remote VNet resource id
     # and creates the reverse peering in the hub.
     peerings = {
       "to-hub" = {
-        name                                 = "mbb-peer-aishared-to-hub-{env}-{region_code}-{iterator}"
+        name                                 = "{org}-peer-aishared-to-hub-{env}-{region_code}-{iterator}"
         hub_key                              = "hub"
         allow_forwarded_traffic              = true
         allow_virtual_network_access         = true
         create_reverse_peering               = true
-        reverse_name                         = "mbb-peer-hub-to-aishared-{env}-{region_code}-{iterator}"
+        reverse_name                         = "{org}-peer-hub-to-aishared-{env}-{region_code}-{iterator}"
         reverse_allow_forwarded_traffic      = true
         reverse_allow_virtual_network_access = true
       }
@@ -593,36 +593,36 @@ virtual_networks = {
     }
 
     subnets = {
-      "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+      "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          id = "mbb-nsg-pe-aishared-{env}-{region_code}-{iterator}"
+          id = "{org}-nsg-pe-aishared-{env}-{region_code}-{iterator}"
         }
       }
-      "mbb-snet-agw-aishared-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-agw-aishared-{env}-{region_code}-{iterator}"
+      "{org}-snet-agw-aishared-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-agw-aishared-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          id = "mbb-nsg-agw-aishared-{env}-{region_code}-{iterator}"
+          id = "{org}-nsg-agw-aishared-{env}-{region_code}-{iterator}"
         }
       }
-      "mbb-snet-apim-aishared-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-apim-aishared-{env}-{region_code}-{iterator}"
+      "{org}-snet-apim-aishared-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-apim-aishared-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          id = "mbb-nsg-apim-aishared-{env}-{region_code}-{iterator}"
+          id = "{org}-nsg-apim-aishared-{env}-{region_code}-{iterator}"
         }
       }
-      "mbb-snet-vm-aishared-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-vm-aishared-{env}-{region_code}-{iterator}"
+      "{org}-snet-vm-aishared-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-vm-aishared-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          id = "mbb-nsg-vm-aishared-{env}-{region_code}-{iterator}"
+          id = "{org}-nsg-vm-aishared-{env}-{region_code}-{iterator}"
         }
         # delegation = [
         #   {
-        #     name = "mbb-delg-vm-aishared-{env}-{region_code}-{iterator}"
+        #     name = "{org}-delg-vm-aishared-{env}-{region_code}-{iterator}"
         #     service_delegation = {
         #       name = "Microsoft.Web/serverFarms"
         #     }
@@ -640,11 +640,11 @@ virtual_networks = {
   # zones linked to this VNet (foundry_spoke_zones in main.tf), while resolving
   # public bootstrap endpoints via Azure DNS. It has its OWN hub peering so the
   # agent + PE subnets can reach the internal firewall, and its dedicated route
-  # table (mbb-rt-aifoundry-...) forces 0.0.0.0/0 -> firewall so ALL agent egress
+  # table ({org}-rt-aifoundry-...) forces 0.0.0.0/0 -> firewall so ALL agent egress
   # is filtered by the firewall FQDN/URL allow-list. The workflow injects the
   # SECOND (Class B) issue range into this VNet's address_space.
   # ---------------------------------------------------------------------------
-  "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}" = {
+  "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -678,7 +678,7 @@ virtual_networks = {
     region              = ""
     description         = "AI Foundry VNET (Standard-Agent network injection)"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-{region_code}-ID01-00001"
+    app_id              = "{org}-{region_code}-ID01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -692,19 +692,19 @@ virtual_networks = {
 
     # Second (Class B) range from the issue is injected here by the workflow.
     address_space      = []
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Own hub peering (independent of the aishared VNet) so the Foundry agent /
     # PE subnets have a path to the internal firewall + hub-hosted private DNS
     # zones. Distinct peering names avoid collision with the aishared peering.
     peerings = {
       "to-hub" = {
-        name                                 = "mbb-peer-aifoundry-to-hub-{env}-{region_code}-{iterator}"
+        name                                 = "{org}-peer-aifoundry-to-hub-{env}-{region_code}-{iterator}"
         hub_key                              = "hub"
         allow_forwarded_traffic              = true
         allow_virtual_network_access         = true
         create_reverse_peering               = true
-        reverse_name                         = "mbb-peer-hub-to-aifoundry-{env}-{region_code}-{iterator}"
+        reverse_name                         = "{org}-peer-hub-to-aifoundry-{env}-{region_code}-{iterator}"
         reverse_allow_forwarded_traffic      = true
         reverse_allow_virtual_network_access = true
       }
@@ -717,26 +717,26 @@ virtual_networks = {
     # endpoints via Azure DNS.
 
     subnets = {
-      "mbb-snet-agt-aifoundry-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
+      "{org}-snet-agt-aifoundry-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          id = "mbb-nsg-agt-aifoundry-{env}-{region_code}-{iterator}"
+          id = "{org}-nsg-agt-aifoundry-{env}-{region_code}-{iterator}"
         }
         delegation = [
           {
-            name = "mbb-delg-agt-aifoundry-{env}-{region_code}-{iterator}"
+            name = "{org}-delg-agt-aifoundry-{env}-{region_code}-{iterator}"
             service_delegation = {
               name = "Microsoft.App/environments"
             }
           }
         ]
       }
-      "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+      "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          id = "mbb-nsg-pe-aifoundry-{env}-{region_code}-{iterator}"
+          id = "{org}-nsg-pe-aifoundry-{env}-{region_code}-{iterator}"
         }
       }
     }
@@ -744,7 +744,7 @@ virtual_networks = {
 }
 
 network_security_groups = {
-  "mbb-nsg-pe-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-pe-aishared-{env}-{region_code}-{iterator}" = {
     # Naming module required variables
     env                = ""
     au                 = ""
@@ -781,7 +781,7 @@ network_security_groups = {
     region               = ""
     description          = "NSG for PE subnet in SIT network"
     notification_emails  = ["platform-alerts@example.com"]
-    app_id               = "MBB-{region_code}-NET01-00001"
+    app_id               = "{org}-{region_code}-NET01-00001"
     auto_delete          = "No"
     delete_after         = "TBD"
     integration_id       = "TBD"
@@ -802,11 +802,11 @@ network_security_groups = {
     budget_limit         = "10000"
     cost_allocation_unit = "TBD"
 
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     security_rules = {}
   }
-  "mbb-nsg-agw-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-agw-aishared-{env}-{region_code}-{iterator}" = {
     # Naming module required variables
     env                = ""
     au                 = ""
@@ -843,7 +843,7 @@ network_security_groups = {
     region               = ""
     description          = "NSG for Application Gateway subnet in SIT network"
     notification_emails  = ["platform-alerts@example.com"]
-    app_id               = "MBB-{region_code}-NET01-00001"
+    app_id               = "{org}-{region_code}-NET01-00001"
     auto_delete          = "No"
     delete_after         = "TBD"
     integration_id       = "TBD"
@@ -864,7 +864,7 @@ network_security_groups = {
     budget_limit         = "10000"
     cost_allocation_unit = "TBD"
 
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     security_rules = {
       allow_app_gateway_infrastructure = {
@@ -880,7 +880,7 @@ network_security_groups = {
       }
     }
   }
-  "mbb-nsg-apim-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-apim-aishared-{env}-{region_code}-{iterator}" = {
     # Naming module required variables
     env                = ""
     au                 = ""
@@ -917,7 +917,7 @@ network_security_groups = {
     region               = ""
     description          = "NSG for APIM subnet in SIT network"
     notification_emails  = ["platform-alerts@example.com"]
-    app_id               = "MBB-{region_code}-NET01-00001"
+    app_id               = "{org}-{region_code}-NET01-00001"
     auto_delete          = "No"
     delete_after         = "TBD"
     integration_id       = "TBD"
@@ -938,7 +938,7 @@ network_security_groups = {
     budget_limit         = "10000"
     cost_allocation_unit = "TBD"
 
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     security_rules = {
       #Inbound rules for Azure Bastion
@@ -1054,7 +1054,7 @@ network_security_groups = {
       }
     }
   }
-  "mbb-nsg-vm-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-vm-aishared-{env}-{region_code}-{iterator}" = {
     # Naming module required variables
     env                = ""
     au                 = ""
@@ -1091,7 +1091,7 @@ network_security_groups = {
     region               = ""
     description          = "NSG for VM subnet in production network"
     notification_emails  = ["platform-alerts@example.com"]
-    app_id               = "MBB-{region_code}-NET01-00001"
+    app_id               = "{org}-{region_code}-NET01-00001"
     auto_delete          = "No"
     delete_after         = "TBD"
     integration_id       = "TBD"
@@ -1112,7 +1112,7 @@ network_security_groups = {
     budget_limit         = "10000"
     cost_allocation_unit = "TBD"
 
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     security_rules = {
       Allow-Bastion-RDP-SSH = {
@@ -1128,7 +1128,7 @@ network_security_groups = {
       }
     }
   }
-  "mbb-nsg-agt-aifoundry-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-agt-aifoundry-{env}-{region_code}-{iterator}" = {
     # Naming module required variables
     env                = ""
     au                 = ""
@@ -1165,7 +1165,7 @@ network_security_groups = {
     region               = ""
     description          = "NSG for Foundry agent integration subnet in network"
     notification_emails  = ["platform-alerts@example.com"]
-    app_id               = "MBB-{region_code}-NET01-00001"
+    app_id               = "{org}-{region_code}-NET01-00001"
     auto_delete          = "No"
     delete_after         = "TBD"
     integration_id       = "TBD"
@@ -1186,11 +1186,11 @@ network_security_groups = {
     budget_limit         = "10000"
     type                 = "Production"
     cost_allocation_unit = "TBD"
-    resource_group_key   = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key   = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     security_rules = {}
   }
-  "mbb-nsg-pe-aifoundry-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-pe-aifoundry-{env}-{region_code}-{iterator}" = {
     # Naming module required variables
     env                = ""
     au                 = ""
@@ -1226,7 +1226,7 @@ network_security_groups = {
     region               = ""
     description          = "NSG for  Foundry private endpoints subnet in network"
     notification_emails  = ["platform-alerts@example.com"]
-    app_id               = "MBB-{region_code}-NET01-00001"
+    app_id               = "{org}-{region_code}-NET01-00001"
     auto_delete          = "No"
     delete_after         = "TBD"
     integration_id       = "TBD"
@@ -1247,7 +1247,7 @@ network_security_groups = {
     budget_limit         = "10000"
     type                 = "Production"
     cost_allocation_unit = "TBD"
-    resource_group_key   = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key   = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     security_rules = {}
   }
@@ -1255,7 +1255,7 @@ network_security_groups = {
 
 key_vaults = {
   # Base Infra - AI Shared Key Vault (Premium, private endpoint only)
-  "mbb-kv-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-kv-aishared-{env}-{region_code}-{iterator}" = {
     # Naming module variables
     env                = ""
     org                = ""
@@ -1405,9 +1405,9 @@ key_vaults = {
     # Private endpoint placed in the AI Shared private-endpoint subnet
     private_endpoints = {
       pe = {
-        name          = "mbb-pe-kv-aishared-{env}-{region_code}-{iterator}"
-        vnet_key      = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key    = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name          = "{org}-pe-kv-aishared-{env}-{region_code}-{iterator}"
+        vnet_key      = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key    = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         dns_zone_keys = ["vault_core"]
       }
     }
@@ -1417,13 +1417,13 @@ key_vaults = {
     description         = "AI Shared Base Infra Key Vault"
     notification_emails = ["platform-alerts@example.com"]
 
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     additional_tags = {}
   }
 
   # Base Infra - AI Foundry Key Vault (Premium, private endpoint only)
-  "mbb-kv-aifoundry-{env}-{region_code}-{iterator}" = {
+  "{org}-kv-aifoundry-{env}-{region_code}-{iterator}" = {
     # Naming module variables
     env                = ""
     org                = ""
@@ -1502,9 +1502,9 @@ key_vaults = {
     # Private endpoint placed in the dedicated AI Foundry private-endpoint subnet
     private_endpoints = {
       pe = {
-        name          = "mbb-pe-kv-aifoundry-{env}-{region_code}-{iterator}"
-        vnet_key      = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-        subnet_key    = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+        name          = "{org}-pe-kv-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key      = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        subnet_key    = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
         dns_zone_keys = ["vault_core"]
       }
     }
@@ -1514,7 +1514,7 @@ key_vaults = {
     description         = "AI Foundry Base Infra Key Vault"
     notification_emails = ["platform-alerts@example.com"]
 
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     additional_tags = {}
   }
@@ -1524,12 +1524,12 @@ key_vaults = {
 # Route Tables (UDRs)
 # -
 # A single User Defined Route table is applied to all 7 AI Shared subnets,
-# matching the inventory (mbb-rt-aishared-<env>-<region>-01). The AI Foundry
+# matching the inventory ({org}-rt-aishared-<env>-<region>-01). The AI Foundry
 # subnets do NOT use this route table.
 route_tables = {
-  "mbb-rt-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-rt-aishared-{env}-{region_code}-{iterator}" = {
     # Resource group (resolved from the resource_groups map in main.tf)
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables (env/au/bu/owner/region_code injected by workflow)
     env                = ""
@@ -1564,7 +1564,7 @@ route_tables = {
     # longer rely on the hub BGP-advertised default.
     bgp_route_propagation_enabled = false
 
-    # Route table (parity with ex/dev-ai mbb-rt-aishared): force ALL egress
+    # Route table (parity with ex/dev-ai {org}-rt-aishared): force ALL egress
     # from the AI Shared subnets through the internal firewall (like the Foundry
     # route table), WITH an ApiManagement exception so APIM's control-plane
     # (:3443) is not black-holed. next_hop_in_ip_address is rewritten to the
@@ -1590,20 +1590,20 @@ route_tables = {
     # Associate the route table with all 7 AI Shared subnets
     subnet_associations = {
       "pe-aishared" = {
-        vnet_key   = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
       }
       "agw-aishared" = {
-        vnet_key   = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key = "mbb-snet-agw-aishared-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key = "{org}-snet-agw-aishared-{env}-{region_code}-{iterator}"
       }
       "apim-aishared" = {
-        vnet_key   = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key = "mbb-snet-apim-aishared-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key = "{org}-snet-apim-aishared-{env}-{region_code}-{iterator}"
       }
       "vm-aishared" = {
-        vnet_key   = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key = "mbb-snet-vm-aishared-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key = "{org}-snet-vm-aishared-{env}-{region_code}-{iterator}"
       }
     }
 
@@ -1615,14 +1615,14 @@ route_tables = {
 
   # ---------------------------------------------------------------------------
   # Dedicated AI Foundry route table (parity with ex/dev-ai-latest
-  # mbb-rt-aifoundry). Forces ALL Foundry agent + PE egress through the internal
+  # {org}-rt-aifoundry). Forces ALL Foundry agent + PE egress through the internal
   # firewall so the network-injected Standard-Agent managed environment is
   # filtered by the firewall FQDN/URL allow-list. bgp propagation OFF so the
   # explicit default route wins. next_hop_in_ip_address is rewritten to the
   # region firewall IP by the workflow (SEA = 10.247.130.4).
   # ---------------------------------------------------------------------------
-  "mbb-rt-aifoundry-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-rt-aifoundry-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
@@ -1662,12 +1662,12 @@ route_tables = {
 
     subnet_associations = {
       "agt-aifoundry" = {
-        vnet_key   = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-        subnet_key = "mbb-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        subnet_key = "{org}-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
       }
       "pe-aifoundry" = {
-        vnet_key   = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-        subnet_key = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        subnet_key = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
       }
     }
 
@@ -1685,9 +1685,9 @@ route_tables = {
 # injected by the workflow, so they are intentionally left blank here.
 user_managed_identities = {
   # Backup platform identities (CMK for Recovery Services Vault + Backup Vault).
-  "mbb-uami-rsv-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-rsv-aishared-{env}-{region_code}-{iterator}" = {
     # Resource group
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -1727,9 +1727,9 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-uami-bvault-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-bvault-aishared-{env}-{region_code}-{iterator}" = {
     # Resource group
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -1769,9 +1769,9 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-uami-bvault-aifoundry-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-bvault-aifoundry-{env}-{region_code}-{iterator}" = {
     # Resource group
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -1811,9 +1811,9 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-id-sa-aishared-{env}-{region_code}-{iterator}" = {
     # Resource group
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -1853,9 +1853,9 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-aifoundry-{env}-{region_code}-{iterator}" = {
+  "{org}-id-sa-aifoundry-{env}-{region_code}-{iterator}" = {
     # Resource group
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -1896,8 +1896,8 @@ user_managed_identities = {
   }
 
   # Identity for the AI Foundry (MS Foundry) account - UserAssigned
-  "mbb-id-aif-aishared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-id-aif-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
@@ -1934,8 +1934,8 @@ user_managed_identities = {
   }
 
   # Identity for the Azure Container Registry
-  "mbb-id-cr-aishared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-id-cr-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
@@ -1972,8 +1972,8 @@ user_managed_identities = {
   }
 
   # Identity for the Managed Redis cache (AI Common)
-  "mbb-id-redis-aicommon-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+  "{org}-id-redis-aicommon-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
@@ -2012,8 +2012,8 @@ user_managed_identities = {
   # --- REMOVED FROM THIS DEPLOYMENT (SQL Server identity - app use case) ---
   /*
   # Identity for the SQL Server (AI Common)
-  "mbb-id-sql-aicommon-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+  "{org}-id-sql-aicommon-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
@@ -2051,8 +2051,8 @@ user_managed_identities = {
   */
 
   # Identity for the Cosmos DB account (AI Common)
-  "mbb-id-cosmos-aicommon-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+  "{org}-id-cosmos-aicommon-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
@@ -2090,8 +2090,8 @@ user_managed_identities = {
 
   # --- REMOVED FROM THIS DEPLOYMENT (all AEA/ESPI app-use-case identities) ---
   /*
-  "mbb-id-di-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-di-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
@@ -2127,8 +2127,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-srch-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-srch-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-espi-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
@@ -2167,8 +2167,8 @@ user_managed_identities = {
   # ---------------------------------------------------------------------------
   # Storage account identities (one per AEA/ESPI/EGST storage account)
   # ---------------------------------------------------------------------------
-  "mbb-id-sa-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-aea"
@@ -2200,8 +2200,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-fmcp-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-fmcp-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-fmcp-aea"
@@ -2233,8 +2233,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-forch-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-forch-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-forch-aea"
@@ -2266,8 +2266,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-espi"
@@ -2299,8 +2299,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-feval-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-feval-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-feval-espi"
@@ -2332,8 +2332,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-fing-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-fing-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-fing-espi"
@@ -2365,8 +2365,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-fmcp-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-fmcp-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-fmcp-espi"
@@ -2398,8 +2398,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-forch-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-forch-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-forch-espi"
@@ -2431,8 +2431,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-sa-egst-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+  "{org}-id-sa-egst-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "sa-egst"
@@ -2467,8 +2467,8 @@ user_managed_identities = {
   # ---------------------------------------------------------------------------
   # Function App identities
   # ---------------------------------------------------------------------------
-  "mbb-id-func-mcp-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-func-mcp-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "func-mcp-aea"
@@ -2500,8 +2500,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-func-orch-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-func-orch-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "func-orch-aea"
@@ -2533,8 +2533,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-func-eval-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-func-eval-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "func-eval-espi"
@@ -2566,8 +2566,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-func-ingestion-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-func-ingestion-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "func-ingestion-espi"
@@ -2599,8 +2599,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-func-mcp-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-func-mcp-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "func-mcp-espi"
@@ -2632,8 +2632,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-func-orch-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-func-orch-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "func-orch-espi"
@@ -2668,8 +2668,8 @@ user_managed_identities = {
   # ---------------------------------------------------------------------------
   # App Service identity (AEA web apps)
   # ---------------------------------------------------------------------------
-  "mbb-id-app-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-app-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "app-aea"
@@ -2701,8 +2701,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-app-aea-{env}-{region_code}-02" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-app-aea-{env}-{region_code}-02" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "app-aea"
@@ -2737,8 +2737,8 @@ user_managed_identities = {
   # ---------------------------------------------------------------------------
   # Event Grid system topic identities
   # ---------------------------------------------------------------------------
-  "mbb-id-egst-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-egst-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "egst-aea"
@@ -2770,8 +2770,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-egst-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-egst-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "egst-espi"
@@ -2806,8 +2806,8 @@ user_managed_identities = {
   # ---------------------------------------------------------------------------
   # Document Intelligence (ESPI) and Cosmos DB (ESPI) identities
   # ---------------------------------------------------------------------------
-  "mbb-id-di-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-di-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "di-espi"
@@ -2839,8 +2839,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-cosmos-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-cosmos-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "cosmos-espi"
@@ -2875,8 +2875,8 @@ user_managed_identities = {
   # ---------------------------------------------------------------------------
   # Application Gateway identities
   # ---------------------------------------------------------------------------
-  "mbb-id-agw-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-id-agw-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "agw-aea"
@@ -2908,8 +2908,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "mbb-id-agw-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-agw-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "agw-espi"
@@ -2951,9 +2951,9 @@ user_managed_identities = {
 # dedicated user-assigned managed identity. env/au/bu/owner/region_code/region
 # and all mandatory tags are injected by the workflow.
 storage_accounts = {
-  "mbb-sa-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-sa-aishared-{env}-{region_code}-{iterator}" = {
     # Resource group
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -3020,13 +3020,13 @@ storage_accounts = {
       key_vault_key              = "sa-aishared-kv"
       key_name                   = "{org}-cmk-sa-aishared-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-id-sa-aishared-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-id-sa-aishared-{env}-{region_code}-{iterator}"
     }
 
     # Identity - references the user_managed_identities map key
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-aishared-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-aishared-{env}-{region_code}-{iterator}"
     }
 
     # Network rules
@@ -3046,18 +3046,18 @@ storage_accounts = {
     # Private endpoint in the AI Shared private-endpoint subnet
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-aishared-{env}-{region_code}-{iterator}"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-aishared-{env}-{region_code}-{iterator}"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
         dns_zone_keys    = ["storage_blob"]
       }
     }
   }
 
-  "mbb-sa-aifoundry-{env}-{region_code}-{iterator}" = {
+  "{org}-sa-aifoundry-{env}-{region_code}-{iterator}" = {
     # Resource group
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -3124,13 +3124,13 @@ storage_accounts = {
       key_vault_key              = "sa-aifoundry-kv"
       key_name                   = "{org}-cmk-sa-aifoundry-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-id-sa-aifoundry-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-id-sa-aifoundry-{env}-{region_code}-{iterator}"
     }
 
     # Identity - references the user_managed_identities map key
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-aifoundry-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-aifoundry-{env}-{region_code}-{iterator}"
     }
 
     # Network rules
@@ -3150,9 +3150,9 @@ storage_accounts = {
     # Private endpoint in the AI Foundry private-endpoint subnet
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-aifoundry-{env}-{region_code}-{iterator}"
-        vnet_key         = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key         = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
         dns_zone_keys    = ["storage_blob"]
       }
@@ -3167,8 +3167,8 @@ storage_accounts = {
   # public network access disabled, private endpoints NIC-only (DNS deferred to
   # the peering stage). Each uses its own user-assigned managed identity.
   # ===========================================================================
-  "mbb-sa-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-sa-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "aea"
@@ -3214,7 +3214,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-aea-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-aea-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -3230,15 +3230,15 @@ storage_accounts = {
     }
 
     containers = {
-      "mbb-blob-aea-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-blob-aea-{env}-{region_code}-{iterator}"
+      "{org}-blob-aea-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-blob-aea-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     queues = {
-      "mbb-queue-aea-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-aea-{env}-{region_code}-{iterator}"
+      "{org}-queue-aea-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-aea-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
@@ -3249,8 +3249,8 @@ storage_accounts = {
       }
     }
     tables = {
-      "mbb-table-aea-{env}-{region_code}-{iterator}" = {
-        name               = "mbbtableaea{env}{region_code}{iterator}"
+      "{org}-table-aea-{env}-{region_code}-{iterator}" = {
+        name               = "{org}tableaea{env}{region_code}{iterator}"
         signed_identifiers = []
         timeouts           = null
       }
@@ -3258,28 +3258,28 @@ storage_accounts = {
 
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-aea-{env}-{region_code}-{iterator}-blob"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-aea-{env}-{region_code}-{iterator}-blob"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
       }
       "queue" = {
-        name             = "mbb-pe-sa-aea-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-aea-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
       "table" = {
-        name             = "mbb-pe-sa-aea-{env}-{region_code}-{iterator}-table"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-aea-{env}-{region_code}-{iterator}-table"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "table"
       }
     }
   }
 
-  "mbb-sa-fmcp-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-sa-fmcp-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "fmcp-aea"
@@ -3325,7 +3325,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-fmcp-aea-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-fmcp-aea-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -3341,22 +3341,22 @@ storage_accounts = {
     }
 
     containers = {
-      "mbb-blob-fmcp-aea-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-blob-fmcp-aea-{env}-{region_code}-{iterator}"
+      "{org}-blob-fmcp-aea-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-blob-fmcp-aea-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     queues = {
-      "mbb-queue-fmcp-aea-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-fmcp-aea-{env}-{region_code}-{iterator}"
+      "{org}-queue-fmcp-aea-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-fmcp-aea-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     tables = {
-      "mbb-table-fmcp-aea-{env}-{region_code}-{iterator}" = {
-        name               = "mbbtablefmcpaea{env}{region_code}{iterator}"
+      "{org}-table-fmcp-aea-{env}-{region_code}-{iterator}" = {
+        name               = "{org}tablefmcpaea{env}{region_code}{iterator}"
         signed_identifiers = []
         timeouts           = null
       }
@@ -3364,28 +3364,28 @@ storage_accounts = {
 
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-fmcp-aea-{env}-{region_code}-{iterator}-blob"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fmcp-aea-{env}-{region_code}-{iterator}-blob"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
       }
       "queue" = {
-        name             = "mbb-pe-sa-fmcp-aea-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fmcp-aea-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
       "table" = {
-        name             = "mbb-pe-sa-fmcp-aea-{env}-{region_code}-{iterator}-table"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fmcp-aea-{env}-{region_code}-{iterator}-table"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "table"
       }
     }
   }
 
-  "mbb-sa-forch-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-sa-forch-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "forch-aea"
@@ -3431,7 +3431,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-forch-aea-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-forch-aea-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -3447,22 +3447,22 @@ storage_accounts = {
     }
 
     containers = {
-      "mbb-blob-forch-aea-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-blob-forch-aea-{env}-{region_code}-{iterator}"
+      "{org}-blob-forch-aea-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-blob-forch-aea-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     queues = {
-      "mbb-queue-forch-aea-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-forch-aea-{env}-{region_code}-{iterator}"
+      "{org}-queue-forch-aea-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-forch-aea-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     tables = {
-      "mbb-table-forch-aea-{env}-{region_code}-{iterator}" = {
-        name               = "mbbtableforchaea{env}{region_code}{iterator}"
+      "{org}-table-forch-aea-{env}-{region_code}-{iterator}" = {
+        name               = "{org}tableforchaea{env}{region_code}{iterator}"
         signed_identifiers = []
         timeouts           = null
       }
@@ -3470,28 +3470,28 @@ storage_accounts = {
 
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-forch-aea-{env}-{region_code}-{iterator}-blob"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-forch-aea-{env}-{region_code}-{iterator}-blob"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
       }
       "queue" = {
-        name             = "mbb-pe-sa-forch-aea-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-forch-aea-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
       "table" = {
-        name             = "mbb-pe-sa-forch-aea-{env}-{region_code}-{iterator}-table"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-forch-aea-{env}-{region_code}-{iterator}-table"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "table"
       }
     }
   }
 
-  "mbb-sa-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-sa-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "espi"
@@ -3537,7 +3537,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-espi-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-espi-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -3553,15 +3553,15 @@ storage_accounts = {
     }
 
     containers = {
-      "mbb-blob-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-blob-espi-{env}-{region_code}-{iterator}"
+      "{org}-blob-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-blob-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     queues = {
-      "mbb-queue-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-espi-{env}-{region_code}-{iterator}"
+      "{org}-queue-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
@@ -3572,8 +3572,8 @@ storage_accounts = {
       }
     }
     tables = {
-      "mbb-table-espi-{env}-{region_code}-{iterator}" = {
-        name               = "mbbtableespi{env}{region_code}{iterator}"
+      "{org}-table-espi-{env}-{region_code}-{iterator}" = {
+        name               = "{org}tableespi{env}{region_code}{iterator}"
         signed_identifiers = []
         timeouts           = null
       }
@@ -3581,28 +3581,28 @@ storage_accounts = {
 
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-espi-{env}-{region_code}-{iterator}-blob"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-espi-{env}-{region_code}-{iterator}-blob"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
       }
       "queue" = {
-        name             = "mbb-pe-sa-espi-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-espi-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
       "table" = {
-        name             = "mbb-pe-sa-espi-{env}-{region_code}-{iterator}-table"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-espi-{env}-{region_code}-{iterator}-table"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "table"
       }
     }
   }
 
-  "mbb-sa-feval-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-sa-feval-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "feval-espi"
@@ -3648,7 +3648,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-feval-espi-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-feval-espi-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -3664,22 +3664,22 @@ storage_accounts = {
     }
 
     containers = {
-      "mbb-blob-feval-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-blob-feval-espi-{env}-{region_code}-{iterator}"
+      "{org}-blob-feval-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-blob-feval-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     queues = {
-      "mbb-queue-feval-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-feval-espi-{env}-{region_code}-{iterator}"
+      "{org}-queue-feval-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-feval-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     tables = {
-      "mbb-table-feval-espi-{env}-{region_code}-{iterator}" = {
-        name               = "mbbtablefevalespi{env}{region_code}{iterator}"
+      "{org}-table-feval-espi-{env}-{region_code}-{iterator}" = {
+        name               = "{org}tablefevalespi{env}{region_code}{iterator}"
         signed_identifiers = []
         timeouts           = null
       }
@@ -3687,28 +3687,28 @@ storage_accounts = {
 
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-feval-espi-{env}-{region_code}-{iterator}-blob"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-feval-espi-{env}-{region_code}-{iterator}-blob"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
       }
       "queue" = {
-        name             = "mbb-pe-sa-feval-espi-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-feval-espi-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
       "table" = {
-        name             = "mbb-pe-sa-feval-espi-{env}-{region_code}-{iterator}-table"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-feval-espi-{env}-{region_code}-{iterator}-table"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "table"
       }
     }
   }
 
-  "mbb-sa-fing-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-sa-fing-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "fing-espi"
@@ -3754,7 +3754,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-fing-espi-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-fing-espi-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -3770,22 +3770,22 @@ storage_accounts = {
     }
 
     containers = {
-      "mbb-blob-fing-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-blob-fing-espi-{env}-{region_code}-{iterator}"
+      "{org}-blob-fing-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-blob-fing-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     queues = {
-      "mbb-queue-fing-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-fing-espi-{env}-{region_code}-{iterator}"
+      "{org}-queue-fing-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-fing-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     tables = {
-      "mbb-table-fing-espi-{env}-{region_code}-{iterator}" = {
-        name               = "mbbtablefingespi{env}{region_code}{iterator}"
+      "{org}-table-fing-espi-{env}-{region_code}-{iterator}" = {
+        name               = "{org}tablefingespi{env}{region_code}{iterator}"
         signed_identifiers = []
         timeouts           = null
       }
@@ -3793,28 +3793,28 @@ storage_accounts = {
 
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-fing-espi-{env}-{region_code}-{iterator}-blob"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fing-espi-{env}-{region_code}-{iterator}-blob"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
       }
       "queue" = {
-        name             = "mbb-pe-sa-fing-espi-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fing-espi-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
       "table" = {
-        name             = "mbb-pe-sa-fing-espi-{env}-{region_code}-{iterator}-table"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fing-espi-{env}-{region_code}-{iterator}-table"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "table"
       }
     }
   }
 
-  "mbb-sa-fmcp-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-sa-fmcp-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "fmcp-espi"
@@ -3860,7 +3860,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-fmcp-espi-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-fmcp-espi-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -3876,22 +3876,22 @@ storage_accounts = {
     }
 
     containers = {
-      "mbb-blob-fmcp-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-blob-fmcp-espi-{env}-{region_code}-{iterator}"
+      "{org}-blob-fmcp-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-blob-fmcp-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     queues = {
-      "mbb-queue-fmcp-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-fmcp-espi-{env}-{region_code}-{iterator}"
+      "{org}-queue-fmcp-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-fmcp-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     tables = {
-      "mbb-table-fmcp-espi-{env}-{region_code}-{iterator}" = {
-        name               = "mbbtablefmcpespi{env}{region_code}{iterator}"
+      "{org}-table-fmcp-espi-{env}-{region_code}-{iterator}" = {
+        name               = "{org}tablefmcpespi{env}{region_code}{iterator}"
         signed_identifiers = []
         timeouts           = null
       }
@@ -3899,28 +3899,28 @@ storage_accounts = {
 
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-fmcp-espi-{env}-{region_code}-{iterator}-blob"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fmcp-espi-{env}-{region_code}-{iterator}-blob"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
       }
       "queue" = {
-        name             = "mbb-pe-sa-fmcp-espi-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fmcp-espi-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
       "table" = {
-        name             = "mbb-pe-sa-fmcp-espi-{env}-{region_code}-{iterator}-table"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-fmcp-espi-{env}-{region_code}-{iterator}-table"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "table"
       }
     }
   }
 
-  "mbb-sa-forch-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-sa-forch-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "forch-espi"
@@ -3966,7 +3966,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-forch-espi-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-forch-espi-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -3982,22 +3982,22 @@ storage_accounts = {
     }
 
     containers = {
-      "mbb-blob-forch-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-blob-forch-espi-{env}-{region_code}-{iterator}"
+      "{org}-blob-forch-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-blob-forch-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     queues = {
-      "mbb-queue-forch-espi-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-forch-espi-{env}-{region_code}-{iterator}"
+      "{org}-queue-forch-espi-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-forch-espi-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
     }
     tables = {
-      "mbb-table-forch-espi-{env}-{region_code}-{iterator}" = {
-        name               = "mbbtableforchespi{env}{region_code}{iterator}"
+      "{org}-table-forch-espi-{env}-{region_code}-{iterator}" = {
+        name               = "{org}tableforchespi{env}{region_code}{iterator}"
         signed_identifiers = []
         timeouts           = null
       }
@@ -4005,28 +4005,28 @@ storage_accounts = {
 
     private_endpoints = {
       "blob" = {
-        name             = "mbb-pe-sa-forch-espi-{env}-{region_code}-{iterator}-blob"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-forch-espi-{env}-{region_code}-{iterator}-blob"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
       }
       "queue" = {
-        name             = "mbb-pe-sa-forch-espi-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-forch-espi-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
       "table" = {
-        name             = "mbb-pe-sa-forch-espi-{env}-{region_code}-{iterator}-table"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-forch-espi-{env}-{region_code}-{iterator}-table"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "table"
       }
     }
   }
 
-  "mbb-sa-egst-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+  "{org}-sa-egst-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "egst"
@@ -4072,7 +4072,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-id-sa-egst-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-id-sa-egst-{env}-{region_code}-{iterator}"
     }
 
     network_rules = {
@@ -4088,8 +4088,8 @@ storage_accounts = {
     }
 
     queues = {
-      "mbb-queue-egst-{env}-{region_code}-{iterator}" = {
-        name          = "mbb-queue-egst-{env}-{region_code}-{iterator}"
+      "{org}-queue-egst-{env}-{region_code}-{iterator}" = {
+        name          = "{org}-queue-egst-{env}-{region_code}-{iterator}"
         public_access = "None"
         metadata      = {}
       }
@@ -4097,9 +4097,9 @@ storage_accounts = {
 
     private_endpoints = {
       "queue" = {
-        name             = "mbb-pe-sa-egst-{env}-{region_code}-{iterator}-queue"
-        vnet_key         = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key       = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name             = "{org}-pe-sa-egst-{env}-{region_code}-{iterator}-queue"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key       = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name = "queue"
       }
     }
@@ -4110,14 +4110,14 @@ storage_accounts = {
 # =============================================================================
 # Application Insights
 # Workspace-based; connected to the existing CENTRAL Log Analytics Workspace
-# (mbb-law-ops-pd-myw-01 in the management subscription). The workspace is
+# ({org}-law-ops-pd-myw-01 in the management subscription). The workspace is
 # resolved via a data source - see subscriptions / log_analytics_workspace_*
 # above and the azurerm.law provider.
 # =============================================================================
 application_insights = {
-  "mbb-appi-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-appi-aishared-{env}-{region_code}-{iterator}" = {
     # Resource group
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4175,8 +4175,8 @@ application_insights = {
 # "sea" so southeastasia is used.
 # =============================================================================
 internal_api_management = {
-  "mbb-apim-aishared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-apim-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     location = "{location}"
 
@@ -4218,8 +4218,8 @@ internal_api_management = {
     publisher_email = "platform-alerts@example.com"
 
     # Internal VNet integration subnet
-    vnet_key   = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key = "mbb-snet-apim-aishared-{env}-{region_code}-{iterator}"
+    vnet_key   = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key = "{org}-snet-apim-aishared-{env}-{region_code}-{iterator}"
 
     # Global API policy values. Placeholders for openid/jwt/issuer - replace with
     # the real identity-provider config. Module validations require:
@@ -4261,8 +4261,8 @@ internal_api_management = {
 # Enabled until DNS is fully layered in at the peering stage.
 # =============================================================================
 ai_foundry_accounts = {
-  "mbb-aif-aishared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-aif-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4294,7 +4294,7 @@ ai_foundry_accounts = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_ms_foundry"
+    product_name        = "{org}_ms_foundry"
 
     # Account configuration
     sku_name = "S0"
@@ -4305,10 +4305,10 @@ ai_foundry_accounts = {
     # model gpt-5.1/2025-11-13" while older models (gpt-5-mini/embedding) validate
     # fine. disableLocalAuth=true also mirrors ex/dev-ai (was the last account diff).
     identity_type          = "SystemAssigned, UserAssigned"
-    umi_key                = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
+    umi_key                = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
     disableLocalAuth       = true
     allowProjectManagement = true
-    customSubDomainName    = "mbb-aif-aishared-{env}-{region_code}-{iterator}"
+    customSubDomainName    = "{org}-aif-aishared-{env}-{region_code}-{iterator}"
     publicNetworkAccess    = "Disabled"
 
     # Allow TRUSTED Azure services (the model-deployment + RAI policy-validation
@@ -4341,8 +4341,8 @@ ai_foundry_accounts = {
     network_injections = [
       {
         scenario   = "agent"
-        vnet_key   = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-        subnet_key = "mbb-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        subnet_key = "{org}-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
       }
     ]
 
@@ -4353,22 +4353,22 @@ ai_foundry_accounts = {
     # owned storage" requires redeployment if added later). The account UMI
     # already holds Storage Blob Data Contributor/Owner on the aishared RG that
     # contains this storage account.
-    storage_key = "mbb-sa-aifoundry-{env}-{region_code}-{iterator}"
+    storage_key = "{org}-sa-aifoundry-{env}-{region_code}-{iterator}"
 
     # Customer-Managed Key encryption (CMK) - AI Foundry account. CMK key housed
-    # in the DEDICATED AI Foundry Key Vault (mbb-kv-aifoundry) for byte-parity
+    # in the DEDICATED AI Foundry Key Vault ({org}-kv-aifoundry) for byte-parity
     # with the working ex/dev-ai-latest reference (was the shared KV).
     encryption = {
       key_vault_key = "aif-aifoundry-kv"
-      umi_key       = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
+      umi_key       = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
     }
 
     # Private endpoint placed in the dedicated AI Foundry private-endpoint
     # subnet, registered into the shared cognitive/openai/ai-services zones.
     private_endpoint = {
-      name          = "mbb-pe-aif-aishared-{env}-{region_code}-{iterator}"
-      vnet_key      = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-      subnet_key    = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+      name          = "{org}-pe-aif-aishared-{env}-{region_code}-{iterator}"
+      vnet_key      = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+      subnet_key    = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
       dns_zone_keys = ["cognitive_services", "openai", "ai_services"]
     }
   }
@@ -4376,27 +4376,27 @@ ai_foundry_accounts = {
 
 # =============================================================================
 # AI Foundry Projects (Common AI resource)
-# NOTE: EXCLUDED FROM SEA. The only projects (mbb-proj-aea / mbb-proj-espi)
+# NOTE: EXCLUDED FROM SEA. The only projects ({org}-proj-aea / {org}-proj-espi)
 # belong to the AEA/ESPI app tier, which is not deployed in SEA (base infra
 # only). main.tf filters out any project key containing "aea"/"espi", so these
 # entries are retained for reference/parity but are NOT created. A future
 # non-AEA/ESPI project added here would be deployed.
 # =============================================================================
 ai_foundry_projects = {
-  "mbb-proj-aea-{env}-{region_code}-{iterator}" = {
-    foundry_key   = "mbb-aif-aishared-{env}-{region_code}-{iterator}"
+  "{org}-proj-aea-{env}-{region_code}-{iterator}" = {
+    foundry_key   = "{org}-aif-aishared-{env}-{region_code}-{iterator}"
     sku_name      = "S0"
     identity_type = "UserAssigned"
-    umi_key       = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    displayName   = "mbb-proj-aea"
+    umi_key       = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    displayName   = "{org}-proj-aea"
     description   = "AI Foundry project - AEA"
   }
-  "mbb-proj-espi-{env}-{region_code}-{iterator}" = {
-    foundry_key   = "mbb-aif-aishared-{env}-{region_code}-{iterator}"
+  "{org}-proj-espi-{env}-{region_code}-{iterator}" = {
+    foundry_key   = "{org}-aif-aishared-{env}-{region_code}-{iterator}"
     sku_name      = "S0"
     identity_type = "UserAssigned"
-    umi_key       = "mbb-id-aif-aishared-{env}-{region_code}-{iterator}"
-    displayName   = "mbb-proj-espi"
+    umi_key       = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    displayName   = "{org}-proj-espi"
     description   = "AI Foundry project - ESPI"
   }
 }
@@ -4407,8 +4407,8 @@ ai_foundry_projects = {
 # capacity to the approved model for your environment.
 # =============================================================================
 ai_foundry_deployments_01 = {
-  "mbb-opeai-aishared-{env}-{region_code}-01" = {
-    foundry_key = "mbb-aif-aishared-{env}-{region_code}-{iterator}"
+  "{org}-opeai-aishared-{env}-{region_code}-01" = {
+    foundry_key = "{org}-aif-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4440,12 +4440,12 @@ ai_foundry_deployments_01 = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_ms_foundry"
+    product_name        = "{org}_ms_foundry"
     service             = "CognitiveServices"
 
     # Model deployment configuration - gpt-5.1 (GA GlobalStandard in SEA).
     # capacity 1000 matches the proven-working ex/dev-ai gpt-5.1 deployment
-    # (mbb-openai-aifoundry-dev-sea-04) exactly. Quota limit is 30000, 0 used.
+    # ({org}-openai-aifoundry-dev-sea-04) exactly. Quota limit is 30000, 0 used.
     sku_name      = "GlobalStandard"
     capacity      = 1000
     model_format  = "OpenAI"
@@ -4455,7 +4455,7 @@ ai_foundry_deployments_01 = {
     # The earlier "drop RAI" was WRONG - ex/dev-ai deploys this SAME gpt-5.1/
     # 2025-11-13 successfully WITH this custom RAI (base = Microsoft.DefaultV2).
     # Dropping it fell back to Microsoft.Default (V1), which gpt-5.1 rejects.
-    rai_policy_key = "mbb-raip-aishared-{env}-{region_code}-{iterator}"
+    rai_policy_key = "{org}-raip-aishared-{env}-{region_code}-{iterator}"
   }
 }
 
@@ -4468,8 +4468,8 @@ ai_foundry_deployments_01 = {
 # sequential - Azure returns 409 on concurrent creates). Mirrors AI LZ.
 # =============================================================================
 ai_foundry_deployments_02 = {
-  "mbb-opeai-aishared-{env}-{region_code}-02" = {
-    foundry_key = "mbb-aif-aishared-{env}-{region_code}-{iterator}"
+  "{org}-opeai-aishared-{env}-{region_code}-02" = {
+    foundry_key = "{org}-aif-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4501,7 +4501,7 @@ ai_foundry_deployments_02 = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_ms_foundry"
+    product_name        = "{org}_ms_foundry"
     service             = "CognitiveServices"
 
     # Model deployment configuration.
@@ -4511,7 +4511,7 @@ ai_foundry_deployments_02 = {
     model_name    = "gpt-5-mini"
     model_version = "2025-08-07"
     # RAI policy re-enabled (base Microsoft.DefaultV2) - mirrors ex/dev-ai.
-    rai_policy_key = "mbb-raip-aishared-{env}-{region_code}-{iterator}"
+    rai_policy_key = "{org}-raip-aishared-{env}-{region_code}-{iterator}"
   }
 }
 
@@ -4521,8 +4521,8 @@ ai_foundry_deployments_02 = {
 # Uses the Standard sku (embedding model). Mirrors AI LZ.
 # =============================================================================
 ai_foundry_deployments_03 = {
-  "mbb-opeai-aishared-{env}-{region_code}-03" = {
-    foundry_key = "mbb-aif-aishared-{env}-{region_code}-{iterator}"
+  "{org}-opeai-aishared-{env}-{region_code}-03" = {
+    foundry_key = "{org}-aif-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4554,7 +4554,7 @@ ai_foundry_deployments_03 = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_ms_foundry"
+    product_name        = "{org}_ms_foundry"
     service             = "CognitiveServices"
 
     # Model deployment configuration.
@@ -4564,7 +4564,7 @@ ai_foundry_deployments_03 = {
     model_name    = "text-embedding-3-large"
     model_version = "1"
     # RAI policy re-enabled (base Microsoft.DefaultV2) - mirrors ex/dev-ai.
-    rai_policy_key = "mbb-raip-aishared-{env}-{region_code}-{iterator}"
+    rai_policy_key = "{org}-raip-aishared-{env}-{region_code}-{iterator}"
   }
 }
 
@@ -4576,10 +4576,10 @@ ai_foundry_deployments_03 = {
 # via rai_policy_key. content_filters come from local.rai_content_filters (main.tf).
 # =============================================================================
 ai_foundry_rai_policy = {
-  "mbb-raip-aishared-{env}-{region_code}-{iterator}" = {
+  "{org}-raip-aishared-{env}-{region_code}-{iterator}" = {
     # Naming module required variables
     env                = ""
-    org                = "mbb"
+    org                = "{org}"
     region_code        = ""
     base_name          = null
     additional_name    = null
@@ -4605,12 +4605,12 @@ ai_foundry_rai_policy = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_ms_foundry"
+    product_name        = "{org}_ms_foundry"
     service             = "foundry-service"
 
     # AI Foundry Responsible AI Policy specific variables. base = Microsoft.DefaultV2
     # (required by gpt-5.1); the foundry_key resolves the parent Cognitive account.
-    foundry_key      = "mbb-aif-aishared-{env}-{region_code}-{iterator}"
+    foundry_key      = "{org}-aif-aishared-{env}-{region_code}-{iterator}"
     base_policy_name = "Microsoft.DefaultV2"
   }
 }
@@ -4619,12 +4619,12 @@ ai_foundry_rai_policy = {
 # Azure Container Registry (Common AI resource)
 # Premium SKU, uses a dedicated user-assigned identity. Customer-managed key is
 # active from the initial deployment (ACR CMK is create-time only). The private
-# endpoint (mbb-pe-cr-aishared-...) sits in the AI Shared PE subnet and is
+# endpoint ({org}-pe-cr-aishared-...) sits in the AI Shared PE subnet and is
 # registered into the shared Azure Container Registry private DNS zone.
 # =============================================================================
 azure_container_registry = {
-  "mbb-cr-aishared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-cr-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4669,7 +4669,7 @@ azure_container_registry = {
     managed_identities = {
       system_assigned = false
     }
-    umi_key = "mbb-id-cr-aishared-{env}-{region_code}-{iterator}"
+    umi_key = "{org}-id-cr-aishared-{env}-{region_code}-{iterator}"
 
     # Customer-Managed Key encryption (CMK) - AI Shared ACR. Must be set at
     # creation time (ACR CMK cannot be enabled on an existing registry without
@@ -4678,16 +4678,16 @@ azure_container_registry = {
       key_vault_key              = "acr-aishared-kv"
       key_name                   = "{org}-cmk-cr-aishared-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-id-cr-aishared-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-id-cr-aishared-{env}-{region_code}-{iterator}"
     }
 
     # Private endpoint placed in the AI Shared private-endpoint subnet,
     # registered into the shared Azure Container Registry private DNS zone.
     private_endpoints = {
       pe = {
-        name          = "mbb-pe-cr-aishared-{env}-{region_code}-{iterator}"
-        vnet_key      = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key    = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name          = "{org}-pe-cr-aishared-{env}-{region_code}-{iterator}"
+        vnet_key      = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key    = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         dns_zone_keys = ["azure_cr"]
       }
     }
@@ -4701,8 +4701,8 @@ azure_container_registry = {
 # active (applied via azapi PATCH after the account is created).
 # =============================================================================
 cosmosdb_accounts = {
-  "mbb-cosmos-aicommon-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+  "{org}-cosmos-aicommon-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4734,7 +4734,7 @@ cosmosdb_accounts = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_cosmos_db"
+    product_name        = "{org}_cosmos_db"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -4767,7 +4767,7 @@ cosmosdb_accounts = {
     identity = {
       type = "UserAssigned"
     }
-    umi_key = "mbb-id-cosmos-aicommon-{env}-{region_code}-{iterator}"
+    umi_key = "{org}-id-cosmos-aicommon-{env}-{region_code}-{iterator}"
 
     # Customer-Managed Key encryption (CMK) - Cosmos DB (applied via azapi PATCH).
     customer_managed_key = {
@@ -4788,11 +4788,11 @@ cosmosdb_accounts = {
     # Cosmos DB (documents) private DNS zone.
     private_endpoints = {
       "pe" = {
-        name                   = "mbb-pe-cosmos-aifoundry-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-cosmos-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
         subresource_name       = "Sql"
-        network_interface_name = "mbb-pe-cosmosdb-aifoundry-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-cosmosdb-aifoundry-{env}-{region_code}-{iterator}-nic"
         dns_zone_keys          = ["cosmos_sql"]
       }
     }
@@ -4802,8 +4802,8 @@ cosmosdb_accounts = {
   /*
   # Cosmos DB account for ESPI workloads. UserAssigned identity; NIC-only
   # private endpoint in the AI Shared PE subnet (DNS deferred). CMK omitted.
-  "mbb-cosmos-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-cosmos-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-espi-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4835,7 +4835,7 @@ cosmosdb_accounts = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_cosmos_db"
+    product_name        = "{org}_cosmos_db"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -4865,7 +4865,7 @@ cosmosdb_accounts = {
     identity = {
       type = "UserAssigned"
     }
-    umi_key = "mbb-id-cosmos-espi-{env}-{region_code}-{iterator}"
+    umi_key = "{org}-id-cosmos-espi-{env}-{region_code}-{iterator}"
 
     capabilities                          = []
     ip_range_filter                       = []
@@ -4877,10 +4877,10 @@ cosmosdb_accounts = {
 
     sql_databases = {
       sql_db01 = {
-        name = "mbb-cosmos-db-espi-{env}-{region_code}-{iterator}"
+        name = "{org}-cosmos-db-espi-{env}-{region_code}-{iterator}"
         containers = {
           container01 = {
-            name                = "mbb-cosmos-container-espi-{env}-{region_code}-{iterator}"
+            name                = "{org}-cosmos-container-espi-{env}-{region_code}-{iterator}"
             partition_key_paths = ["/sessionid"]
           }
         }
@@ -4890,11 +4890,11 @@ cosmosdb_accounts = {
     # Private endpoint in the AI Shared PE subnet (NIC only; DNS deferred).
     private_endpoints = {
       "pe" = {
-        name                   = "mbb-pe-cosmos-espi-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-cosmos-espi-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "Sql"
-        network_interface_name = "mbb-pe-cosmosdb-espi-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-cosmosdb-espi-{env}-{region_code}-{iterator}-nic"
       }
     }
   }
@@ -4913,8 +4913,8 @@ cosmosdb_accounts = {
 # --- REMOVED FROM THIS DEPLOYMENT (SQL Server - app use case) ---
 /*
 sql_servers = {
-  "mbb-sql-aicommon-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+  "{org}-sql-aicommon-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -4947,7 +4947,7 @@ sql_servers = {
     budget_id           = ""
     status              = ""
     service             = "sql_server"
-    product_name        = "mbb_sql_server"
+    product_name        = "{org}_sql_server"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -4957,7 +4957,7 @@ sql_servers = {
     notification_emails = ["platform-alerts@example.com"]
 
     # SQL Server configuration
-    umi_key                                  = "mbb-id-sql-aicommon-{env}-{region_code}-{iterator}"
+    umi_key                                  = "{org}-id-sql-aicommon-{env}-{region_code}-{iterator}"
     server_version                           = "12.0"
     administrator_login                      = "sql_admin"
     enable_telemetry                         = true
@@ -4968,8 +4968,8 @@ sql_servers = {
     }
 
     databases = {
-      "mbb-sqldb-aicommon-{env}-{region_code}-{iterator}" = {
-        name                        = "mbb-sqldb-aicommon-{env}-{region_code}-{iterator}"
+      "{org}-sqldb-aicommon-{env}-{region_code}-{iterator}" = {
+        name                        = "{org}-sqldb-aicommon-{env}-{region_code}-{iterator}"
         create_mode                 = "Default"
         collation                   = "SQL_Latin1_General_CP1_CI_AS"
         license_type                = null
@@ -4985,11 +4985,11 @@ sql_servers = {
     # Private endpoint in the AI Shared PE subnet (NIC only; DNS deferred).
     private_endpoints = {
       "pe" = {
-        name                   = "mbb-pe-sql-aicommon-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-sql-aicommon-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sqlServer"
-        network_interface_name = "mbb-pe-sql-aicommon-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-sql-aicommon-{env}-{region_code}-{iterator}-nic"
       }
     }
   }
@@ -5002,8 +5002,8 @@ sql_servers = {
 # is omitted (service-managed encryption) until the hub peering exists.
 # =============================================================================
 managed_redis_instances = {
-  "mbb-redis-aicommon-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
+  "{org}-redis-aicommon-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -5032,7 +5032,7 @@ managed_redis_instances = {
     type           = "Infrastructure"
 
     # Mandatory DevOps Tags
-    product_name    = "mbb_redis_cache"
+    product_name    = "{org}_redis_cache"
     product_version = "1.0.0.0"
 
     # Mandatory Finance Tags
@@ -5056,7 +5056,7 @@ managed_redis_instances = {
     notification_emails = ["platform-alerts@example.com"]
 
     # Redis configuration
-    umi_key                   = "mbb-id-redis-aicommon-{env}-{region_code}-{iterator}"
+    umi_key                   = "{org}-id-redis-aicommon-{env}-{region_code}-{iterator}"
     sku_name                  = "Balanced_B1"
     high_availability_enabled = true
     public_network_access     = "Disabled"
@@ -5091,8 +5091,8 @@ managed_redis_instances = {
 # Bing resource (Grounding Custom Search) - AEA. Always Global location.
 # =============================================================================
 bing_accounts = {
-  "mbb-bing-aea-{env}-global-{iterator}" = {
-    resource_group_key = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-bing-aea-{env}-global-{iterator}" = {
+    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -5145,8 +5145,8 @@ bing_accounts = {
 # added in the dedicated private-endpoint phase.
 # =============================================================================
 document_intelligence = {
-  "mbb-di-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+  "{org}-di-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -5188,8 +5188,8 @@ document_intelligence = {
     # Document Intelligence configuration
     sku_name                      = "S0"
     kind                          = "FormRecognizer"
-    umi_key                       = "mbb-id-di-aea-{env}-{region_code}-{iterator}"
-    custom_subdomain_name         = "mbb-di-aea-{env}-{region_code}-{iterator}"
+    umi_key                       = "{org}-id-di-aea-{env}-{region_code}-{iterator}"
+    custom_subdomain_name         = "{org}-di-aea-{env}-{region_code}-{iterator}"
     local_auth_enabled            = true
     public_network_access_enabled = false
 
@@ -5201,8 +5201,8 @@ document_intelligence = {
   # Document Intelligence (Form Recognizer) - ESPI. UserAssigned identity, CMK
   # deferred (service-managed key) until peering. Standalone private endpoint is
   # added in the dedicated private-endpoint phase.
-  "mbb-di-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-di-espi-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-espi-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -5244,8 +5244,8 @@ document_intelligence = {
     # Document Intelligence configuration
     sku_name                      = "S0"
     kind                          = "FormRecognizer"
-    umi_key                       = "mbb-id-di-espi-{env}-{region_code}-{iterator}"
-    custom_subdomain_name         = "mbb-di-espi-{env}-{region_code}-{iterator}"
+    umi_key                       = "{org}-id-di-espi-{env}-{region_code}-{iterator}"
+    custom_subdomain_name         = "{org}-di-espi-{env}-{region_code}-{iterator}"
     local_auth_enabled            = false
     public_network_access_enabled = false
 
@@ -5267,11 +5267,11 @@ search_services = {
   # one region, so its private endpoint stays in-region). `name`/`location` are
   # hardcoded (the workflow does not rewrite them); `{env}` stays a token so the
   # same definition works for every environment.
-  "mbb-srch-espi-{env}-sea-{iterator}" = {
-    resource_group_key = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-srch-espi-{env}-sea-{iterator}" = {
+    resource_group_key = "{org}-rg-espi-{env}-{region_code}-{iterator}"
 
     # Region is pinned here (not taken from the issue template).
-    name     = "mbb-srch-espi-{env}-sea-{iterator}"
+    name     = "{org}-srch-espi-{env}-sea-{iterator}"
     location = "{location}"
 
     # Naming module required variables
@@ -5304,7 +5304,7 @@ search_services = {
     compliance          = ""
 
     # Mandatory DevOps Tags
-    product_name    = "mbb_ai_search"
+    product_name    = "{org}_ai_search"
     product_version = "1.0.0.0"
 
     # Mandatory Finance Tags
@@ -5323,7 +5323,7 @@ search_services = {
     notification_emails = ["platform-alerts@example.com"]
 
     # AI Search configuration
-    umi_key                       = "mbb-id-srch-espi-{env}-{region_code}-{iterator}"
+    umi_key                       = "{org}-id-srch-espi-{env}-{region_code}-{iterator}"
     sku                           = "standard"
     public_network_access_enabled = false
     local_authentication_enabled  = false
@@ -5338,10 +5338,10 @@ search_services = {
     # NIC-only private endpoint (DNS integration deferred until peering).
     private_endpoints = {
       "pe-srch" = {
-        name                   = "mbb-pe-srch-espi-{env}-sea-{iterator}"
-        vnet_key               = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
-        network_interface_name = "mbb-pe-srch-espi-{env}-sea-{iterator}-nic"
+        name                   = "{org}-pe-srch-espi-{env}-sea-{iterator}"
+        vnet_key               = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+        network_interface_name = "{org}-pe-srch-espi-{env}-sea-{iterator}-nic"
       }
     }
   }
@@ -5354,7 +5354,7 @@ search_services = {
 # the ESPI side). os_type Linux, zone balancing disabled.
 # =============================================================================
 app_service_plans = {
-  "mbb-asp-app-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-asp-app-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5380,10 +5380,10 @@ app_service_plans = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-ASP-001"
+    app_id              = "{org}-MYW-ASP-001"
 
     # Mandatory DevOps Tags
-    product_name    = "mbb_app_service_plan"
+    product_name    = "{org}_app_service_plan"
     product_version = "1.0.0.0"
 
     # Mandatory Finance Tags
@@ -5404,9 +5404,9 @@ app_service_plans = {
     os_type                = "Linux"
     sku_name               = "S1"
     zone_balancing_enabled = false
-    resource_group_key     = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+    resource_group_key     = "{org}-rg-aea-{env}-{region_code}-{iterator}"
   }
-  "mbb-asp-func-mcp-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-asp-func-mcp-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5431,9 +5431,9 @@ app_service_plans = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-ASP-001"
+    app_id              = "{org}-MYW-ASP-001"
 
-    product_name    = "mbb_app_service_plan"
+    product_name    = "{org}_app_service_plan"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -5451,9 +5451,9 @@ app_service_plans = {
     os_type                = "Linux"
     sku_name               = "FC1"
     zone_balancing_enabled = false
-    resource_group_key     = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+    resource_group_key     = "{org}-rg-aea-{env}-{region_code}-{iterator}"
   }
-  "mbb-asp-func-orch-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-asp-func-orch-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5478,9 +5478,9 @@ app_service_plans = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-ASP-001"
+    app_id              = "{org}-MYW-ASP-001"
 
-    product_name    = "mbb_app_service_plan"
+    product_name    = "{org}_app_service_plan"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -5498,9 +5498,9 @@ app_service_plans = {
     os_type                = "Linux"
     sku_name               = "FC1"
     zone_balancing_enabled = false
-    resource_group_key     = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+    resource_group_key     = "{org}-rg-aea-{env}-{region_code}-{iterator}"
   }
-  "mbb-asp-func-eval-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-asp-func-eval-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5525,9 +5525,9 @@ app_service_plans = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-ASP-001"
+    app_id              = "{org}-MYW-ASP-001"
 
-    product_name    = "mbb_app_service_plan"
+    product_name    = "{org}_app_service_plan"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -5545,9 +5545,9 @@ app_service_plans = {
     os_type                = "Linux"
     sku_name               = "FC1"
     zone_balancing_enabled = false
-    resource_group_key     = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+    resource_group_key     = "{org}-rg-espi-{env}-{region_code}-{iterator}"
   }
-  "mbb-asp-func-ing-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-asp-func-ing-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5572,9 +5572,9 @@ app_service_plans = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-ASP-001"
+    app_id              = "{org}-MYW-ASP-001"
 
-    product_name    = "mbb_app_service_plan"
+    product_name    = "{org}_app_service_plan"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -5592,9 +5592,9 @@ app_service_plans = {
     os_type                = "Linux"
     sku_name               = "FC1"
     zone_balancing_enabled = false
-    resource_group_key     = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+    resource_group_key     = "{org}-rg-espi-{env}-{region_code}-{iterator}"
   }
-  "mbb-asp-func-mcp-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-asp-func-mcp-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5619,9 +5619,9 @@ app_service_plans = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-ASP-001"
+    app_id              = "{org}-MYW-ASP-001"
 
-    product_name    = "mbb_app_service_plan"
+    product_name    = "{org}_app_service_plan"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -5639,9 +5639,9 @@ app_service_plans = {
     os_type                = "Linux"
     sku_name               = "FC1"
     zone_balancing_enabled = false
-    resource_group_key     = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+    resource_group_key     = "{org}-rg-espi-{env}-{region_code}-{iterator}"
   }
-  "mbb-asp-func-orch-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-asp-func-orch-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5666,9 +5666,9 @@ app_service_plans = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-ASP-001"
+    app_id              = "{org}-MYW-ASP-001"
 
-    product_name    = "mbb_app_service_plan"
+    product_name    = "{org}_app_service_plan"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -5686,7 +5686,7 @@ app_service_plans = {
     os_type                = "Linux"
     sku_name               = "FC1"
     zone_balancing_enabled = false
-    resource_group_key     = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+    resource_group_key     = "{org}-rg-espi-{env}-{region_code}-{iterator}"
   }
 }
 
@@ -5697,7 +5697,7 @@ app_service_plans = {
 # subnet; NIC-only private endpoints; shared user-assigned identity.
 # =============================================================================
 app_services = {
-  "mbb-app-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-app-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5733,11 +5733,11 @@ app_services = {
     description = "Web App shell for AEA workloads"
 
     enable_telemetry   = true
-    resource_group_key = "mbb-rg-aea-{env}-{region_code}-{iterator}"
-    service_plan_key   = "mbb-asp-app-aea-{env}-{region_code}-{iterator}"
-    umi_key            = "mbb-id-app-aea-{env}-{region_code}-{iterator}"
-    vnet_key           = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key         = "mbb-snet-web-aea-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
+    service_plan_key   = "{org}-asp-app-aea-{env}-{region_code}-{iterator}"
+    umi_key            = "{org}-id-app-aea-{env}-{region_code}-{iterator}"
+    vnet_key           = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key         = "{org}-snet-web-aea-{env}-{region_code}-{iterator}"
     kind               = "webapp"
     os_type            = "Linux"
 
@@ -5757,15 +5757,15 @@ app_services = {
 
     private_endpoints = {
       "pe-app" = {
-        name                   = "mbb-pe-app-aea-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-app-aea-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sites"
-        network_interface_name = "mbb-pe-app-aea-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-app-aea-{env}-{region_code}-{iterator}-nic"
       }
     }
   }
-  "mbb-app-aea-{env}-{region_code}-02" = {
+  "{org}-app-aea-{env}-{region_code}-02" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5799,11 +5799,11 @@ app_services = {
     description = "Web App shell for AEA workloads"
 
     enable_telemetry   = true
-    resource_group_key = "mbb-rg-aea-{env}-{region_code}-{iterator}"
-    service_plan_key   = "mbb-asp-app-aea-{env}-{region_code}-{iterator}"
-    umi_key            = "mbb-id-app-aea-{env}-{region_code}-02"
-    vnet_key           = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key         = "mbb-snet-web-aea-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
+    service_plan_key   = "{org}-asp-app-aea-{env}-{region_code}-{iterator}"
+    umi_key            = "{org}-id-app-aea-{env}-{region_code}-02"
+    vnet_key           = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key         = "{org}-snet-web-aea-{env}-{region_code}-{iterator}"
     kind               = "webapp"
     os_type            = "Linux"
 
@@ -5823,11 +5823,11 @@ app_services = {
 
     private_endpoints = {
       "pe-app" = {
-        name                   = "mbb-pe-app-aea-{env}-{region_code}-02"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-app-aea-{env}-{region_code}-02"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sites"
-        network_interface_name = "mbb-pe-app-aea-{env}-{region_code}-02-nic"
+        network_interface_name = "{org}-pe-app-aea-{env}-{region_code}-02-nic"
       }
     }
   }
@@ -5841,7 +5841,7 @@ app_services = {
 # out-of-band; infrastructure only. NIC-only private endpoints.
 # =============================================================================
 function_app_flex = {
-  "mbb-func-mcp-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-func-mcp-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5866,9 +5866,9 @@ function_app_flex = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "{org}-MYW-NET01-00001"
 
-    product_name    = "mbb_function_app"
+    product_name    = "{org}_function_app"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -5883,14 +5883,14 @@ function_app_flex = {
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
-    service_plan_key            = "mbb-asp-func-mcp-aea-{env}-{region_code}-{iterator}"
-    container_key               = "mbb-blob-fmcp-aea-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-id-func-mcp-aea-{env}-{region_code}-{iterator}"
-    storage_key                 = "mbb-sa-fmcp-aea-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-aea-{env}-{region_code}-{iterator}"
-    app_insights_key            = "mbb-appi-aishared-{env}-{region_code}-{iterator}"
-    vnet_key                    = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key                  = "mbb-snet-func-aea-{env}-{region_code}-{iterator}"
+    service_plan_key            = "{org}-asp-func-mcp-aea-{env}-{region_code}-{iterator}"
+    container_key               = "{org}-blob-fmcp-aea-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-id-func-mcp-aea-{env}-{region_code}-{iterator}"
+    storage_key                 = "{org}-sa-fmcp-aea-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-aea-{env}-{region_code}-{iterator}"
+    app_insights_key            = "{org}-appi-aishared-{env}-{region_code}-{iterator}"
+    vnet_key                    = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key                  = "{org}-snet-func-aea-{env}-{region_code}-{iterator}"
     enable_telemetry            = true
     fc1_runtime_name            = "python"
     fc1_runtime_version         = "3.13"
@@ -5909,11 +5909,11 @@ function_app_flex = {
 
     private_endpoints = {
       "pe-func" = {
-        name                   = "mbb-pe-func-mcp-aea-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-func-mcp-aea-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sites"
-        network_interface_name = "mbb-pe-func-mcp-aea-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-func-mcp-aea-{env}-{region_code}-{iterator}-nic"
       }
     }
 
@@ -5924,7 +5924,7 @@ function_app_flex = {
       scm_minimum_tls_version = "1.2"
     }
   }
-  "mbb-func-orch-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-func-orch-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -5949,9 +5949,9 @@ function_app_flex = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "{org}-MYW-NET01-00001"
 
-    product_name    = "mbb_function_app"
+    product_name    = "{org}_function_app"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -5966,14 +5966,14 @@ function_app_flex = {
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
-    service_plan_key            = "mbb-asp-func-orch-aea-{env}-{region_code}-{iterator}"
-    container_key               = "mbb-blob-forch-aea-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-id-func-orch-aea-{env}-{region_code}-{iterator}"
-    storage_key                 = "mbb-sa-forch-aea-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-aea-{env}-{region_code}-{iterator}"
-    app_insights_key            = "mbb-appi-aishared-{env}-{region_code}-{iterator}"
-    vnet_key                    = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key                  = "mbb-snet-func-aea-{env}-{region_code}-{iterator}"
+    service_plan_key            = "{org}-asp-func-orch-aea-{env}-{region_code}-{iterator}"
+    container_key               = "{org}-blob-forch-aea-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-id-func-orch-aea-{env}-{region_code}-{iterator}"
+    storage_key                 = "{org}-sa-forch-aea-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-aea-{env}-{region_code}-{iterator}"
+    app_insights_key            = "{org}-appi-aishared-{env}-{region_code}-{iterator}"
+    vnet_key                    = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key                  = "{org}-snet-func-aea-{env}-{region_code}-{iterator}"
     enable_telemetry            = true
     fc1_runtime_name            = "python"
     fc1_runtime_version         = "3.13"
@@ -5992,11 +5992,11 @@ function_app_flex = {
 
     private_endpoints = {
       "pe-func" = {
-        name                   = "mbb-pe-func-orch-aea-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-func-orch-aea-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sites"
-        network_interface_name = "mbb-pe-func-orch-aea-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-func-orch-aea-{env}-{region_code}-{iterator}-nic"
       }
     }
 
@@ -6007,7 +6007,7 @@ function_app_flex = {
       scm_minimum_tls_version = "1.2"
     }
   }
-  "mbb-func-eval-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-func-eval-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -6032,9 +6032,9 @@ function_app_flex = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "{org}-MYW-NET01-00001"
 
-    product_name    = "mbb_function_app"
+    product_name    = "{org}_function_app"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -6049,14 +6049,14 @@ function_app_flex = {
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
-    service_plan_key            = "mbb-asp-func-eval-espi-{env}-{region_code}-{iterator}"
-    container_key               = "mbb-blob-feval-espi-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-id-func-eval-espi-{env}-{region_code}-{iterator}"
-    storage_key                 = "mbb-sa-feval-espi-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-espi-{env}-{region_code}-{iterator}"
-    app_insights_key            = "mbb-appi-aishared-{env}-{region_code}-{iterator}"
-    vnet_key                    = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key                  = "mbb-snet-func-espi-{env}-{region_code}-{iterator}"
+    service_plan_key            = "{org}-asp-func-eval-espi-{env}-{region_code}-{iterator}"
+    container_key               = "{org}-blob-feval-espi-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-id-func-eval-espi-{env}-{region_code}-{iterator}"
+    storage_key                 = "{org}-sa-feval-espi-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-espi-{env}-{region_code}-{iterator}"
+    app_insights_key            = "{org}-appi-aishared-{env}-{region_code}-{iterator}"
+    vnet_key                    = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key                  = "{org}-snet-func-espi-{env}-{region_code}-{iterator}"
     enable_telemetry            = true
     fc1_runtime_name            = "python"
     fc1_runtime_version         = "3.13"
@@ -6075,11 +6075,11 @@ function_app_flex = {
 
     private_endpoints = {
       "pe-func" = {
-        name                   = "mbb-pe-func-eval-espi-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-func-eval-espi-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sites"
-        network_interface_name = "mbb-pe-func-eval-espi-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-func-eval-espi-{env}-{region_code}-{iterator}-nic"
       }
     }
 
@@ -6090,7 +6090,7 @@ function_app_flex = {
       scm_minimum_tls_version = "1.2"
     }
   }
-  "mbb-func-ing-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-func-ing-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -6115,9 +6115,9 @@ function_app_flex = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "{org}-MYW-NET01-00001"
 
-    product_name    = "mbb_function_app"
+    product_name    = "{org}_function_app"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -6132,14 +6132,14 @@ function_app_flex = {
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
-    service_plan_key            = "mbb-asp-func-ing-espi-{env}-{region_code}-{iterator}"
-    container_key               = "mbb-blob-fing-espi-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-id-func-ingestion-espi-{env}-{region_code}-{iterator}"
-    storage_key                 = "mbb-sa-fing-espi-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-espi-{env}-{region_code}-{iterator}"
-    app_insights_key            = "mbb-appi-aishared-{env}-{region_code}-{iterator}"
-    vnet_key                    = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key                  = "mbb-snet-func-espi-{env}-{region_code}-{iterator}"
+    service_plan_key            = "{org}-asp-func-ing-espi-{env}-{region_code}-{iterator}"
+    container_key               = "{org}-blob-fing-espi-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-id-func-ingestion-espi-{env}-{region_code}-{iterator}"
+    storage_key                 = "{org}-sa-fing-espi-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-espi-{env}-{region_code}-{iterator}"
+    app_insights_key            = "{org}-appi-aishared-{env}-{region_code}-{iterator}"
+    vnet_key                    = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key                  = "{org}-snet-func-espi-{env}-{region_code}-{iterator}"
     enable_telemetry            = true
     fc1_runtime_name            = "python"
     fc1_runtime_version         = "3.13"
@@ -6158,11 +6158,11 @@ function_app_flex = {
 
     private_endpoints = {
       "pe-func" = {
-        name                   = "mbb-pe-func-ing-espi-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-func-ing-espi-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sites"
-        network_interface_name = "mbb-pe-func-ing-espi-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-func-ing-espi-{env}-{region_code}-{iterator}-nic"
       }
     }
 
@@ -6173,7 +6173,7 @@ function_app_flex = {
       scm_minimum_tls_version = "1.2"
     }
   }
-  "mbb-func-mcp-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-func-mcp-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -6198,9 +6198,9 @@ function_app_flex = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "{org}-MYW-NET01-00001"
 
-    product_name    = "mbb_function_app"
+    product_name    = "{org}_function_app"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -6215,14 +6215,14 @@ function_app_flex = {
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
-    service_plan_key            = "mbb-asp-func-mcp-espi-{env}-{region_code}-{iterator}"
-    container_key               = "mbb-blob-fmcp-espi-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-id-func-mcp-espi-{env}-{region_code}-{iterator}"
-    storage_key                 = "mbb-sa-fmcp-espi-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-espi-{env}-{region_code}-{iterator}"
-    app_insights_key            = "mbb-appi-aishared-{env}-{region_code}-{iterator}"
-    vnet_key                    = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key                  = "mbb-snet-func-espi-{env}-{region_code}-{iterator}"
+    service_plan_key            = "{org}-asp-func-mcp-espi-{env}-{region_code}-{iterator}"
+    container_key               = "{org}-blob-fmcp-espi-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-id-func-mcp-espi-{env}-{region_code}-{iterator}"
+    storage_key                 = "{org}-sa-fmcp-espi-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-espi-{env}-{region_code}-{iterator}"
+    app_insights_key            = "{org}-appi-aishared-{env}-{region_code}-{iterator}"
+    vnet_key                    = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key                  = "{org}-snet-func-espi-{env}-{region_code}-{iterator}"
     enable_telemetry            = true
     fc1_runtime_name            = "python"
     fc1_runtime_version         = "3.13"
@@ -6241,11 +6241,11 @@ function_app_flex = {
 
     private_endpoints = {
       "pe-func" = {
-        name                   = "mbb-pe-func-mcp-espi-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-func-mcp-espi-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sites"
-        network_interface_name = "mbb-pe-func-mcp-espi-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-func-mcp-espi-{env}-{region_code}-{iterator}-nic"
       }
     }
 
@@ -6256,7 +6256,7 @@ function_app_flex = {
       scm_minimum_tls_version = "1.2"
     }
   }
-  "mbb-func-orch-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-func-orch-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -6281,9 +6281,9 @@ function_app_flex = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "{org}-MYW-NET01-00001"
 
-    product_name    = "mbb_function_app"
+    product_name    = "{org}_function_app"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -6298,14 +6298,14 @@ function_app_flex = {
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
-    service_plan_key            = "mbb-asp-func-orch-espi-{env}-{region_code}-{iterator}"
-    container_key               = "mbb-blob-forch-espi-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-id-func-orch-espi-{env}-{region_code}-{iterator}"
-    storage_key                 = "mbb-sa-forch-espi-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-espi-{env}-{region_code}-{iterator}"
-    app_insights_key            = "mbb-appi-aishared-{env}-{region_code}-{iterator}"
-    vnet_key                    = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key                  = "mbb-snet-func-espi-{env}-{region_code}-{iterator}"
+    service_plan_key            = "{org}-asp-func-orch-espi-{env}-{region_code}-{iterator}"
+    container_key               = "{org}-blob-forch-espi-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-id-func-orch-espi-{env}-{region_code}-{iterator}"
+    storage_key                 = "{org}-sa-forch-espi-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-espi-{env}-{region_code}-{iterator}"
+    app_insights_key            = "{org}-appi-aishared-{env}-{region_code}-{iterator}"
+    vnet_key                    = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key                  = "{org}-snet-func-espi-{env}-{region_code}-{iterator}"
     enable_telemetry            = true
     fc1_runtime_name            = "python"
     fc1_runtime_version         = "3.13"
@@ -6324,11 +6324,11 @@ function_app_flex = {
 
     private_endpoints = {
       "pe-func" = {
-        name                   = "mbb-pe-func-orch-espi-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-func-orch-espi-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "sites"
-        network_interface_name = "mbb-pe-func-orch-espi-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-func-orch-espi-{env}-{region_code}-{iterator}-nic"
       }
     }
 
@@ -6351,21 +6351,21 @@ function_app_flex = {
 # =============================================================================
 role_assignments_config_egst = {
   queue_role_on_ai_aea_storage = {
-    umi_key              = "mbb-id-egst-aea-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-egst-aea-{env}-{region_code}-{iterator}"
     scope_source         = "ai_aea_storage"
-    scope_key            = "mbb-sa-aea-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-sa-aea-{env}-{region_code}-{iterator}"
     role_definition_name = "Storage Queue Data Message Sender"
   }
   queue_role_on_ai_espi_storage = {
-    umi_key              = "mbb-id-egst-espi-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-id-egst-espi-{env}-{region_code}-{iterator}"
     scope_source         = "ai_espi_storage"
-    scope_key            = "mbb-sa-espi-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-sa-espi-{env}-{region_code}-{iterator}"
     role_definition_name = "Storage Queue Data Message Sender"
   }
 }
 
 eventgrid_system_topics = {
-  "mbb-egst-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-egst-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -6390,9 +6390,9 @@ eventgrid_system_topics = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-SEA-NET01-00001"
+    app_id              = "{org}-SEA-NET01-00001"
 
-    product_name    = "mbb_eventgrid_namespace"
+    product_name    = "{org}_eventgrid_namespace"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -6407,9 +6407,9 @@ eventgrid_system_topics = {
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
-    storage_account_key         = "mbb-sa-aea-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-id-egst-aea-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+    storage_account_key         = "{org}-sa-aea-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-id-egst-aea-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     eventgrid_system_topic_type = "Microsoft.Storage.StorageAccounts"
 
     eventgrid_system_topic_identity = {
@@ -6417,15 +6417,15 @@ eventgrid_system_topics = {
     }
 
     event_subscriptions = {
-      mbb-evgts-aea-01 = {
-        eventgrid_system_topic_event_subscription_name                  = "mbb-evgts-aea-{env}-{region_code}-{iterator}"
-        resource_group_key                                              = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+      {org}-evgts-aea-01 = {
+        eventgrid_system_topic_event_subscription_name                  = "{org}-evgts-aea-{env}-{region_code}-{iterator}"
+        resource_group_key                                              = "{org}-rg-aea-{env}-{region_code}-{iterator}"
         eventgrid_system_topic_event_subscription_expiration_time_utc   = "2026-12-31T23:59:59Z"
         eventgrid_system_topic_event_subscription_event_delivery_schema = "EventGridSchema"
 
         eventgrid_system_topic_event_subscription_delivery_identity = {
           type                       = "UserAssigned"
-          user_assigned_identity_key = "mbb-id-egst-aea-{env}-{region_code}-{iterator}"
+          user_assigned_identity_key = "{org}-id-egst-aea-{env}-{region_code}-{iterator}"
         }
 
         eventgrid_system_topic_event_subscription_included_event_types = [
@@ -6437,14 +6437,14 @@ eventgrid_system_topics = {
         }
 
         eventgrid_system_topic_event_subscription_storage_queue_endpoint = {
-          storage_account_key                   = "mbb-sa-aea-{env}-{region_code}-{iterator}"
+          storage_account_key                   = "{org}-sa-aea-{env}-{region_code}-{iterator}"
           queue_key                             = "aea-manifest-blob-events"
           queue_message_time_to_live_in_seconds = 3600
         }
       }
     }
   }
-  "mbb-egst-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-egst-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -6469,9 +6469,9 @@ eventgrid_system_topics = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-SEA-NET01-00001"
+    app_id              = "{org}-SEA-NET01-00001"
 
-    product_name    = "mbb_eventgrid_namespace"
+    product_name    = "{org}_eventgrid_namespace"
     product_version = "1.0.0.0"
 
     cost_allocation_unit = "TBD"
@@ -6486,9 +6486,9 @@ eventgrid_system_topics = {
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
-    storage_account_key         = "mbb-sa-espi-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-id-egst-espi-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+    storage_account_key         = "{org}-sa-espi-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-id-egst-espi-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     eventgrid_system_topic_type = "Microsoft.Storage.StorageAccounts"
 
     eventgrid_system_topic_identity = {
@@ -6496,15 +6496,15 @@ eventgrid_system_topics = {
     }
 
     event_subscriptions = {
-      mbb-evgts-espi-01 = {
-        eventgrid_system_topic_event_subscription_name                  = "mbb-evgts-espi-{env}-{region_code}-{iterator}"
-        resource_group_key                                              = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+      {org}-evgts-espi-01 = {
+        eventgrid_system_topic_event_subscription_name                  = "{org}-evgts-espi-{env}-{region_code}-{iterator}"
+        resource_group_key                                              = "{org}-rg-espi-{env}-{region_code}-{iterator}"
         eventgrid_system_topic_event_subscription_expiration_time_utc   = "2026-12-31T23:59:59Z"
         eventgrid_system_topic_event_subscription_event_delivery_schema = "EventGridSchema"
 
         eventgrid_system_topic_event_subscription_delivery_identity = {
           type                       = "UserAssigned"
-          user_assigned_identity_key = "mbb-id-egst-espi-{env}-{region_code}-{iterator}"
+          user_assigned_identity_key = "{org}-id-egst-espi-{env}-{region_code}-{iterator}"
         }
 
         eventgrid_system_topic_event_subscription_included_event_types = [
@@ -6516,7 +6516,7 @@ eventgrid_system_topics = {
         }
 
         eventgrid_system_topic_event_subscription_storage_queue_endpoint = {
-          storage_account_key                   = "mbb-sa-espi-{env}-{region_code}-{iterator}"
+          storage_account_key                   = "{org}-sa-espi-{env}-{region_code}-{iterator}"
           queue_key                             = "evaluationdata-blob-events"
           queue_message_time_to_live_in_seconds = 3600
         }
@@ -6562,8 +6562,8 @@ waf_policies = {
     cost_allocation_unit = "Platform"
     compliance_required  = "No"
 
-    name               = "mbb-waf-aea-{env}-{region_code}-{iterator}"
-    resource_group_key = "mbb-rg-aea-{env}-{region_code}-{iterator}"
+    name               = "{org}-waf-aea-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
 
     managed_rules = {
       managed_rule_set = {
@@ -6623,8 +6623,8 @@ waf_policies = {
     cost_allocation_unit = "Platform"
     compliance_required  = "No"
 
-    name               = "mbb-waf-espi-{env}-{region_code}-{iterator}"
-    resource_group_key = "mbb-rg-espi-{env}-{region_code}-{iterator}"
+    name               = "{org}-waf-espi-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-espi-{env}-{region_code}-{iterator}"
 
     managed_rules = {
       managed_rule_set = {
@@ -6656,10 +6656,10 @@ waf_policies = {
 # =============================================================================
 # Application Gateways (WAF_v2, private frontend, HTTP-only - TLS deferred)
 # NOTE: private_ip_address values mirror the reference stack; they must sit
-# within the mbb-snet-agw-aishared subnet range of the target region.
+# within the {org}-snet-agw-aishared subnet range of the target region.
 # =============================================================================
 app_gateways = {
-  "mbb-agw-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-agw-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -6694,10 +6694,10 @@ app_gateways = {
     budget_id           = ""
     compliance_required = "No"
 
-    resource_group_key = "mbb-rg-aea-{env}-{region_code}-{iterator}"
-    vnet_key           = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key         = "mbb-snet-agw-aishared-{env}-{region_code}-{iterator}"
-    umi_key            = "mbb-id-agw-aea-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
+    vnet_key           = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key         = "{org}-snet-agw-aishared-{env}-{region_code}-{iterator}"
+    umi_key            = "{org}-id-agw-aea-{env}-{region_code}-{iterator}"
     waf_policy_key     = "aea-waf-policy"
 
     managed_identities = {
@@ -6721,12 +6721,12 @@ app_gateways = {
       backend-pool-frontend = {
         name         = "backend-pool-frontend"
         ip_addresses = []
-        fqdns        = ["mbb-app-aea-{env}-{region_code}-{iterator}.azurewebsites.net"]
+        fqdns        = ["{org}-app-aea-{env}-{region_code}-{iterator}.azurewebsites.net"]
       }
       backend-pool-backend-api = {
         name         = "backend-pool-backend-api"
         ip_addresses = []
-        fqdns        = ["mbb-app-aea-{env}-{region_code}-02.azurewebsites.net"]
+        fqdns        = ["{org}-app-aea-{env}-{region_code}-02.azurewebsites.net"]
       }
     }
 
@@ -6837,7 +6837,7 @@ app_gateways = {
       }
     }
   }
-  "mbb-agw-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-agw-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -6872,10 +6872,10 @@ app_gateways = {
     budget_id           = ""
     compliance_required = "No"
 
-    resource_group_key = "mbb-rg-espi-{env}-{region_code}-{iterator}"
-    vnet_key           = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key         = "mbb-snet-agw-aishared-{env}-{region_code}-{iterator}"
-    umi_key            = "mbb-id-agw-espi-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-espi-{env}-{region_code}-{iterator}"
+    vnet_key           = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key         = "{org}-snet-agw-aishared-{env}-{region_code}-{iterator}"
+    umi_key            = "{org}-id-agw-espi-{env}-{region_code}-{iterator}"
     waf_policy_key     = "espi-waf-policy"
 
     managed_identities = {
@@ -6899,7 +6899,7 @@ app_gateways = {
       backend-pool-1 = {
         name         = "backend-pool-1"
         ip_addresses = []
-        fqdns        = ["mbb-apim-aishared-{env}-{region_code}-{iterator}.azure-api.net"]
+        fqdns        = ["{org}-apim-aishared-{env}-{region_code}-{iterator}.azure-api.net"]
       }
     }
 
@@ -6976,7 +6976,7 @@ app_gateways = {
 private_endpoints = {
   # --- REMOVED FROM THIS DEPLOYMENT (Document Intelligence AEA/ESPI PEs) ---
   /*
-  "mbb-pe-di-aea-{env}-{region_code}-{iterator}" = {
+  "{org}-pe-di-aea-{env}-{region_code}-{iterator}" = {
     env                = ""
     au                 = ""
     app_code           = "di-aea"
@@ -7006,7 +7006,7 @@ private_endpoints = {
     region              = ""
     description         = "Private endpoint for AEA Document Intelligence"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "{org}-MYW-NET01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -7018,14 +7018,14 @@ private_endpoints = {
     maintenance_window  = "Sun-02:00Z"
     last_vm_accessed    = "TBD"
 
-    resource_group_key              = "mbb-rg-aea-{env}-{region_code}-{iterator}"
-    network_interface_name          = "mbb-pe-di-aea-{env}-{region_code}-{iterator}-nic"
-    vnet_key                        = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-    subnet_key                      = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
-    private_connection_resource_ref = "di:mbb-di-aea-{env}-{region_code}-{iterator}"
+    resource_group_key              = "{org}-rg-aea-{env}-{region_code}-{iterator}"
+    network_interface_name          = "{org}-pe-di-aea-{env}-{region_code}-{iterator}-nic"
+    vnet_key                        = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+    subnet_key                      = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+    private_connection_resource_ref = "di:{org}-di-aea-{env}-{region_code}-{iterator}"
     subresource_names               = ["account"]
   }
-  "mbb-pe-di-espi-{env}-{region_code}-{iterator}" = {
+  "{org}-pe-di-espi-{env}-{region_code}-{iterator}" = {
     env                = ""
     au                 = ""
     app_code           = "di-espi"
@@ -7055,7 +7055,7 @@ private_endpoints = {
     region              = ""
     description         = "Private endpoint for ESPI Document Intelligence"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "{org}-MYW-NET01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -7067,15 +7067,15 @@ private_endpoints = {
     maintenance_window  = "Sun-02:00Z"
     last_vm_accessed    = "TBD"
 
-    resource_group_key              = "mbb-rg-espi-{env}-{region_code}-{iterator}"
-    network_interface_name          = "mbb-pe-di-espi-{env}-{region_code}-{iterator}-nic"
-    vnet_key                        = "mbb-vnet-aifoundry-{env}-{region_code}-{iterator}"
-    subnet_key                      = "mbb-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
-    private_connection_resource_ref = "di:mbb-di-espi-{env}-{region_code}-{iterator}"
+    resource_group_key              = "{org}-rg-espi-{env}-{region_code}-{iterator}"
+    network_interface_name          = "{org}-pe-di-espi-{env}-{region_code}-{iterator}-nic"
+    vnet_key                        = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+    subnet_key                      = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+    private_connection_resource_ref = "di:{org}-di-espi-{env}-{region_code}-{iterator}"
     subresource_names               = ["account"]
   }
   */
-  "mbb-pe-redis-aicommon-{env}-{region_code}-{iterator}" = {
+  "{org}-pe-redis-aicommon-{env}-{region_code}-{iterator}" = {
     env                = ""
     au                 = ""
     app_code           = "pe-redis"
@@ -7105,7 +7105,7 @@ private_endpoints = {
     region              = ""
     description         = "Private endpoint for AI Common Managed Redis"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-{region_code}-NET01-00001"
+    app_id              = "{org}-{region_code}-NET01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -7117,11 +7117,11 @@ private_endpoints = {
     maintenance_window  = "Sun-02:00Z"
     last_vm_accessed    = "TBD"
 
-    resource_group_key              = "mbb-rg-aicommon-{env}-{region_code}-{iterator}"
-    network_interface_name          = "mbb-pe-redis-aicommon-{env}-{region_code}-{iterator}-nic"
-    vnet_key                        = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-    subnet_key                      = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
-    private_connection_resource_ref = "redis:mbb-redis-aicommon-{env}-{region_code}-{iterator}"
+    resource_group_key              = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
+    network_interface_name          = "{org}-pe-redis-aicommon-{env}-{region_code}-{iterator}-nic"
+    vnet_key                        = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+    subnet_key                      = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
+    private_connection_resource_ref = "redis:{org}-redis-aicommon-{env}-{region_code}-{iterator}"
     subresource_names               = ["redisEnterprise"]
     dns_zone_keys                   = ["redis"]
   }
@@ -7129,12 +7129,12 @@ private_endpoints = {
 
 # =============================================================================
 # Backup platform - Recovery Services Vault (VM / file share backup).
-# CMK-encrypted via mbb-uami-rsv-aishared + {org}-cmk-rsv-aishared; the private
+# CMK-encrypted via {org}-uami-rsv-aishared + {org}-cmk-rsv-aishared; the private
 # endpoint registers into the shared `backup_azure` private DNS zone.
 # =============================================================================
 recovery_service_vaults = {
-  "mbb-rsv-aishared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-rsv-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -7170,7 +7170,7 @@ recovery_service_vaults = {
     region              = ""
     desc                = "Recovery Services Vault for AI backup"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-AISHARED-01-00001"
+    app_id              = "{org}-AISHARED-01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -7196,37 +7196,37 @@ recovery_service_vaults = {
     # Managed Identity for CMK encryption
     managed_identities = {
       system_assigned             = false
-      user_assigned_identity_refs = ["mbb-uami-rsv-aishared-{env}-{region_code}-{iterator}"]
+      user_assigned_identity_refs = ["{org}-uami-rsv-aishared-{env}-{region_code}-{iterator}"]
     }
 
     # Customer Managed Key encryption
     customer_managed_key = {
-      key_vault_key              = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+      key_vault_key              = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
       key_ref                    = "{org}-cmk-rsv-aishared-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-uami-rsv-aishared-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-uami-rsv-aishared-{env}-{region_code}-{iterator}"
     }
 
     # Private endpoint (registers into the shared backup private DNS zone)
     private_endpoints = {
       "pe_backup" = {
-        name                   = "mbb-pe-rsv-aishared-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-aishared-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-aishared-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-rsv-aishared-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}"
         subresource_name       = "AzureBackup"
         dns_zone_keys          = ["backup_azure"]
-        network_interface_name = "mbb-pe-rsv-aishared-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-rsv-aishared-{env}-{region_code}-{iterator}-nic"
       }
     }
 
     # Backup policies
     # VM backup policy - name must match the governance assignment
-    # (subscription-mbb-AI-sea) backupPolicyId. Schedule/retention/timezone
-    # mirror the org-standard mbb-rsv-vm-backup-policy used by every other
+    # (subscription-{org}-AI-sea) backupPolicyId. Schedule/retention/timezone
+    # mirror the org-standard {org}-rsv-vm-backup-policy used by every other
     # landing zone (identity/management/network/security) and the MYW reference.
     vm_backup_policy = {
-      "mbb-rsv-vm-backup-policy" = {
-        name                           = "mbb-rsv-vm-backup-policy"
+      "{org}-rsv-vm-backup-policy" = {
+        name                           = "{org}-rsv-vm-backup-policy"
         timezone                       = "Pacific Standard Time"
         instant_restore_retention_days = 5
         policy_type                    = "V2"
@@ -7268,8 +7268,8 @@ recovery_service_vaults = {
     }
 
     file_share_backup_policy = {
-      "mbb-rsv-fileshare-backup-policy" = {
-        name      = "mbb-rsv-fileshare-backup-policy"
+      "{org}-rsv-fileshare-backup-policy" = {
+        name      = "{org}-rsv-fileshare-backup-policy"
         timezone  = "Pacific Standard Time"
         frequency = "Daily"
         backup = {
@@ -7306,8 +7306,8 @@ recovery_service_vaults = {
 # access on the Key Vault (see azapi_update_resource.backup_vault_cmk).
 # =============================================================================
 backup_vaults = {
-  "mbb-bvault-aishared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-bvault-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module variables
     env                = ""
@@ -7343,7 +7343,7 @@ backup_vaults = {
     region              = ""
     desc                = "Backup Vault for AI backup"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-AISHARED-01-00001"
+    app_id              = "{org}-AISHARED-01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -7364,22 +7364,22 @@ backup_vaults = {
     # Managed Identity configuration
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-uami-bvault-aishared-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-uami-bvault-aishared-{env}-{region_code}-{iterator}"
     }
 
     # Customer Managed Key encryption (applied post-deploy via azapi)
     customer_managed_key = {
-      key_vault_key              = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
+      key_vault_key              = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
       key_name                   = "{org}-cmk-bvault-aishared-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-uami-bvault-aishared-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-uami-bvault-aishared-{env}-{region_code}-{iterator}"
     }
 
     # Backup Policies
     backup_policies = {
-      "mbb-bvault-blob-backup-policy" = {
+      "{org}-bvault-blob-backup-policy" = {
         type                                   = "blob"
-        name                                   = "mbb-bvault-blob-backup-policy"
+        name                                   = "{org}-bvault-blob-backup-policy"
         backup_repeating_time_intervals        = ["R/2024-09-17T06:33:16+00:00/P1D"]
         operational_default_retention_duration = "P30D"
         vault_default_retention_duration       = "P90D"
@@ -7423,9 +7423,9 @@ backup_vaults = {
           }
         ]
       },
-      "mbb-bvault-disk-backup-policy" = {
+      "{org}-bvault-disk-backup-policy" = {
         type                            = "disk"
-        name                            = "mbb-bvault-disk-backup-policy"
+        name                            = "{org}-bvault-disk-backup-policy"
         backup_repeating_time_intervals = ["R/2024-09-17T06:33:16+00:00/P1D"]
         default_retention_duration      = "P30D"
         time_zone                       = "Central Standard Time"
@@ -7454,8 +7454,8 @@ backup_vaults = {
     enable_telemetry = true
     tags             = {}
   }
-  "mbb-bvault-aifoundry-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-aishared-{env}-{region_code}-{iterator}"
+  "{org}-bvault-aifoundry-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     # Naming module variables
     env                = ""
@@ -7491,7 +7491,7 @@ backup_vaults = {
     region              = ""
     desc                = "Backup Vault for AI Foundry backup"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-AIFOUNDRY-01-00001"
+    app_id              = "{org}-AIFOUNDRY-01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -7512,22 +7512,22 @@ backup_vaults = {
     # Managed Identity configuration
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-uami-bvault-aifoundry-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-uami-bvault-aifoundry-{env}-{region_code}-{iterator}"
     }
 
     # Customer Managed Key encryption (applied post-deploy via azapi)
     customer_managed_key = {
-      key_vault_key              = "mbb-kv-aifoundry-{env}-{region_code}-{iterator}"
+      key_vault_key              = "{org}-kv-aifoundry-{env}-{region_code}-{iterator}"
       key_name                   = "{org}-cmk-bvault-aifoundry-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-uami-bvault-aifoundry-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-uami-bvault-aifoundry-{env}-{region_code}-{iterator}"
     }
 
     # Backup Policies
     backup_policies = {
-      "mbb-bvault-blob-backup-policy" = {
+      "{org}-bvault-blob-backup-policy" = {
         type                                   = "blob"
-        name                                   = "mbb-bvault-blob-backup-policy"
+        name                                   = "{org}-bvault-blob-backup-policy"
         backup_repeating_time_intervals        = ["R/2024-09-17T06:33:16+00:00/P1D"]
         operational_default_retention_duration = "P30D"
         vault_default_retention_duration       = "P90D"
@@ -7571,9 +7571,9 @@ backup_vaults = {
           }
         ]
       },
-      "mbb-bvault-disk-backup-policy" = {
+      "{org}-bvault-disk-backup-policy" = {
         type                            = "disk"
-        name                            = "mbb-bvault-disk-backup-policy"
+        name                            = "{org}-bvault-disk-backup-policy"
         backup_repeating_time_intervals = ["R/2024-09-17T06:33:16+00:00/P1D"]
         default_retention_duration      = "P30D"
         time_zone                       = "Central Standard Time"
