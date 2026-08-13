@@ -184,37 +184,37 @@ existing_private_dns_zones = {
 # ---------------------------------------------------------------------------
 key_vault_keys = {
   "sa-aishared-kv" = {
-    name                = "mbb-cmk-sa-aishared-{env}-{region_code}-{iterator}"
+    name                = "{org}-cmk-sa-aishared-{env}-{region_code}-{iterator}"
     key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
     resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   "sa-aifoundry-kv" = {
-    name                = "mbb-cmk-sa-aifoundry-{env}-{region_code}-{iterator}"
+    name                = "{org}-cmk-sa-aifoundry-{env}-{region_code}-{iterator}"
     key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
     resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   # AI Foundry ACCOUNT CMK - housed in the DEDICATED AI Foundry Key Vault
   # (mbb-kv-aifoundry), matching ex/dev-ai-latest (its account encryption.
-  # key_vault_key = mbb-kv-aifoundry / cmk_key = mbb-cmk-aif-aifoundry). Kept
+  # key_vault_key = mbb-kv-aifoundry / cmk_key = {org}-cmk-aif-aifoundry). Kept
   # SEPARATE from the shared KV so the Foundry account's CMK setup is byte-parity
   # with the working MYW reference.
   "aif-aifoundry-kv" = {
-    name                = "mbb-cmk-aif-aifoundry-{env}-{region_code}-{iterator}"
+    name                = "{org}-cmk-aif-aifoundry-{env}-{region_code}-{iterator}"
     key_vault_name      = "{org}kvaifoundry{env}{region_code}{iterator}"
     resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   "cosmos-aicommon-kv" = {
-    name                = "mbb-cmk-cosmos-aicommon-{env}-{region_code}-{iterator}"
+    name                = "{org}-cmk-cosmos-aicommon-{env}-{region_code}-{iterator}"
     key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
     resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   "redis-aicommon-kv" = {
-    name                = "mbb-cmk-redis-aicommon-{env}-{region_code}-{iterator}"
+    name                = "{org}-cmk-redis-aicommon-{env}-{region_code}-{iterator}"
     key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
     resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
   "acr-aishared-kv" = {
-    name                = "mbb-cmk-cr-aishared-{env}-{region_code}-{iterator}"
+    name                = "{org}-cmk-cr-aishared-{env}-{region_code}-{iterator}"
     key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
     resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
@@ -1304,8 +1304,8 @@ key_vaults = {
     # Customer-Managed Keys created in this Key Vault (consumed by storage,
     # AI Foundry, Cosmos DB and Managed Redis via `key_vault_keys`).
     keys = {
-      "mbb-cmk-sa-aishared-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-sa-aishared-{env}-{region_code}-{iterator}"
+      "{org}-cmk-sa-aishared-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-sa-aishared-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1316,8 +1316,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-sa-aifoundry-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-sa-aifoundry-{env}-{region_code}-{iterator}"
+      "{org}-cmk-sa-aifoundry-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-sa-aifoundry-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1328,8 +1328,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-aif-aishared-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-aif-aishared-{env}-{region_code}-{iterator}"
+      "{org}-cmk-aif-aishared-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-aif-aishared-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1340,8 +1340,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-cosmos-aicommon-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-cosmos-aicommon-{env}-{region_code}-{iterator}"
+      "{org}-cmk-cosmos-aicommon-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-cosmos-aicommon-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1352,8 +1352,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-redis-aicommon-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-redis-aicommon-{env}-{region_code}-{iterator}"
+      "{org}-cmk-redis-aicommon-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-redis-aicommon-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1364,8 +1364,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-cr-aishared-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-cr-aishared-{env}-{region_code}-{iterator}"
+      "{org}-cmk-cr-aishared-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-cr-aishared-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1376,8 +1376,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-rsv-aishared-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-rsv-aishared-{env}-{region_code}-{iterator}"
+      "{org}-cmk-rsv-aishared-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-rsv-aishared-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1388,8 +1388,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-bvault-aishared-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-bvault-aishared-{env}-{region_code}-{iterator}"
+      "{org}-cmk-bvault-aishared-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-bvault-aishared-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1470,11 +1470,11 @@ key_vaults = {
     }
 
     # Customer-Managed Keys created in this Key Vault: the AI Foundry ACCOUNT CMK
-    # (mbb-cmk-aif-aifoundry - dedicated Foundry KV, parity with ex/dev-ai-latest)
+    # ({org}-cmk-aif-aifoundry - dedicated Foundry KV, parity with ex/dev-ai-latest)
     # and the AI Foundry Backup Vault CMK.
     keys = {
-      "mbb-cmk-aif-aifoundry-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-aif-aifoundry-{env}-{region_code}-{iterator}"
+      "{org}-cmk-aif-aifoundry-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-aif-aifoundry-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -1485,8 +1485,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-bvault-aifoundry-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-bvault-aifoundry-{env}-{region_code}-{iterator}"
+      "{org}-cmk-bvault-aifoundry-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-bvault-aifoundry-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -3018,7 +3018,7 @@ storage_accounts = {
     # Customer-Managed Key encryption (CMK) - AI Shared storage.
     customer_managed_key = {
       key_vault_key              = "sa-aishared-kv"
-      key_name                   = "mbb-cmk-sa-aishared-{env}-{region_code}-{iterator}"
+      key_name                   = "{org}-cmk-sa-aishared-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-id-sa-aishared-{env}-{region_code}-{iterator}"
     }
@@ -3122,7 +3122,7 @@ storage_accounts = {
     # Customer-Managed Key encryption (CMK) - AI Foundry storage.
     customer_managed_key = {
       key_vault_key              = "sa-aifoundry-kv"
-      key_name                   = "mbb-cmk-sa-aifoundry-{env}-{region_code}-{iterator}"
+      key_name                   = "{org}-cmk-sa-aifoundry-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-id-sa-aifoundry-{env}-{region_code}-{iterator}"
     }
@@ -4676,7 +4676,7 @@ azure_container_registry = {
     # redeploying it), so this is active from the initial deployment.
     customer_managed_key = {
       key_vault_key              = "acr-aishared-kv"
-      key_name                   = "mbb-cmk-cr-aishared-{env}-{region_code}-{iterator}"
+      key_name                   = "{org}-cmk-cr-aishared-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-id-cr-aishared-{env}-{region_code}-{iterator}"
     }
@@ -5064,7 +5064,7 @@ managed_redis_instances = {
     # Customer-Managed Key encryption (CMK) - Managed Redis (Enterprise).
     customer_managed_key = {
       key_vault_key = "redis-aicommon-kv"
-      key_name      = "mbb-cmk-redis-aicommon-{env}-{region_code}-{iterator}"
+      key_name      = "{org}-cmk-redis-aicommon-{env}-{region_code}-{iterator}"
     }
 
     managed_redis_identity = {
@@ -7129,7 +7129,7 @@ private_endpoints = {
 
 # =============================================================================
 # Backup platform - Recovery Services Vault (VM / file share backup).
-# CMK-encrypted via mbb-uami-rsv-aishared + mbb-cmk-rsv-aishared; the private
+# CMK-encrypted via mbb-uami-rsv-aishared + {org}-cmk-rsv-aishared; the private
 # endpoint registers into the shared `backup_azure` private DNS zone.
 # =============================================================================
 recovery_service_vaults = {
@@ -7202,7 +7202,7 @@ recovery_service_vaults = {
     # Customer Managed Key encryption
     customer_managed_key = {
       key_vault_key              = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
-      key_ref                    = "mbb-cmk-rsv-aishared-{env}-{region_code}-{iterator}"
+      key_ref                    = "{org}-cmk-rsv-aishared-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-uami-rsv-aishared-{env}-{region_code}-{iterator}"
     }
@@ -7370,7 +7370,7 @@ backup_vaults = {
     # Customer Managed Key encryption (applied post-deploy via azapi)
     customer_managed_key = {
       key_vault_key              = "mbb-kv-aishared-{env}-{region_code}-{iterator}"
-      key_name                   = "mbb-cmk-bvault-aishared-{env}-{region_code}-{iterator}"
+      key_name                   = "{org}-cmk-bvault-aishared-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-uami-bvault-aishared-{env}-{region_code}-{iterator}"
     }
@@ -7518,7 +7518,7 @@ backup_vaults = {
     # Customer Managed Key encryption (applied post-deploy via azapi)
     customer_managed_key = {
       key_vault_key              = "mbb-kv-aifoundry-{env}-{region_code}-{iterator}"
-      key_name                   = "mbb-cmk-bvault-aifoundry-{env}-{region_code}-{iterator}"
+      key_name                   = "{org}-cmk-bvault-aifoundry-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-uami-bvault-aifoundry-{env}-{region_code}-{iterator}"
     }

@@ -577,8 +577,8 @@ key_vaults = {
     }
 
     keys = {
-      "mbb-cmk-sa-adls-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-sa-adls-{env}-{region_code}-{iterator}"
+      "{org}-cmk-sa-adls-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-sa-adls-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -589,8 +589,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-sql-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-sql-{env}-{region_code}-{iterator}"
+      "{org}-cmk-sql-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-sql-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 2048
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -601,8 +601,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-rsv-data-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-rsv-data-{env}-{region_code}-{iterator}"
+      "{org}-cmk-rsv-data-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-rsv-data-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -613,8 +613,8 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
-      "mbb-cmk-bvault-data-{env}-{region_code}-{iterator}" = {
-        name            = "mbb-cmk-bvault-data-{env}-{region_code}-{iterator}"
+      "{org}-cmk-bvault-data-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-bvault-data-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
         key_size        = 4096
         key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
@@ -953,7 +953,7 @@ sql_servers = {
     resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
     umi_key            = "mbb-uami-sql-data-{env}-{region_code}-{iterator}"
     key_vault_key      = "mbb-kv-data-{env}-{region_code}-{iterator}"
-    tde_key_name       = "mbb-cmk-sql-{env}-{region_code}-{iterator}"
+    tde_key_name       = "{org}-cmk-sql-{env}-{region_code}-{iterator}"
 
     transparent_data_encryption_key_automatic_rotation_enabled = true
     server_version                                             = "12.0"
@@ -1094,7 +1094,7 @@ storage_accounts = {
 
     customer_managed_key = {
       key_vault_key              = "mbb-kv-data-{env}-{region_code}-{iterator}"
-      key_name                   = "mbb-cmk-sa-adls-{env}-{region_code}-{iterator}"
+      key_name                   = "{org}-cmk-sa-adls-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-uami-sa-adls-data-{env}-{region_code}-{iterator}"
     }
@@ -1478,7 +1478,7 @@ eventgrid_system_topics = {
 
 # =============================================================================
 # Backup platform - Recovery Services Vault (VM / file share backup).
-# CMK-encrypted via mbb-uami-rsv-data + mbb-cmk-rsv-data; the private endpoint
+# CMK-encrypted via mbb-uami-rsv-data + {org}-cmk-rsv-data; the private endpoint
 # registers into the shared `backup_azure` private DNS zone.
 # =============================================================================
 recovery_service_vaults = {
@@ -1551,7 +1551,7 @@ recovery_service_vaults = {
     # Customer Managed Key encryption
     customer_managed_key = {
       key_vault_key              = "mbb-kv-data-{env}-{region_code}-{iterator}"
-      key_ref                    = "mbb-cmk-rsv-data-{env}-{region_code}-{iterator}"
+      key_ref                    = "{org}-cmk-rsv-data-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-uami-rsv-data-{env}-{region_code}-{iterator}"
     }
@@ -1719,7 +1719,7 @@ backup_vaults = {
     # Customer Managed Key encryption (applied post-deploy via azapi)
     customer_managed_key = {
       key_vault_key              = "mbb-kv-data-{env}-{region_code}-{iterator}"
-      key_name                   = "mbb-cmk-bvault-data-{env}-{region_code}-{iterator}"
+      key_name                   = "{org}-cmk-bvault-data-{env}-{region_code}-{iterator}"
       key_version                = null
       user_assigned_identity_ref = "mbb-uami-bvault-data-{env}-{region_code}-{iterator}"
     }
