@@ -1389,10 +1389,45 @@ private_endpoints = {
 
 # =============================================================================
 # Microsoft Fabric Capacity (analytics).
-# Skipped for this demo: the tenant is not signed up for Microsoft Fabric.
-# Restore the map entry once the tenant is Fabric-enabled.
 # =============================================================================
-fabric_capacities = {}
+fabric_capacities = {
+  "mbb-fc-data-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "mbb-rg-dataanalytics-{env}-{region_code}-{iterator}"
+    sku_name           = "F4"
+    administration_members = [
+      "{fabric_admin}"
+    ]
+
+    env                 = ""
+    au                  = ""
+    app_code            = "data"
+    bu                  = ""
+    owner               = ""
+    resource_type_code  = "fc"
+    org                 = ""
+    region_code         = ""
+    base_name           = ""
+    additional_name     = ""
+    iterator            = ""
+    max_length          = 80
+    no_dashes           = true
+    add_random          = false
+    rnd_length          = 4
+    app_name            = ""
+    business_unit       = ""
+    business_owner      = ""
+    cost_center         = ""
+    data_classification = ""
+    compliance          = ""
+    criticality         = ""
+    environment         = ""
+    status              = ""
+    service             = "fabric_capacity"
+    budget_id           = ""
+    description         = "Fabric capacity for the data landing zone."
+    region              = ""
+  }
+}
 
 # =============================================================================
 # Consolidated cross-resource RBAC (replaces the standalone data_rbac root).
