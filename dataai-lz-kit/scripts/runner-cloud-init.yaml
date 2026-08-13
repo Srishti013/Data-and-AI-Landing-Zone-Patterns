@@ -1,0 +1,21 @@
+#cloud-config
+# Bootstraps a GitHub Actions self-hosted runner host with all deps the
+# Data/AI spoke workflows need. Runner registration is done manually afterwards.
+package_update: true
+packages:
+  - unzip
+  - jq
+  - git
+  - curl
+  - wget
+  - python3-pip
+runcmd:
+  - curl -fsSL https://aka.ms/InstallAzureCLIDeb | bash
+  - curl -fsSL https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip -o /tmp/tf.zip && unzip -o /tmp/tf.zip -d /usr/local/bin/ && chmod +x /usr/local/bin/terraform
+  - curl -fsSL https://github.com/terraform-linters/tflint/releases/download/v0.53.0/tflint_linux_amd64.zip -o /tmp/tflint.zip && unzip -o /tmp/tflint.zip -d /usr/local/bin/ && chmod +x /usr/local/bin/tflint
+  - curl -fsSL https://github.com/aquasecurity/tfsec/releases/download/v1.28.11/tfsec-linux-amd64 -o /usr/local/bin/tfsec && chmod +x /usr/local/bin/tfsec
+  - pip3 install --quiet checkov
+  - mkdir -p /home/azureuser/actions-runner
+  - cd /home/azureuser/actions-runner && curl -fsSL https://github.com/actions/runner/releases/download/v2.319.1/actions-runner-linux-x64-2.319.1.tar.gz -o r.tar.gz && tar xzf r.tar.gz && rm r.tar.gz
+  - chown -R azureuser:azureuser /home/azureuser/actions-runner
+  - touch /home/azureuser/RUNNER_DEPS_READY

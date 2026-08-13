@@ -1,0 +1,40 @@
+<policies>
+
+  <inbound>
+    <base />
+
+    <cors>
+      <allowed-origins>
+        ${cors_allowed_origins_block}
+      </allowed-origins>
+
+      <allowed-methods preflight-result-max-age="${cors_preflight_max_age}">
+        ${cors_allowed_methods_block}
+      </allowed-methods>
+
+      <allowed-headers>
+        ${cors_allowed_headers_block}
+      </allowed-headers>
+
+      <expose-headers>
+        ${cors_exposed_headers_block}
+      </expose-headers>
+
+      <allow-credentials>${cors_allow_credentials}</allow-credentials>
+    </cors>
+
+  </inbound>
+
+  <backend>
+    <base />
+  </backend>
+
+  <outbound>
+    <base />
+  </outbound>
+
+  <on-error>
+    <base />
+  </on-error>
+
+</policies>

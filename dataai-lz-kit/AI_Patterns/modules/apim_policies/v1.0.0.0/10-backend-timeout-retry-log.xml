@@ -1,0 +1,50 @@
+<policies>
+
+  <inbound>
+    <base />
+
+    <set-backend-service timeout="${backend_timeout_seconds}" />
+
+    <retry 
+        condition="${retry_condition}" 
+        count="${retry_count}" 
+        interval="${retry_interval_seconds}" />
+
+  </inbound>
+
+  <backend>
+    <base />
+  </backend>
+
+  <outbound>
+    <base />
+
+    <log-to-application-insights 
+        logger-id="${appinsights_logger_id}" 
+        severity="${success_log_severity}">
+
+@{
+    var corr = context.Request.Headers.GetValueOrDefault("${correlation_header_name}", "n/a");
+    return $"{{\"corrId\":\"{corr}\",\"api\":\"{context.Api.Name}\",\"status\":{context.Response.StatusCode}}}";
+}
+
+    </log-to-application-insights>
+
+  </outbound>
+
+  <on-error>
+
+    <log-to-application-insights 
+        logger-id="${appinsights_logger_id}" 
+        severity="${error_log_severity}">
+
+@{
+    var corr = context.Request.Headers.GetValueOrDefault("${correlation_header_name}", "n/a");
+    return $"{{\"corrId\":\"{corr}\",\"api\":\"{context.Api.Name}\",\"error\":\"{context.LastError?.Message}\"}}";
+}
+
+    </log-to-application-insights>
+
+  </on-error>
+
+</policies>

@@ -1,0 +1,66 @@
+terraform {
+  required_version = ">= 1.9, < 2.0"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.0"
+    }
+  }
+}
+
+provider "azurerm" {
+
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy = false
+    }
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+
+  }
+}
+
+# This is required for resource modules
+resource "azurerm_resource_group" "this" {
+  location = "malaysiawest"
+  name     = "rg-iapim-tst-01"
+}
+
+# This is the module call
+# Leaving location as `null` will cause the module to use the resource group location
+# with a data source.
+module "test" {
+  source = "../../"
+  #checkov:skip=CKV_AZURE_174: Public access is controlled via virtual_network_type and private endpoint configuration
+  location            = azurerm_resource_group.this.location
+  name                = "apim-iapim-tst-01"
+  publisher_email     = var.publisher_email
+  resource_group_name = azurerm_resource_group.this.name
+  enable_telemetry    = var.enable_telemetry
+  env                 = "test"
+  au                  = "0000001"
+  app_code            = "apim"
+  bu                  = "it"
+  owner               = "CEAT"
+  region_code         = "myw"
+  service             = "apim"
+  business_unit       = "GTD-ISD"
+  business_owner      = "Head of Cloud Engineering and Automation"
+  app_name            = "Internal APIM"
+  budget_id           = "83254"
+  criticality         = "T1"
+  environment         = "Test"
+  managed_identities = {
+    system_assigned = true
+  }
+  publisher_name = "Apim Example Publisher"
+  sku_name       = "Premium_3"
+  # sku_name = "Developer_1"
+  tags = {
+    environment = "test"
+    cost_center = "test"
+  }
+  zones = ["1", "2", "3"] # For compliance with WAF
+}
