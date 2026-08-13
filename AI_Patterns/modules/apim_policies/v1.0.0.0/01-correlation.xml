@@ -1,0 +1,36 @@
+<policies>
+
+  <inbound>
+    <base />
+
+    <set-variable name="${correlation_variable_name}"
+      value="@(context.Request.Headers.GetValueOrDefault(&quot;${correlation_header_name}&quot;, Guid.NewGuid().ToString()))" />
+
+    <set-header name="${correlation_header_name}" exists-action="${header_exists_action}">
+      <value>@((string)context.Variables["${correlation_variable_name}"])</value>
+    </set-header>
+
+  </inbound>
+
+  <backend>
+
+    <set-header name="${correlation_header_name}" exists-action="${header_exists_action}">
+      <value>@((string)context.Variables["${correlation_variable_name}"])</value>
+    </set-header>
+
+  </backend>
+
+  <outbound>
+    <base />
+
+    <set-header name="${correlation_header_name}" exists-action="${header_exists_action}">
+      <value>@((string)context.Variables["${correlation_variable_name}"])</value>
+    </set-header>
+
+  </outbound>
+
+  <on-error>
+    <base />
+  </on-error>
+
+</policies>

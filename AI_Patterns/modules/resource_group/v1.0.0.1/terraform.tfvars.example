@@ -1,0 +1,42 @@
+# Example terraform.tfvars for MBB Resource Group Module v1.0.0.1
+
+# Required Naming Variables
+env      = "p"
+app_code = "demo"
+bu       = "IT"
+au       = "12345"
+
+# Optional Naming Variables  
+region_code = "sg"  # Singapore
+base_name   = "main"
+
+# 8 Mandatory Tags for v1.0.0.1 Naming Module (environment and business_owner are auto-mapped from env and owner)
+business_unit       = "IT Department"  
+criticality         = "High"
+cost_center         = "CC-12345"
+data_classification = "Internal"
+compliance          = "SOX"
+
+# 3 Optional Tags for v1.0.0.1 Naming Module
+region              = "Singapore"
+description         = "Production resource group for demo application"
+notification_emails = ["admin@company.com", "ops@company.com"]
+
+# Additional Required Tags (Mandatory)
+app_name    = "Demo Application"
+budget_id   = "BUD-2024-001" 
+status      = "Live"
+app_support = "support@company.com"
+
+# Additional Optional Tags
+automation_policy = "Auto-Scale-Policy"
+review_required   = "Yes"
+backup_policy     = "Daily-Backup"
+disaster_recovery = "RTO-4h-RPO-1h"
+
+# Custom Additional Tags
+additional_tags = {
+  Project     = "Digital-Transformation"
+  Team        = "Platform-Engineering"
+  Monitoring  = "Enabled"
+}

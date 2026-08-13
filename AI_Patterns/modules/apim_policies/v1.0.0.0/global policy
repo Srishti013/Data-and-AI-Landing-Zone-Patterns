@@ -1,0 +1,68 @@
+<policies>
+
+  <inbound>
+    <base />
+
+    <!-- JWT VALIDATION 
+    <validate-jwt
+        header-name="${jwt_header_name}"
+        failed-validation-httpcode="${jwt_failed_status_code}"
+        failed-validation-error-message="${jwt_failed_message}"
+        require-expiration-time="${jwt_require_expiry}"
+        require-scheme="${jwt_scheme}">
+
+        <openid-config url="${openid_config_url}" />
+
+        <audiences>
+            <audience>${jwt_audience}</audience>
+        </audiences>
+
+        <issuers>
+            <issuer>${jwt_issuer}</issuer>
+        </issuers>
+
+    </validate-jwt> -->
+
+    <!-- RATE LIMIT -->
+    <rate-limit-by-key
+        calls="${rate_limit_calls}"
+        renewal-period="${rate_limit_period}"
+        counter-key="${rate_limit_counter_key}" />
+
+    <!-- QUOTA -->
+    <quota-by-key
+        calls="${quota_calls}"
+        renewal-period="${quota_period}"
+        counter-key="${quota_counter_key}" />
+
+  </inbound>
+
+  <backend>
+    <base />
+  </backend>
+
+  <outbound>
+    <base />
+
+    <!-- LOGGING 
+    <log-to-application-insights logger-id="${logger_id}" severity="${log_severity}">
+      @{
+        var corr = context.RequestId;
+        return $"{{\"correlationId\":\"{corr}\",\"api\":\"{context.Api.Name}\",\"status\":{context.Response.StatusCode}}}";
+      }
+    </log-to-application-insights> -->
+
+  </outbound>
+
+  <on-error>
+    <base />
+
+    <!-- LOGGING 
+      @{
+        return $"{{\"api\":\"{context.Api.Name}\",\"error\":\"{context.LastError?.Message}\"}}";
+      }
+    </log-to-application-insights> -->
+
+  </on-error>
+
+</policies>

@@ -1,0 +1,634 @@
+
+variable "subscription_id" {
+  type        = string
+  default     = null
+  description = "(Optional) Subscription ID passed in by an external process.  If this is not supplied, then the configuration either needs to include the subscription ID, or needs to be supplied properties to create the subscription."
+}
+
+# variable "tags" {
+#   type        = map(string)
+#   default     = null
+#   description = "(Optional) Tags of the resource."
+# }
+
+
+# Old tag variables with default values removed - now handled by naming module
+
+# -
+# Naming Module Variables
+# -
+variable "env" {
+  type        = string
+  description = "(Required) Environment code. Example: `test`."
+}
+
+variable "au" {
+  type        = string
+  description = "(Required) Accounting Unit (AU) code. Example: `0233985`."
+  validation {
+    condition     = can(regex("^[[:digit:]]+$", var.au))
+    error_message = "Value for \"au\" must be of numeric characters."
+  }
+}
+
+variable "owner" {
+  type        = string
+  description = "(Required) Technology owner group."
+}
+
+variable "resource_type_code" {
+  type        = string
+  description = "(Required) Azure resource type abbreviation. Example: `vnet`."
+  default     = "vnet"
+}
+
+variable "product_version" {
+  type        = string
+  description = "(Optional) Product version. Example: `1.0.0`."
+  default     = "1.0.0.1"
+}
+
+variable "app_code" {
+  type        = string
+  description = "(Required) Application code. Example: network, mgmt, build"
+}
+
+variable "bu" {
+  type        = string
+  description = "(Required) Business unit code. Example: IT or mbb."
+}
+
+# -
+# Mandatory Business Tags
+# -
+variable "app_name" {
+  type        = string
+  description = "(Required) Human readable name for the Application."
+}
+
+variable "app_support" {
+  type        = string
+  description = "(Optional) Email address of the support team."
+  default     = ""
+  validation {
+    condition     = var.app_support == "" || can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", var.app_support))
+    error_message = "Value for \"app_support\" must be a valid email address."
+  }
+}
+
+variable "business_unit" {
+  type        = string
+  description = "(Required) Department that owns the resources."
+}
+
+variable "business_owner" {
+  type        = string
+  description = "(Required) Contact name of the application owner."
+}
+
+variable "type" {
+  type        = string
+  description = "(Required) Infrastructure or business service type."
+  default     = "Infrastructure"
+}
+
+# -
+# Mandatory DevOps Tags
+# -
+variable "product_name" {
+  type        = string
+  description = "(Required) Terraform Module name."
+  default     = "virtual_network"
+}
+
+# -
+# Mandatory Finance Tags
+# -
+variable "cost_center" {
+  type        = string
+  description = "(Required) Cost center that should bear the costs."
+  default     = ""
+}
+
+variable "cost_allocation_unit" {
+  type        = string
+  default     = ""
+  description = "(Required) Logical bucket to split shared platform cost."
+}
+
+variable "budget_id" {
+  type        = string
+  description = "(Required) Budget or GL code used by Finance."
+}
+
+variable "budget_limit" {
+  type        = string
+  description = "(Required) Maximum budget allocated."
+  default     = ""
+}
+
+variable "cost_alert_threshold" {
+  type        = string
+  description = "(Required) Cost threshold for triggering alerts."
+  default     = ""
+}
+
+# -
+# Mandatory Governance Tags
+# -
+variable "data_classification" {
+  type        = string
+  description = "(optional) Data classification level."
+  default     = ""
+}
+
+variable "compliance_required" {
+  type        = string
+  description = "(Required) Does resource need to comply with standards?"
+  validation {
+    condition     = contains(["Yes", "No"], var.compliance_required)
+    error_message = "Value must be Yes or No."
+  }
+  default = "No"
+}
+
+variable "compliance" {
+  type        = string
+  description = "(Required) Specific standard/regulation."
+  default     = "None"
+}
+
+# -
+# Mandatory Operation Tags
+# -
+variable "criticality" {
+  type        = string
+  description = "(Required) Workload SLA requirements."
+}
+
+variable "environment" {
+  type        = string
+  description = "(Required) Environment where the resource is located."
+}
+
+variable "status" {
+  type        = string
+  description = "(Required) Status of the resource."
+  validation {
+    condition     = contains(["Live", "Non-Operational", "Decommissioned"], var.status)
+    error_message = "Value must be one of: Live, Non-Operational, Decommissioned."
+  }
+  default = "Live"
+}
+
+# -
+# Optional Tags for Virtual Networks
+# -
+variable "delete_after" {
+  type        = string
+  description = "(Optional) Date after which resource should be deleted (MM/DD/YYYY)."
+  default     = ""
+}
+
+variable "tier" {
+  type        = string
+  description = "(Optional) Network tier (VNet/subnet name)."
+  default     = ""
+}
+
+variable "app_id" {
+  type        = string
+  description = "(Optional) Application ID from CMDB."
+  default     = ""
+}
+
+variable "auto_delete" {
+  type        = string
+  description = "(Optional) Should resource be auto-deleted? (Yes/No)."
+  validation {
+    condition     = var.auto_delete == "" || contains(["Yes", "No"], var.auto_delete)
+    error_message = "Value must be Yes or No."
+  }
+  default = ""
+}
+
+variable "auto_shutdown" {
+  type        = string
+  description = "(Optional) Auto-shutdown configuration for cost optimization."
+  default     = ""
+}
+
+variable "description" {
+  type        = string
+  description = "(Optional) Brief description of the resource purpose."
+  default     = ""
+}
+
+variable "backup_policy" {
+  type        = string
+  description = "(Optional) Backup policy (Manual or Policy Based)."
+  default     = ""
+}
+
+variable "disaster_recovery" {
+  type        = string
+  description = "(Optional) DR requirements."
+  default     = ""
+}
+
+variable "notification_emails" {
+  type        = list(string)
+  description = "(Optional) List of emails for notifications."
+  default     = [""]
+}
+
+variable "region" {
+  type        = string
+  description = "(Optional) Cloud region where resource is deployed."
+  default     = ""
+}
+
+# -
+# Optional Naming Variables
+# -
+variable "org" {
+  type        = string
+  description = "(Optional) Company/business unit code. Example: `mbb`."
+  default     = "mbb"
+}
+
+variable "region_code" {
+  type        = string
+  description = "(Optional) Region code."
+  validation {
+    condition     = contains(["ea", "sea", "eu", "myw"], var.region_code)
+    error_message = "Value of \"region_code\" must be one of: [ea,sea,eu,myw]."
+  }
+  default = "sea"
+}
+
+variable "additional_name" {
+  type        = string
+  description = "(Optional) Additional suffix to create resource uniqueness."
+  default     = null
+}
+
+variable "iterator" {
+  type        = string
+  description = "(Optional) Iterator to create resource uniqueness."
+  default     = null
+}
+
+variable "additional_tags" {
+  description = "(Optional) Additional base tags."
+  type        = map(string)
+  default     = null
+}
+
+variable "base_name" {
+  type        = string
+  description = "(Optional) Application/Infrastructure base name."
+  default     = null
+}
+
+variable "max_length" {
+  type        = number
+  description = "(Optional) Set the maximum length of the generated name."
+  default     = 63
+}
+
+variable "no_dashes" {
+  type        = bool
+  description = "(Optional) When set to true, it will remove all '-' separators from the generated name."
+  default     = false
+}
+
+variable "add_random" {
+  type        = bool
+  description = "(Optional) When set to true, it will add a random number at the name's end."
+  default     = false
+}
+
+variable "rnd_length" {
+  type        = number
+  description = "(Optional) Set the length of the random number generated."
+  default     = 2
+}
+
+# -
+# Additional Optional Tags
+# -
+variable "integration_id" {
+  type        = string
+  description = "(Optional) Integration ID for the resource."
+  default     = ""
+}
+
+variable "experiment_phase" {
+  type        = string
+  description = "(Optional) Experiment phase for sandbox environments."
+  default     = ""
+}
+
+variable "os" {
+  type        = string
+  description = "(Optional) Operating System type."
+  default     = ""
+}
+
+variable "last_vm_accessed" {
+  type        = string
+  description = "(Optional) Last VM access timestamp."
+  default     = ""
+}
+
+variable "service" {
+  type        = string
+  description = "(Required) Service name or identifier."
+}
+
+variable "retention" {
+  type        = string
+  description = "(Optional) Data retention policy."
+  default     = ""
+}
+
+variable "sandbox_type" {
+  type        = string
+  description = "(Optional) Type of sandbox environment."
+  default     = ""
+}
+
+variable "patch_policy" {
+  type        = string
+  description = "(Optional) Patch policy configuration."
+  default     = ""
+}
+
+variable "maintenance_window" {
+  type        = string
+  description = "(Optional) Maintenance window schedule."
+  default     = ""
+}
+
+
+
+//TAGGING VARIABLES FOR WAF
+variable "location" {
+  type        = string
+  description = "Azure region where the resource should be deployed."
+  nullable    = false
+}
+
+variable "managed_rules" {
+  type = object({
+    exclusion = optional(map(object({
+      match_variable          = string
+      selector                = string
+      selector_match_operator = string
+      excluded_rule_set = optional(object({
+        type    = optional(string)
+        version = optional(string)
+        rule_group = optional(list(object({
+          excluded_rules  = optional(list(string))
+          rule_group_name = string
+        })))
+      }))
+    })))
+    managed_rule_set = map(object({
+      type    = optional(string)
+      version = string
+      rule_group_override = optional(map(object({
+        rule_group_name = string
+        rule = optional(list(object({
+          action  = optional(string)
+          enabled = optional(bool)
+          id      = string
+        })))
+      })))
+    }))
+  })
+  description = <<DESCRIPTION
+
+ ---
+ `exclusion` block supports the following:
+ - `match_variable` - (Required) The name of the Match Variable. Possible values: `RequestArgKeys`, `RequestArgNames`, `RequestArgValues`, `RequestCookieKeys`, `RequestCookieNames`, `RequestCookieValues`, `RequestHeaderKeys`, `RequestHeaderNames`, `RequestHeaderValues`.
+ - `selector` - (Required) Describes field of the matchVariable collection.
+ - `selector_match_operator` - (Required) Describes operator to be matched. Possible values: `Contains`, `EndsWith`, `Equals`, `EqualsAny`, `StartsWith`.
+
+ ---
+ `excluded_rule_set` block supports the following:
+ - `type` - (Optional) The rule set type. Possible values are `Microsoft_DefaultRuleSet`, `Microsoft_BotManagerRuleSet` and `OWASP`. Defaults to `OWASP`.
+ - `version` - (Optional) The rule set version. Possible values are `1.0` (for rule set type `Microsoft_BotManagerRuleSet`), `2.1` (for rule set type `Microsoft_DefaultRuleSet`) and `3.2` (for rule set type `OWASP`). Defaults to `3.2`.
+
+ ---
+ `rule_group` block supports the following:
+ - `excluded_rules` - (Optional) One or more Rule IDs for exclusion.
+ - `rule_group_name` - (Required) The name of rule group for exclusion. Possible values are `BadBots`, `crs_20_protocol_violations`, `crs_21_protocol_anomalies`, `crs_23_request_limits`, `crs_30_http_policy`, `crs_35_bad_robots`, `crs_40_generic_attacks`, `crs_41_sql_injection_attacks`, `crs_41_xss_attacks`, `crs_42_tight_security`, `crs_45_trojans`, `crs_49_inbound_blocking`, `General`, `GoodBots`, `KnownBadBots`, `Known-CVEs`, `REQUEST-911-METHOD-ENFORCEMENT`, `REQUEST-913-SCANNER-DETECTION`, `REQUEST-920-PROTOCOL-ENFORCEMENT`, `REQUEST-921-PROTOCOL-ATTACK`, `REQUEST-930-APPLICATION-ATTACK-LFI`, `REQUEST-931-APPLICATION-ATTACK-RFI`, `REQUEST-932-APPLICATION-ATTACK-RCE`, `REQUEST-933-APPLICATION-ATTACK-PHP`, `REQUEST-941-APPLICATION-ATTACK-XSS`, `REQUEST-942-APPLICATION-ATTACK-SQLI`, `REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION`, `REQUEST-944-APPLICATION-ATTACK-JAVA`, `UnknownBots`, `METHOD-ENFORCEMENT`, `PROTOCOL-ENFORCEMENT`, `PROTOCOL-ATTACK`, `LFI`, `RFI`, `RCE`, `PHP`, `NODEJS`, `XSS`, `SQLI`, `FIX`, `JAVA`, `MS-ThreatIntel-WebShells`, `MS-ThreatIntel-AppSec`, `MS-ThreatIntel-SQLI` and `MS-ThreatIntel-CVEs`. `MS-ThreatIntel-AppSec`, `MS-ThreatIntel-SQLI` and `MS-ThreatIntel-CVEs`.
+
+ ---
+ `managed_rule_set` block supports the following:
+ - `type` - (Optional) The rule set type. Possible values: `Microsoft_BotManagerRuleSet`, `Microsoft_DefaultRuleSet` and `OWASP`. Defaults to `OWASP`.
+ - `version` - (Required) The rule set version. Possible values: `0.1`, `1.0`, `2.1`, `2.2.9`, `3.0`, `3.1` and `3.2`.
+
+ ---
+ `rule_group_override` block supports the following:
+ - `rule_group_name` - (Required) The name of the Rule Group. Possible values are `BadBots`, `crs_20_protocol_violations`, `crs_21_protocol_anomalies`, `crs_23_request_limits`, `crs_30_http_policy`, `crs_35_bad_robots`, `crs_40_generic_attacks`, `crs_41_sql_injection_attacks`, `crs_41_xss_attacks`, `crs_42_tight_security`, `crs_45_trojans`, `crs_49_inbound_blocking`, `General`, `GoodBots`, `KnownBadBots`, `Known-CVEs`, `REQUEST-911-METHOD-ENFORCEMENT`, `REQUEST-913-SCANNER-DETECTION`, `REQUEST-920-PROTOCOL-ENFORCEMENT`, `REQUEST-921-PROTOCOL-ATTACK`, `REQUEST-930-APPLICATION-ATTACK-LFI`, `REQUEST-931-APPLICATION-ATTACK-RFI`, `REQUEST-932-APPLICATION-ATTACK-RCE`, `REQUEST-933-APPLICATION-ATTACK-PHP`, `REQUEST-941-APPLICATION-ATTACK-XSS`, `REQUEST-942-APPLICATION-ATTACK-SQLI`, `REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION`, `REQUEST-944-APPLICATION-ATTACK-JAVA`, `UnknownBots`, `METHOD-ENFORCEMENT`, `PROTOCOL-ENFORCEMENT`, `PROTOCOL-ATTACK`, `LFI`, `RFI`, `RCE`, `PHP`, `NODEJS`, `XSS`, `SQLI`, `FIX`, `JAVA`, `MS-ThreatIntel-WebShells`, `MS-ThreatIntel-AppSec`, `MS-ThreatIntel-SQLI` and `MS-ThreatIntel-CVEs`MS-ThreatIntel-WebShells`,.
+
+ ---
+ `rule` block supports the following:
+ - `action` - (Optional) Describes the override action to be applied when rule matches. Possible values are `Allow`, `AnomalyScoring`, `Block`, `JSChallenge` and `Log`. `JSChallenge` is only valid for rulesets of type `Microsoft_BotManagerRuleSet`.
+ - `enabled` - (Optional) Describes if the managed rule is in enabled state or disabled state. Defaults to `false`.
+ - `id` - (Required) Identifier for the managed rule.
+DESCRIPTION
+  nullable    = false
+}
+
+variable "name" {
+  type        = string
+  description = "The name of the this resource."
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9_]$", var.name))
+    error_message = "The name must begin with a letter or number, end with a letter, number or underscore, and may contain only letters, numbers, underscores, periods, or hyphens."
+  }
+}
+
+# This is required for most resource modules
+variable "resource_group_name" {
+  type        = string
+  description = "The resource group where the resources will be deployed."
+}
+
+variable "custom_rules" {
+  type = map(object({
+    action               = string
+    enabled              = optional(bool)
+    group_rate_limit_by  = optional(string)
+    name                 = optional(string)
+    priority             = number
+    rate_limit_duration  = optional(string)
+    rate_limit_threshold = optional(number)
+    rule_type            = string
+    match_conditions = map(object({
+      match_values       = optional(list(string))
+      negation_condition = optional(bool)
+      operator           = string
+      transforms         = optional(set(string))
+      match_variables = list(object({
+        selector      = optional(string)
+        variable_name = string
+      }))
+    }))
+  }))
+  default     = null
+  description = <<DESCRIPTION
+ - `action` - (Required) Type of action. Possible values are `Allow`, `Block` and `Log`.
+ - `enabled` - (Optional) Describes if the policy is in enabled state or disabled state. Defaults to `true`.
+ - `group_rate_limit_by` - (Optional) Specifies what grouping the rate limit will count requests by. Possible values are `GeoLocation`, `ClientAddr` and `None`.
+ - `name` - (Optional) Gets name of the resource that is unique within a policy. This name can be used to access the resource.
+ - `priority` - (Required) Describes priority of the rule. Rules with a lower value will be evaluated before rules with a higher value.
+ - `rate_limit_duration` - (Optional) Specifies the duration at which the rate limit policy will be applied. Should be used with `RateLimitRule` rule type. Possible values are `FiveMins` and `OneMin`.
+ - `rate_limit_threshold` - (Optional) Specifies the threshold value for the rate limit policy. Must be greater than or equal to 1 if provided.
+ - `rule_type` - (Required) Describes the type of rule. Possible values are `MatchRule`, `RateLimitRule` and `Invalid`.
+
+ ---
+ `match_conditions` block supports the following:
+ - `match_values` - (Optional) A list of match values. This is **Required** when the `operator` is not `Any`.
+ - `negation_condition` - (Optional) Describes if this is negate condition or not
+ - `operator` - (Required) Describes operator to be matched. Possible values are `Any`, `IPMatch`, `GeoMatch`, `Equal`, `Contains`, `LessThan`, `GreaterThan`, `LessThanOrEqual`, `GreaterThanOrEqual`, `BeginsWith`, `EndsWith` and `Regex`.
+ - `transforms` - (Optional) A list of transformations to do before the match is attempted. Possible values are `HtmlEntityDecode`, `Lowercase`, `RemoveNulls`, `Trim`, `Uppercase`, `UrlDecode` and `UrlEncode`.
+
+ ---
+ `match_variables` block supports the following:
+ - `selector` - (Optional) Describes field of the matchVariable collection
+ - `variable_name` - (Required) The name of the Match Variable. Possible values are `RemoteAddr`, `RequestMethod`, `QueryString`, `PostArgs`, `RequestUri`, `RequestHeaders`, `RequestBody` and `RequestCookies`.
+DESCRIPTION
+}
+
+# required AVM interfaces
+# remove only if not supported by the resource
+# tflint-ignore: terraform_unused_declarations
+variable "enable_telemetry" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+This variable controls whether or not telemetry is enabled for the module.
+For more information see <https://aka.ms/avm/telemetryinfo>.
+If it is set to false, then no telemetry will be collected.
+DESCRIPTION
+  nullable    = false
+}
+
+variable "lock" {
+  type = object({
+    kind = string
+    name = optional(string, null)
+  })
+  default     = null
+  description = <<DESCRIPTION
+Controls the Resource Lock configuration for this resource. The following properties can be specified:
+
+- `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+- `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+DESCRIPTION
+
+  validation {
+    condition     = var.lock != null ? contains(["CanNotDelete", "ReadOnly"], var.lock.kind) : true
+    error_message = "The lock level must be one of: 'None', 'CanNotDelete', or 'ReadOnly'."
+  }
+}
+
+variable "policy_settings" {
+  type = object({
+    enabled                                   = optional(bool)
+    file_upload_limit_in_mb                   = optional(number)
+    js_challenge_cookie_expiration_in_minutes = optional(number)
+    max_request_body_size_in_kb               = optional(number)
+    mode                                      = optional(string)
+    request_body_check                        = optional(bool)
+    request_body_enforcement                  = optional(bool)
+    request_body_inspect_limit_in_kb          = optional(number)
+    log_scrubbing = optional(object({
+      enabled = optional(bool)
+      rule = optional(list(object({
+        enabled                 = optional(bool)
+        match_variable          = string
+        selector                = optional(string)
+        selector_match_operator = optional(string)
+      })))
+    }))
+  })
+  default     = null
+  description = <<DESCRIPTION
+ - `enabled` - (Optional) Describes if the policy is in enabled state or disabled state. Defaults to `true`.
+ - `file_upload_limit_in_mb` - (Optional) The File Upload Limit in MB. Accepted values are in the range `1` to `4000`. Defaults to `100`.
+ - `js_challenge_cookie_expiration_in_minutes` - (Optional) Specifies the JavaScript challenge cookie validity lifetime in minutes. The user is challenged after the lifetime expires. Accepted values are in the range `5` to `1440`. Defaults to `30`.
+ - `max_request_body_size_in_kb` - (Optional) The Maximum Request Body Size in KB. Accepted values are in the range `8` to `2000`. Defaults to `128`.
+ - `mode` - (Optional) Describes if it is in detection mode or prevention mode at the policy level. Valid values are `Detection` and `Prevention`. Defaults to `Prevention`.
+ - `request_body_check` - (Optional) Is Request Body Inspection enabled? Defaults to `true`.
+ - `request_body_enforcement` - (Optional) Whether the firewall should block a request with body size greater then `max_request_body_size_in_kb`. Defaults to `true`.
+ - `request_body_inspect_limit_in_kb` - (Optional) Specifies the maximum request body inspection limit in KB for the Web Application Firewall. Defaults to `128`.
+
+ ---
+ `log_scrubbing` block supports the following:
+ - `enabled` - (Optional) Whether the log scrubbing is enabled or disabled. Defaults to `true`.
+
+ ---
+ `rule` block supports the following:
+ - `enabled` - (Optional) Describes if the managed rule is in enabled state or disabled state. Defaults to `false`.
+ - `match_variable` -
+ - `selector` -
+ - `selector_match_operator` -
+DESCRIPTION
+}
+
+variable "role_assignments" {
+  type = map(object({
+    role_definition_id_or_name             = string
+    principal_id                           = string
+    description                            = optional(string, null)
+    skip_service_principal_aad_check       = optional(bool, false)
+    condition                              = optional(string, null)
+    condition_version                      = optional(string, null)
+    delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+- `principal_id` - The ID of the principal to assign the role to.
+- `description` - The description of the role assignment.
+- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
+- `condition` - The condition which will be used to scope the role assignment.
+- `condition_version` - The version of the condition syntax. Valid values are '2.0'.
+
+> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+DESCRIPTION
+  nullable    = false
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) Tags of the resource."
+}
+
+variable "timeouts" {
+  type = object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
+  })
+  default     = null
+  description = <<DESCRIPTION
+ - `create` - (Defaults to 30 minutes) Used when creating the Web Application Firewall Policy.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Web Application Firewall Policy.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Web Application Firewall Policy.
+ - `update` - (Defaults to 30 minutes) Used when updating the Web Application Firewall Policy.
+DESCRIPTION
+}
