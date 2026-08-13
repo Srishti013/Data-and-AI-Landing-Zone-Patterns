@@ -1221,7 +1221,7 @@ storage_accounts = {
 # =============================================================================
 data_factories = {
   "mbb-adf-data-{env}-{region_code}-{iterator}" = {
-    name               = "mbb-adf-data-{env}-{region_code}-{iterator}"
+    name               = "{org}-adf-data-{env}-{region_code}-{iterator}"
     resource_group_key = "mbb-rg-dataingestion-{env}-{region_code}-{iterator}"
 
     env                 = ""
