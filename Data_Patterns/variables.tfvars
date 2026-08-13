@@ -1,5 +1,5 @@
 # =============================================================================
-# MBB Data Landing Zone - consolidated tfvars.
+# {org} Data Landing Zone - consolidated tfvars.
 #
 # Tokenisation (rewritten by .github/workflows/data-pattern.yml from the deploy
 # issue BEFORE plan/apply):
@@ -46,7 +46,7 @@ existing_private_dns_zones_rg_name = "{org}-rg-private-network-pd-{region_code}-
 
 # Hub network this spoke peers to. The hub is the region's platform private
 # firewall/DNS VNet (region-tokenized): for SEA it resolves to the SEA hub in
-# mbb-plt-sub-network-prd-sea-01. `hub_key` in the VNet peering below refers to
+# {org}-plt-sub-network-prd-sea-01. `hub_key` in the VNet peering below refers to
 # a key in this map. Required so private endpoints resolve via the central
 # private DNS zones (CMK / KV / SQL / ADLS all depend on this).
 hub_virtual_networks = {
@@ -71,7 +71,7 @@ existing_private_dns_zones = {
 # Resource Groups (datashared / datastorage / dataingestion / dataanalytics)
 # =============================================================================
 data_resource_groups = {
-  "mbb-rg-datashared-{env}-{region_code}-{iterator}" = {
+  "{org}-rg-datashared-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -98,7 +98,7 @@ data_resource_groups = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_resource_group"
+    product_name        = "{org}_resource_group"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -107,7 +107,7 @@ data_resource_groups = {
     notification_emails = ["platform-alerts@example.com"]
     review_required     = "Yes"
   }
-  "mbb-rg-datastorage-{env}-{region_code}-{iterator}" = {
+  "{org}-rg-datastorage-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -134,7 +134,7 @@ data_resource_groups = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_resource_group"
+    product_name        = "{org}_resource_group"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -143,7 +143,7 @@ data_resource_groups = {
     notification_emails = ["platform-alerts@example.com"]
     review_required     = "Yes"
   }
-  "mbb-rg-dataingestion-{env}-{region_code}-{iterator}" = {
+  "{org}-rg-dataingestion-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -170,7 +170,7 @@ data_resource_groups = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_resource_group"
+    product_name        = "{org}_resource_group"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -179,7 +179,7 @@ data_resource_groups = {
     notification_emails = ["platform-alerts@example.com"]
     review_required     = "Yes"
   }
-  "mbb-rg-dataanalytics-{env}-{region_code}-{iterator}" = {
+  "{org}-rg-dataanalytics-{env}-{region_code}-{iterator}" = {
     env                = ""
     org                = ""
     region_code        = ""
@@ -206,7 +206,7 @@ data_resource_groups = {
     app_name            = ""
     budget_id           = ""
     status              = ""
-    product_name        = "mbb_resource_group"
+    product_name        = "{org}_resource_group"
     product_version     = "1.0.0.0"
     app_support         = ""
 
@@ -221,7 +221,7 @@ data_resource_groups = {
 # Network Security Groups (PE / Data / Internal-Data subnets)
 # =============================================================================
 network_security_groups = {
-  "mbb-nsg-pe-data-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-pe-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     au                  = ""
     app_code            = "pe-data"
@@ -248,7 +248,7 @@ network_security_groups = {
     description         = "NSG for the data private-endpoint subnet."
     notification_emails = ["platform-alerts@example.com"]
 
-    resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     security_rules = {
       Allow-Bastion-RDP-SSH = {
         name                       = "Allow-Bastion-RDP-SSH"
@@ -263,7 +263,7 @@ network_security_groups = {
       }
     }
   }
-  "mbb-nsg-data-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     au                  = ""
     app_code            = "data"
@@ -290,10 +290,10 @@ network_security_groups = {
     description         = "NSG for the data services subnet."
     notification_emails = ["platform-alerts@example.com"]
 
-    resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     security_rules     = {}
   }
-  "mbb-nsg-int-data-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-int-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     au                  = ""
     app_code            = "int-data"
@@ -320,10 +320,10 @@ network_security_groups = {
     description         = "NSG for the internal data (compute) subnet."
     notification_emails = ["platform-alerts@example.com"]
 
-    resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     security_rules     = {}
   }
-  "mbb-nsg-consumption-data-{env}-{region_code}-{iterator}" = {
+  "{org}-nsg-consumption-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     au                  = ""
     app_code            = "consumption-data"
@@ -350,7 +350,7 @@ network_security_groups = {
     description         = "NSG for the consumption data subnet."
     notification_emails = ["platform-alerts@example.com"]
 
-    resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     security_rules     = {}
   }
 }
@@ -360,7 +360,7 @@ network_security_groups = {
 # rewritten by the workflow from the deploy-issue network inputs.
 # =============================================================================
 virtual_networks = {
-  "mbb-vnet-data-{env}-{region_code}-{iterator}" = {
+  "{org}-vnet-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -392,7 +392,7 @@ virtual_networks = {
     notification_emails = ["platform-alerts@example.com"]
 
     address_space      = []
-    resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
 
     # VNet peering to the platform hub network (cross-subscription). `hub_key`
     # refers to a key in `hub_virtual_networks`; the module resolves the remote
@@ -401,12 +401,12 @@ virtual_networks = {
     # and firewall egress.
     peerings = {
       "to-hub" = {
-        name                                 = "mbb-peer-data-to-hub-{env}-{region_code}-{iterator}"
+        name                                 = "{org}-peer-data-to-hub-{env}-{region_code}-{iterator}"
         hub_key                              = "hub"
         allow_forwarded_traffic              = true
         allow_virtual_network_access         = true
         create_reverse_peering               = true
-        reverse_name                         = "mbb-peer-hub-to-data-{env}-{region_code}-{iterator}"
+        reverse_name                         = "{org}-peer-hub-to-data-{env}-{region_code}-{iterator}"
         reverse_allow_forwarded_traffic      = true
         reverse_allow_virtual_network_access = true
       }
@@ -420,32 +420,32 @@ virtual_networks = {
     }
 
     subnets = {
-      "mbb-snet-pe-data-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
+      "{org}-snet-pe-data-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          nsg_key = "mbb-nsg-pe-data-{env}-{region_code}-{iterator}"
+          nsg_key = "{org}-nsg-pe-data-{env}-{region_code}-{iterator}"
         }
       }
-      "mbb-snet-data-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-data-{env}-{region_code}-{iterator}"
+      "{org}-snet-data-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-data-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          nsg_key = "mbb-nsg-data-{env}-{region_code}-{iterator}"
+          nsg_key = "{org}-nsg-data-{env}-{region_code}-{iterator}"
         }
       }
-      "mbb-snet-int-data-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-int-data-{env}-{region_code}-{iterator}"
+      "{org}-snet-int-data-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-int-data-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          nsg_key = "mbb-nsg-int-data-{env}-{region_code}-{iterator}"
+          nsg_key = "{org}-nsg-int-data-{env}-{region_code}-{iterator}"
         }
       }
-      "mbb-snet-consumption-data-{env}-{region_code}-{iterator}" = {
-        name           = "mbb-snet-consumption-data-{env}-{region_code}-{iterator}"
+      "{org}-snet-consumption-data-{env}-{region_code}-{iterator}" = {
+        name           = "{org}-snet-consumption-data-{env}-{region_code}-{iterator}"
         address_prefix = ""
         network_security_group = {
-          nsg_key = "mbb-nsg-consumption-data-{env}-{region_code}-{iterator}"
+          nsg_key = "{org}-nsg-consumption-data-{env}-{region_code}-{iterator}"
         }
       }
     }
@@ -463,8 +463,8 @@ virtual_networks = {
 # Route Table - default route to the platform firewall.
 # =============================================================================
 route_tables = {
-  "mbb-rt-datashared-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+  "{org}-rt-datashared-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "datashared"
@@ -501,10 +501,10 @@ route_tables = {
       }
     }
     subnet_associations = {
-      "pe"          = { vnet_key = "mbb-vnet-data-{env}-{region_code}-{iterator}", subnet_key = "mbb-snet-pe-data-{env}-{region_code}-{iterator}" }
-      "data"        = { vnet_key = "mbb-vnet-data-{env}-{region_code}-{iterator}", subnet_key = "mbb-snet-data-{env}-{region_code}-{iterator}" }
-      "int"         = { vnet_key = "mbb-vnet-data-{env}-{region_code}-{iterator}", subnet_key = "mbb-snet-int-data-{env}-{region_code}-{iterator}" }
-      "consumption" = { vnet_key = "mbb-vnet-data-{env}-{region_code}-{iterator}", subnet_key = "mbb-snet-consumption-data-{env}-{region_code}-{iterator}" }
+      "pe"          = { vnet_key = "{org}-vnet-data-{env}-{region_code}-{iterator}", subnet_key = "{org}-snet-pe-data-{env}-{region_code}-{iterator}" }
+      "data"        = { vnet_key = "{org}-vnet-data-{env}-{region_code}-{iterator}", subnet_key = "{org}-snet-data-{env}-{region_code}-{iterator}" }
+      "int"         = { vnet_key = "{org}-vnet-data-{env}-{region_code}-{iterator}", subnet_key = "{org}-snet-int-data-{env}-{region_code}-{iterator}" }
+      "consumption" = { vnet_key = "{org}-vnet-data-{env}-{region_code}-{iterator}", subnet_key = "{org}-snet-consumption-data-{env}-{region_code}-{iterator}" }
     }
   }
 }
@@ -513,7 +513,7 @@ route_tables = {
 # Key Vault (Standard) with CMK keys (ADLS + SQL TDE) and a private endpoint.
 # =============================================================================
 key_vaults = {
-  "mbb-kv-data-{env}-{region_code}-{iterator}" = {
+  "{org}-kv-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -536,14 +536,14 @@ key_vaults = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-{region_code}-NET01-00001"
+    app_id              = "{org}-{region_code}-NET01-00001"
     criticality         = ""
     environment         = ""
     status              = ""
     service             = "key_vault"
     budget_id           = ""
 
-    resource_group_key            = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key            = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     sku_name                      = "standard"
     public_network_access_enabled = false
 
@@ -555,17 +555,17 @@ key_vaults = {
       "cmk_crypto_user" = {
         role_definition_id_or_name = "Key Vault Crypto Service Encryption User"
         principal_id               = null
-        umi_key                    = "mbb-uami-sql-data-{env}-{region_code}-{iterator}"
+        umi_key                    = "{org}-uami-sql-data-{env}-{region_code}-{iterator}"
       }
       "cmk_crypto_user_rsv" = {
         role_definition_id_or_name = "Key Vault Crypto Service Encryption User"
         principal_id               = null
-        umi_key                    = "mbb-uami-rsv-data-{env}-{region_code}-{iterator}"
+        umi_key                    = "{org}-uami-rsv-data-{env}-{region_code}-{iterator}"
       }
       "cmk_crypto_user_bvault" = {
         role_definition_id_or_name = "Key Vault Crypto Service Encryption User"
         principal_id               = null
-        umi_key                    = "mbb-uami-bvault-data-{env}-{region_code}-{iterator}"
+        umi_key                    = "{org}-uami-bvault-data-{env}-{region_code}-{iterator}"
       }
     }
     additional_tags = {}
@@ -628,10 +628,10 @@ key_vaults = {
     }
 
     private_endpoints = {
-      "mbb-pe-kv-data-{env}-{region_code}-{iterator}" = {
-        vnet_key     = "mbb-vnet-data-{env}-{region_code}-{iterator}"
-        subnet_key   = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
-        name         = "mbb-pe-kv-data-{env}-{region_code}-{iterator}"
+      "{org}-pe-kv-data-{env}-{region_code}-{iterator}" = {
+        vnet_key     = "{org}-vnet-data-{env}-{region_code}-{iterator}"
+        subnet_key   = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
+        name         = "{org}-pe-kv-data-{env}-{region_code}-{iterator}"
         dns_zone_key = "vault_core"
       }
     }
@@ -642,8 +642,8 @@ key_vaults = {
 # Application Insights (wired to central LAW).
 # =============================================================================
 application_insights = {
-  "mbb-appi-data-{env}-{region_code}-{iterator}" = {
-    resource_group_key  = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+  "{org}-appi-data-{env}-{region_code}-{iterator}" = {
+    resource_group_key  = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     env                 = ""
     au                  = ""
     app_code            = "data"
@@ -682,7 +682,7 @@ application_insights = {
 # =============================================================================
 user_managed_identities = {
   # Backup platform identities (CMK for Recovery Services Vault + Backup Vault).
-  "mbb-uami-rsv-data-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-rsv-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -712,10 +712,10 @@ user_managed_identities = {
     region              = ""
     description         = "UMI for Recovery Services Vault (CMK)."
     notification_emails = ["platform-alerts@example.com"]
-    resource_group_key  = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key  = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     enable_telemetry    = true
   }
-  "mbb-uami-bvault-data-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-bvault-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -745,10 +745,10 @@ user_managed_identities = {
     region              = ""
     description         = "UMI for Backup Vault (CMK)."
     notification_emails = ["platform-alerts@example.com"]
-    resource_group_key  = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key  = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     enable_telemetry    = true
   }
-  "mbb-uami-sql-data-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-sql-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -778,10 +778,10 @@ user_managed_identities = {
     region              = ""
     description         = "UMI for SQL Server TDE (CMK)."
     notification_emails = ["platform-alerts@example.com"]
-    resource_group_key  = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+    resource_group_key  = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
     enable_telemetry    = true
   }
-  "mbb-uami-sa-adls-data-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-sa-adls-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -811,10 +811,10 @@ user_managed_identities = {
     region              = ""
     description         = "UMI for the ADLS storage account (CMK)."
     notification_emails = ["platform-alerts@example.com"]
-    resource_group_key  = "mbb-rg-datastorage-{env}-{region_code}-{iterator}"
+    resource_group_key  = "{org}-rg-datastorage-{env}-{region_code}-{iterator}"
     enable_telemetry    = true
   }
-  "mbb-uami-adf-data-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-adf-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -844,11 +844,11 @@ user_managed_identities = {
     region              = ""
     description         = "UMI for Azure Data Factory."
     notification_emails = ["platform-alerts@example.com"]
-    resource_group_key  = "mbb-rg-dataingestion-{env}-{region_code}-{iterator}"
+    resource_group_key  = "{org}-rg-dataingestion-{env}-{region_code}-{iterator}"
     enable_telemetry    = true
   }
   # Event Grid System Topic identity UMI - user-assigned identity for the topic.
-  "mbb-uami-egst-data-{env}-{region_code}-{iterator}" = {
+  "{org}-uami-egst-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -878,7 +878,7 @@ user_managed_identities = {
     region              = ""
     description         = "UMI for the Event Grid System Topic."
     notification_emails = ["platform-alerts@example.com"]
-    resource_group_key  = "mbb-rg-datastorage-{env}-{region_code}-{iterator}"
+    resource_group_key  = "{org}-rg-datastorage-{env}-{region_code}-{iterator}"
     enable_telemetry    = true
   }
 }
@@ -890,12 +890,12 @@ user_managed_identities = {
 # =============================================================================
 role_assignments_config = {
   runner_kv_admin = {
-    key_vault_key        = "mbb-kv-data-{env}-{region_code}-{iterator}"
+    key_vault_key        = "{org}-kv-data-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Administrator"
   }
   adls_umi_kv_crypto = {
-    umi_key              = "mbb-uami-sa-adls-data-{env}-{region_code}-{iterator}"
-    key_vault_key        = "mbb-kv-data-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-uami-sa-adls-data-{env}-{region_code}-{iterator}"
+    key_vault_key        = "{org}-kv-data-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
 }
@@ -905,8 +905,8 @@ role_assignments_config = {
 # =============================================================================
 sql_server_secrets = {
   "admin_password" = {
-    secret_name     = "mbb-kv-data-{env}-{region_code}-{iterator}-admin-password"
-    key_vault_key   = "mbb-kv-data-{env}-{region_code}-{iterator}"
+    secret_name     = "{org}-kv-data-{env}-{region_code}-{iterator}-admin-password"
+    key_vault_key   = "{org}-kv-data-{env}-{region_code}-{iterator}"
     content_type    = "sqlServerPassword"
     expiration_date = "2027-06-01T23:59:59Z"
   }
@@ -916,7 +916,7 @@ sql_server_secrets = {
 # SQL Server + database (TDE with the CMK SQL key) + private endpoint.
 # =============================================================================
 sql_servers = {
-  "mbb-sql-data-{env}-{region_code}-{iterator}" = {
+  "{org}-sql-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -939,7 +939,7 @@ sql_servers = {
     cost_center         = ""
     data_classification = ""
     compliance          = ""
-    app_id              = "MBB-{region_code}-SQLS-001"
+    app_id              = "{org}-{region_code}-SQLS-001"
     criticality         = ""
     environment         = ""
     status              = ""
@@ -950,9 +950,9 @@ sql_servers = {
     notification_emails = ["platform-alerts@example.com"]
     additional_tags     = {}
 
-    resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
-    umi_key            = "mbb-uami-sql-data-{env}-{region_code}-{iterator}"
-    key_vault_key      = "mbb-kv-data-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
+    umi_key            = "{org}-uami-sql-data-{env}-{region_code}-{iterator}"
+    key_vault_key      = "{org}-kv-data-{env}-{region_code}-{iterator}"
     tde_key_name       = "{org}-cmk-sql-{env}-{region_code}-{iterator}"
 
     transparent_data_encryption_key_automatic_rotation_enabled = true
@@ -963,19 +963,19 @@ sql_servers = {
 
     managed_identities = {
       system_assigned = false
-      umi_key         = ["mbb-uami-sql-data-{env}-{region_code}-{iterator}"]
+      umi_key         = ["{org}-uami-sql-data-{env}-{region_code}-{iterator}"]
     }
 
     server_extended_auditing_policy = {
       enabled                 = true
       log_monitoring_enabled  = true
       retention_in_days       = 0
-      diagnostic_setting_name = "mbb-diag-audit-master-sql-data-{env}-{region_code}-{iterator}"
+      diagnostic_setting_name = "{org}-diag-audit-master-sql-data-{env}-{region_code}-{iterator}"
     }
 
     diagnostic_settings = {
       sql_audit_to_law = {
-        name                           = "mbb-diag-audit-sql-data-{env}-{region_code}-{iterator}"
+        name                           = "{org}-diag-audit-sql-data-{env}-{region_code}-{iterator}"
         log_analytics_destination_type = "Dedicated"
         log_categories                 = []
         log_groups                     = []
@@ -984,8 +984,8 @@ sql_servers = {
     }
 
     databases = {
-      "mbb-sqldb-data-{env}-{region_code}-{iterator}" = {
-        name                        = "mbb-sqldb-data-{env}-{region_code}-{iterator}"
+      "{org}-sqldb-data-{env}-{region_code}-{iterator}" = {
+        name                        = "{org}-sqldb-data-{env}-{region_code}-{iterator}"
         create_mode                 = "Default"
         collation                   = "SQL_Latin1_General_CP1_CI_AS"
         license_type                = null
@@ -1010,12 +1010,12 @@ sql_servers = {
 
     private_endpoints = {
       pe_sqlserver = {
-        name                   = "mbb-pe-sqldb-data-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-data-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-sqldb-data-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-data-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
         subresource_name       = "sqlServer"
         dns_zone_key           = "sqlserver"
-        network_interface_name = "mbb-pe-sqldb-data-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-sqldb-data-{env}-{region_code}-{iterator}-nic"
       }
     }
   }
@@ -1025,8 +1025,8 @@ sql_servers = {
 # Storage Account - ADLS Gen2 (ZRS, HNS, CMK) with blob + dfs private endpoints.
 # =============================================================================
 storage_accounts = {
-  "mbb-st-adls-data-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-datastorage-{env}-{region_code}-{iterator}"
+  "{org}-st-adls-data-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-datastorage-{env}-{region_code}-{iterator}"
     env                = ""
     au                 = ""
     app_code           = "adls-data"
@@ -1069,7 +1069,7 @@ storage_accounts = {
 
     managed_identities = {
       system_assigned = true
-      umi_key         = "mbb-uami-sa-adls-data-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-uami-sa-adls-data-{env}-{region_code}-{iterator}"
     }
 
     https_traffic_only_enabled        = true
@@ -1093,10 +1093,10 @@ storage_accounts = {
     }
 
     customer_managed_key = {
-      key_vault_key              = "mbb-kv-data-{env}-{region_code}-{iterator}"
+      key_vault_key              = "{org}-kv-data-{env}-{region_code}-{iterator}"
       key_name                   = "{org}-cmk-sa-adls-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-uami-sa-adls-data-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-uami-sa-adls-data-{env}-{region_code}-{iterator}"
     }
 
     sas_policy = {
@@ -1182,31 +1182,31 @@ storage_accounts = {
     # timeouts } - queues have no `public_access` (that is container-only).
     queues = {
       "eventgrid_system_topic_queue" = {
-        name = "mbb-egst-queue-01"
+        name = "{org}-egst-queue-01"
       }
     }
 
     private_endpoints = {
       "blob_pe" = {
-        name                   = "mbb-pe-st-adls-data-{env}-{region_code}-{iterator}-blob"
-        vnet_key               = "mbb-vnet-data-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-st-adls-data-{env}-{region_code}-{iterator}-blob"
+        vnet_key               = "{org}-vnet-data-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
         subresource_name       = "blob"
         dns_zone_key           = "storage_blob"
         network_interface_name = null
       }
       "dfs_pe" = {
-        name                   = "mbb-pe-st-adls-data-{env}-{region_code}-{iterator}-dfs"
-        vnet_key               = "mbb-vnet-data-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-st-adls-data-{env}-{region_code}-{iterator}-dfs"
+        vnet_key               = "{org}-vnet-data-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
         subresource_name       = "dfs"
         dns_zone_key           = "storage_dfs"
         network_interface_name = null
       }
       "queue_pe" = {
-        name                   = "mbb-pe-st-adls-data-{env}-{region_code}-{iterator}-queue"
-        vnet_key               = "mbb-vnet-data-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-st-adls-data-{env}-{region_code}-{iterator}-queue"
+        vnet_key               = "{org}-vnet-data-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
         subresource_name       = "queue"
         dns_zone_key           = "storage_queue"
         network_interface_name = null
@@ -1220,9 +1220,9 @@ storage_accounts = {
 # Azure + self-hosted IRs, managed private endpoints to the SQL Server + ADLS).
 # =============================================================================
 data_factories = {
-  "mbb-adf-data-{env}-{region_code}-{iterator}" = {
+  "{org}-adf-data-{env}-{region_code}-{iterator}" = {
     name               = "{org}-adf-data-{env}-{region_code}-{iterator}"
-    resource_group_key = "mbb-rg-dataingestion-{env}-{region_code}-{iterator}"
+    resource_group_key = "{org}-rg-dataingestion-{env}-{region_code}-{iterator}"
 
     env                 = ""
     org                 = ""
@@ -1261,7 +1261,7 @@ data_factories = {
       system_assigned            = true
       user_assigned_resource_ids = []
     }
-    umi_keys = ["mbb-uami-adf-data-{env}-{region_code}-{iterator}"]
+    umi_keys = ["{org}-uami-adf-data-{env}-{region_code}-{iterator}"]
 
     public_network_enabled          = false
     managed_virtual_network_enabled = true
@@ -1274,21 +1274,21 @@ data_factories = {
     managed_private_endpoints = {
       "sql_pe" = {
         subresource_name = "sqlServer"
-        sql_server_key   = "mbb-sql-data-{env}-{region_code}-{iterator}"
+        sql_server_key   = "{org}-sql-data-{env}-{region_code}-{iterator}"
       }
       "adls_sa_pe" = {
         subresource_name = "blob"
-        adls_sa_key      = "mbb-st-adls-data-{env}-{region_code}-{iterator}"
+        adls_sa_key      = "{org}-st-adls-data-{env}-{region_code}-{iterator}"
       }
     }
 
     azure_integration_runtime_azure = {
       azure_ir_01 = {
-        name     = "mbb-azure-ir-data-{env}-{region_code}-{iterator}"
+        name     = "{org}-azure-ir-data-{env}-{region_code}-{iterator}"
         location = "auto"
       }
       azure_ir_02 = {
-        name                    = "mbb-azure-ir-data-{env}-{region_code}-02"
+        name                    = "{org}-azure-ir-data-{env}-{region_code}-02"
         location                = "auto"
         virtual_network_enabled = true
         core_count              = 16
@@ -1302,7 +1302,7 @@ data_factories = {
     # after the factory is created.
     integration_runtime_self_hosted = {
       self_hosted_ir_01 = {
-        name     = "mbb-selfhosted-ir-data-{env}-{region_code}-{iterator}"
+        name     = "{org}-selfhosted-ir-data-{env}-{region_code}-{iterator}"
         location = "auto"
       }
     }
@@ -1313,7 +1313,7 @@ data_factories = {
 # Standalone Private Endpoints for the Data Factory (dataFactory + portal).
 # =============================================================================
 private_endpoints = {
-  "mbb-pe-adf-data-{env}-{region_code}-{iterator}" = {
+  "{org}-pe-adf-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     au                  = ""
     app_code            = "adf-data"
@@ -1341,15 +1341,15 @@ private_endpoints = {
     description         = "Private endpoint for Azure Data Factory."
     notification_emails = ["platform-alerts@example.com"]
 
-    resource_group_key              = "mbb-rg-dataingestion-{env}-{region_code}-{iterator}"
-    network_interface_name          = "mbb-pe-adf-data-{env}-{region_code}-{iterator}-nic"
-    vnet_key                        = "mbb-vnet-data-{env}-{region_code}-{iterator}"
-    subnet_key                      = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
-    private_connection_resource_ref = "adf:mbb-adf-data-{env}-{region_code}-{iterator}"
+    resource_group_key              = "{org}-rg-dataingestion-{env}-{region_code}-{iterator}"
+    network_interface_name          = "{org}-pe-adf-data-{env}-{region_code}-{iterator}-nic"
+    vnet_key                        = "{org}-vnet-data-{env}-{region_code}-{iterator}"
+    subnet_key                      = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
+    private_connection_resource_ref = "adf:{org}-adf-data-{env}-{region_code}-{iterator}"
     subresource_names               = ["dataFactory"]
     dns_zone_keys                   = ["adf"]
   }
-  "mbb-pe-portal-adf-data-{env}-{region_code}-{iterator}" = {
+  "{org}-pe-portal-adf-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     au                  = ""
     app_code            = "portal-adf-data"
@@ -1377,11 +1377,11 @@ private_endpoints = {
     description         = "Private endpoint for the Azure Data Factory portal."
     notification_emails = ["platform-alerts@example.com"]
 
-    resource_group_key              = "mbb-rg-dataingestion-{env}-{region_code}-{iterator}"
-    network_interface_name          = "mbb-pe-portal-adf-data-{env}-{region_code}-{iterator}-nic"
-    vnet_key                        = "mbb-vnet-data-{env}-{region_code}-{iterator}"
-    subnet_key                      = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
-    private_connection_resource_ref = "adf:mbb-adf-data-{env}-{region_code}-{iterator}"
+    resource_group_key              = "{org}-rg-dataingestion-{env}-{region_code}-{iterator}"
+    network_interface_name          = "{org}-pe-portal-adf-data-{env}-{region_code}-{iterator}-nic"
+    vnet_key                        = "{org}-vnet-data-{env}-{region_code}-{iterator}"
+    subnet_key                      = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
+    private_connection_resource_ref = "adf:{org}-adf-data-{env}-{region_code}-{iterator}"
     subresource_names               = ["portal"]
     dns_zone_keys                   = ["adf_portal"]
   }
@@ -1391,8 +1391,8 @@ private_endpoints = {
 # Microsoft Fabric Capacity (analytics).
 # =============================================================================
 fabric_capacities = {
-  "mbb-fc-data-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-dataanalytics-{env}-{region_code}-{iterator}"
+  "{org}-fc-data-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-dataanalytics-{env}-{region_code}-{iterator}"
     sku_name           = "F4"
     administration_members = [
       "{fabric_admin}"
@@ -1437,23 +1437,23 @@ fabric_capacities = {
 # =============================================================================
 data_rbac_role_assignments = {
   adf_umi_on_key_vault = {
-    umi_key              = "mbb-uami-adf-data-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-data-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-uami-adf-data-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-data-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Secrets User"
   }
   adf_system_on_key_vault = {
-    system_identity_key  = "mbb-adf-data-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-kv-data-{env}-{region_code}-{iterator}"
+    system_identity_key  = "{org}-adf-data-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-data-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Secrets User"
   }
   adf_umi_on_adls = {
-    umi_key              = "mbb-uami-adf-data-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-st-adls-data-{env}-{region_code}-{iterator}"
+    umi_key              = "{org}-uami-adf-data-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-st-adls-data-{env}-{region_code}-{iterator}"
     role_definition_name = "Storage Blob Data Contributor"
   }
   adf_system_on_adls = {
-    system_identity_key  = "mbb-adf-data-{env}-{region_code}-{iterator}"
-    scope_key            = "mbb-st-adls-data-{env}-{region_code}-{iterator}"
+    system_identity_key  = "{org}-adf-data-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-st-adls-data-{env}-{region_code}-{iterator}"
     role_definition_name = "Storage Blob Data Contributor"
   }
   # External-principal grants (Purview MSI / Fabric SP) removed for portability -
@@ -1463,11 +1463,11 @@ data_rbac_role_assignments = {
 # =============================================================================
 # Event Grid System Topic (BARE - no event subscriptions). Declared directly in
 # main.tf with source_arm_resource_id (valid on azurerm < 4.37, the version this
-# stack is pinned to via the mbb_fabric_capacity module). App teams add delivery
+# stack is pinned to via the {org}_fabric_capacity module). App teams add delivery
 # subscriptions later.
 # =============================================================================
 eventgrid_system_topics = {
-  "mbb-egst-data-{env}-{region_code}-{iterator}" = {
+  "{org}-egst-data-{env}-{region_code}-{iterator}" = {
     env                 = ""
     org                 = ""
     region_code         = ""
@@ -1498,9 +1498,9 @@ eventgrid_system_topics = {
     description         = "Event Grid System Topic for ADLS blob events."
     notification_emails = ["platform-alerts@example.com"]
 
-    storage_account_key         = "mbb-st-adls-data-{env}-{region_code}-{iterator}"
-    umi_key                     = "mbb-uami-egst-data-{env}-{region_code}-{iterator}"
-    resource_group_key          = "mbb-rg-datastorage-{env}-{region_code}-{iterator}"
+    storage_account_key         = "{org}-st-adls-data-{env}-{region_code}-{iterator}"
+    umi_key                     = "{org}-uami-egst-data-{env}-{region_code}-{iterator}"
+    resource_group_key          = "{org}-rg-datastorage-{env}-{region_code}-{iterator}"
     eventgrid_system_topic_type = "Microsoft.Storage.StorageAccounts"
 
     eventgrid_system_topic_identity = {
@@ -1513,12 +1513,12 @@ eventgrid_system_topics = {
 
 # =============================================================================
 # Backup platform - Recovery Services Vault (VM / file share backup).
-# CMK-encrypted via mbb-uami-rsv-data + {org}-cmk-rsv-data; the private endpoint
+# CMK-encrypted via {org}-uami-rsv-data + {org}-cmk-rsv-data; the private endpoint
 # registers into the shared `backup_azure` private DNS zone.
 # =============================================================================
 recovery_service_vaults = {
-  "mbb-rsv-datashared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+  "{org}-rsv-datashared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
 
     # Naming module required variables
     env                = ""
@@ -1554,7 +1554,7 @@ recovery_service_vaults = {
     region              = ""
     desc                = "Recovery Services Vault for data backup"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-DATA-01-00001"
+    app_id              = "{org}-DATA-01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -1580,37 +1580,37 @@ recovery_service_vaults = {
     # Managed Identity for CMK encryption
     managed_identities = {
       system_assigned             = false
-      user_assigned_identity_refs = ["mbb-uami-rsv-data-{env}-{region_code}-{iterator}"]
+      user_assigned_identity_refs = ["{org}-uami-rsv-data-{env}-{region_code}-{iterator}"]
     }
 
     # Customer Managed Key encryption
     customer_managed_key = {
-      key_vault_key              = "mbb-kv-data-{env}-{region_code}-{iterator}"
+      key_vault_key              = "{org}-kv-data-{env}-{region_code}-{iterator}"
       key_ref                    = "{org}-cmk-rsv-data-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-uami-rsv-data-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-uami-rsv-data-{env}-{region_code}-{iterator}"
     }
 
     # Private endpoint (registers into the shared backup private DNS zone)
     private_endpoints = {
       "pe_backup" = {
-        name                   = "mbb-pe-rsv-datashared-{env}-{region_code}-{iterator}"
-        vnet_key               = "mbb-vnet-data-{env}-{region_code}-{iterator}"
-        subnet_key             = "mbb-snet-pe-data-{env}-{region_code}-{iterator}"
+        name                   = "{org}-pe-rsv-datashared-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-data-{env}-{region_code}-{iterator}"
+        subnet_key             = "{org}-snet-pe-data-{env}-{region_code}-{iterator}"
         subresource_name       = "AzureBackup"
         dns_zone_keys          = ["backup_azure"]
-        network_interface_name = "mbb-pe-rsv-datashared-{env}-{region_code}-{iterator}-nic"
+        network_interface_name = "{org}-pe-rsv-datashared-{env}-{region_code}-{iterator}-nic"
       }
     }
 
     # Backup policies
     # VM backup policy - name must match the governance VM-backup assignment's
     # backupPolicyId. Schedule/retention/timezone mirror the org-standard
-    # mbb-rsv-vm-backup-policy used by every other landing zone
+    # {org}-rsv-vm-backup-policy used by every other landing zone
     # (identity/management/network/security) and the MYW reference.
     vm_backup_policy = {
-      "mbb-rsv-vm-backup-policy" = {
-        name                           = "mbb-rsv-vm-backup-policy"
+      "{org}-rsv-vm-backup-policy" = {
+        name                           = "{org}-rsv-vm-backup-policy"
         timezone                       = "Pacific Standard Time"
         instant_restore_retention_days = 5
         policy_type                    = "V2"
@@ -1652,8 +1652,8 @@ recovery_service_vaults = {
     }
 
     file_share_backup_policy = {
-      "mbb-rsv-fileshare-backup-policy" = {
-        name      = "mbb-rsv-fileshare-backup-policy"
+      "{org}-rsv-fileshare-backup-policy" = {
+        name      = "{org}-rsv-fileshare-backup-policy"
         timezone  = "Pacific Standard Time"
         frequency = "Daily"
         backup = {
@@ -1690,8 +1690,8 @@ recovery_service_vaults = {
 # access on the Key Vault (see azapi_update_resource.backup_vault_cmk).
 # =============================================================================
 backup_vaults = {
-  "mbb-bvault-datashared-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "mbb-rg-datashared-{env}-{region_code}-{iterator}"
+  "{org}-bvault-datashared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-datashared-{env}-{region_code}-{iterator}"
 
     # Naming module variables
     env                = ""
@@ -1727,7 +1727,7 @@ backup_vaults = {
     region              = ""
     desc                = "Backup Vault for data backup"
     notification_emails = ["platform-alerts@example.com"]
-    app_id              = "MBB-DATA-01-00001"
+    app_id              = "{org}-DATA-01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -1748,22 +1748,22 @@ backup_vaults = {
     # Managed Identity configuration
     managed_identities = {
       system_assigned = false
-      umi_key         = "mbb-uami-bvault-data-{env}-{region_code}-{iterator}"
+      umi_key         = "{org}-uami-bvault-data-{env}-{region_code}-{iterator}"
     }
 
     # Customer Managed Key encryption (applied post-deploy via azapi)
     customer_managed_key = {
-      key_vault_key              = "mbb-kv-data-{env}-{region_code}-{iterator}"
+      key_vault_key              = "{org}-kv-data-{env}-{region_code}-{iterator}"
       key_name                   = "{org}-cmk-bvault-data-{env}-{region_code}-{iterator}"
       key_version                = null
-      user_assigned_identity_ref = "mbb-uami-bvault-data-{env}-{region_code}-{iterator}"
+      user_assigned_identity_ref = "{org}-uami-bvault-data-{env}-{region_code}-{iterator}"
     }
 
     # Backup Policies
     backup_policies = {
-      "mbb-bvault-blob-backup-policy" = {
+      "{org}-bvault-blob-backup-policy" = {
         type                                   = "blob"
-        name                                   = "mbb-bvault-blob-backup-policy"
+        name                                   = "{org}-bvault-blob-backup-policy"
         backup_repeating_time_intervals        = ["R/2024-09-17T06:33:16+00:00/P1D"]
         operational_default_retention_duration = "P30D"
         vault_default_retention_duration       = "P90D"
@@ -1807,9 +1807,9 @@ backup_vaults = {
           }
         ]
       },
-      "mbb-bvault-disk-backup-policy" = {
+      "{org}-bvault-disk-backup-policy" = {
         type                            = "disk"
-        name                            = "mbb-bvault-disk-backup-policy"
+        name                            = "{org}-bvault-disk-backup-policy"
         backup_repeating_time_intervals = ["R/2024-09-17T06:33:16+00:00/P1D"]
         default_retention_duration      = "P30D"
         time_zone                       = "Central Standard Time"

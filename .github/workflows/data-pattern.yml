@@ -183,11 +183,11 @@ jobs:
         sed -i -E "s/(^[[:space:]]*status[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${STATUS}\2/g"                       "$TFVARS_FILE"
         sed -i -E "s/(^[[:space:]]*app_support[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${APP_SUPPORT}\2/g"             "$TFVARS_FILE"
         # Network CIDRs (from the issue form) - range-scoped so each VNet/subnet gets its own value.
-        sed -i -E "/\"mbb-vnet-data/,/^  \}/ s|(^[[:space:]]*address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${DATA_VNET_AS_LIST}]|" "$TFVARS_FILE"
-        sed -i -E "/\"mbb-snet-pe-data/,/^      \}/  s|(^[[:space:]]*address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${PE_SUBNET_PREFIX}\2|"   "$TFVARS_FILE"
-        sed -i -E "/\"mbb-snet-data/,/^      \}/     s|(^[[:space:]]*address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${DATA_SUBNET_PREFIX}\2|" "$TFVARS_FILE"
-        sed -i -E "/\"mbb-snet-int-data/,/^      \}/ s|(^[[:space:]]*address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${INT_SUBNET_PREFIX}\2|"  "$TFVARS_FILE"
-        sed -i -E "/\"mbb-snet-consumption-data/,/^      \}/ s|(^[[:space:]]*address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${CONSUMPTION_SUBNET_PREFIX}\2|"  "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-vnet-data/,/^  \}/ s|(^[[:space:]]*address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${DATA_VNET_AS_LIST}]|" "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-pe-data/,/^      \}/  s|(^[[:space:]]*address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${PE_SUBNET_PREFIX}\2|"   "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-data/,/^      \}/     s|(^[[:space:]]*address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${DATA_SUBNET_PREFIX}\2|" "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-int-data/,/^      \}/ s|(^[[:space:]]*address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${INT_SUBNET_PREFIX}\2|"  "$TFVARS_FILE"
+        sed -i -E "/\"[^\"]*-snet-consumption-data/,/^      \}/ s|(^[[:space:]]*address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${CONSUMPTION_SUBNET_PREFIX}\2|"  "$TFVARS_FILE"
         # Hub values from repo variables (portable to any hub).
         sed -i -E "s|(^[[:space:]]*source_address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${BASTION_CIDR}\2|g"   "$TFVARS_FILE"
         # Spoke VNet DNS -> hub DNS Private Resolver inbound endpoint.
