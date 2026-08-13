@@ -1,8 +1,0 @@
-# Terraform working dirs / plans (do NOT ignore modules - they are vendored/committed)
-**/.terraform/
-*.tfstate
-*.tfstate.*
-tfplan
-*.tfplan
-plan.json
-crash.log
