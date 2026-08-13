@@ -8,33 +8,23 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## MBB AI Landing Zone
+        ## AI Landing Zone
         Opening this issue triggers `.github/workflows/ai-pattern.yml`, which deploys
         the consolidated AI landing zone (shared networking + Key Vault + Storage +
         ACR, AI Foundry account/projects/deployments, APIM, Redis, AI Search, SQL,
-        Cosmos DB, Event Grid and RBAC) into the selected subscription / environment
-        / region.
+        Cosmos DB, Event Grid and RBAC) into the target subscription for the
+        selected environment / region.
 
-        This pattern uses **TWO VNets** (parity with ex/dev-ai-latest): a
-        **shared VNet** (Class A range) for the general/shared subnets, and a
-        **dedicated AI Foundry VNet** (Class B range) for the Standard-Agent
-        network injection + Foundry private endpoints, on Azure-provided DNS.
-        Provide the ranges in order: the **FIRST** range is used for the shared
-        VNet, the **SECOND** for the Foundry VNet. All CIDRs must be
+        This pattern uses **TWO VNets**: a **shared VNet** (Class A range) for the
+        general/shared subnets, and a **dedicated AI Foundry VNet** (Class B range)
+        for the Standard-Agent network injection + Foundry private endpoints, on
+        Azure-provided DNS. Provide the ranges in order: the **FIRST** range is used
+        for the shared VNet, the **SECOND** for the Foundry VNet. All CIDRs must be
         non-overlapping, IPAM-allocated.
 
-  - type: dropdown
-    id: subscription
-    attributes:
-      label: Subscription
-      description: Select the target AI subscription
-      options:
-        - mbb-ai-sub-tier4-dev-sea-01
-        - mbb-ai-sub-tier4-sit-sea-01
-        - mbb-ai-sub-tier4-uat-sea-01
-        - tst-sub-sea-01
-    validations:
-      required: true
+        > **Target subscription** is taken from the `WORKLOAD_SUBSCRIPTION_ID`
+        > repository variable (Settings → Secrets and variables → Actions →
+        > Variables), not from this form.
 
   - type: markdown
     attributes:
@@ -68,7 +58,7 @@ body:
     id: org
     attributes:
       label: Organisation Code
-      value: "mbb"
+      value: "test"
     validations:
       required: true
 
@@ -76,7 +66,7 @@ body:
     id: au
     attributes:
       label: AU Code
-      value: "00121"
+      value: "00000"
     validations:
       required: true
 
@@ -92,7 +82,7 @@ body:
     id: owner
     attributes:
       label: Owner
-      value: "CEAT"
+      value: "platform-team"
     validations:
       required: true
 
@@ -113,7 +103,7 @@ body:
     id: business_owner
     attributes:
       label: Business Owner
-      value: "Head of Cloud Engineering and Automation"
+      value: "Platform Engineering Lead"
     validations:
       required: true
 
@@ -121,7 +111,7 @@ body:
     id: business_unit
     attributes:
       label: Business Unit
-      value: "GTD-ISD"
+      value: "engineering"
     validations:
       required: true
 
