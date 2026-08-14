@@ -80,12 +80,12 @@ module "module_system_topic" {
 ##  Event Grid System Topic
 #############################
 resource "azurerm_eventgrid_system_topic" "this" {
-  name                = module.module_system_topic.name
-  resource_group_name = var.eventgrid_system_topic_resource_group_name
-  location            = module.module_system_topic.location
-  topic_type          = var.eventgrid_system_topic_type
-  source_arm_resource_id  = var.eventgrid_system_topic_source_resource_id
-  tags                = module.module_system_topic.tags
+  name                   = module.module_system_topic.name
+  resource_group_name    = var.eventgrid_system_topic_resource_group_name
+  location               = module.module_system_topic.location
+  topic_type             = var.eventgrid_system_topic_type
+  source_arm_resource_id = var.eventgrid_system_topic_source_resource_id
+  tags                   = module.module_system_topic.tags
 
   dynamic "identity" {
     for_each = var.eventgrid_system_topic_identity == null ? [] : [var.eventgrid_system_topic_identity]

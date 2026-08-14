@@ -258,7 +258,7 @@ network_security_groups = {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_ranges    = ["22", "3389"]
-        source_address_prefix      = "10.247.2.128/26" # AzureBastionSubnet CIDR in HUB
+        source_address_prefix      = "" # AzureBastionSubnet CIDR in HUB (injected by workflow from BASTION_CIDR)
         destination_address_prefix = "*"
       }
     }
@@ -412,11 +412,11 @@ virtual_networks = {
       }
     }
 
-    # DNS forwarded to the SEA hub DNS Private Resolver inbound endpoint so the
+    # DNS forwarded to the hub DNS Private Resolver inbound endpoint so the
     # spoke resolves the shared private DNS zones (vault_core, backup_azure, ...)
-    # through the hub. Region-specific: SEA = 10.247.130.196 (MYW was 10.247.2.196).
+    # through the hub. Injected by the workflow from the issue form's DNS Resolver IP.
     dns_servers = {
-      dns_servers = ["10.247.130.196"]
+      dns_servers = [""]
     }
 
     subnets = {

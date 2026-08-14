@@ -27,7 +27,7 @@
 ## Upgrade Path
 
 - Upgrade supported from `v1.0.0.0` to `v1.0.0.1`.
-- Update module source from `modules/mbb_internal_apim/v1.0.0.0` to `modules/mbb_internal_apim/v1.0.0.1`.
+- Update module source from `modules/internal_apim/v1.0.0.0` to `modules/internal_apim/v1.0.0.1`.
 - Update input contracts before running plan:
   - New required input: `global_policy_vars`.
   - Removed input: `protocols` (if previously passed at module level).
@@ -40,7 +40,7 @@
 
 - This module deploys Internal Azure API Management (`azurerm_api_management`) with optional API entities and policy components.
 - It supports API version sets, APIs, operations, named values, products, subscriptions, diagnostics, role assignments, and private endpoint integration.
-- It applies standardized naming and enterprise tags through `mbb_naming_module` v1.0.0.1.
+- It applies standardized naming and enterprise tags through `naming_module` v1.0.0.1.
 
 ## Note
 
@@ -102,15 +102,15 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_internal_apim | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_internal_apim) | v1.0.0.1 |
+| internal_apim | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/internal_apim) | v1.0.0.1 |
 
 ## Sample pipeline code snippet to use the product
 
 ### How to use this product in Terraform
 
 ```main.tf
-module "mbb_internal_apim" {
-  source = "../../modules/mbb_internal_apim/v1.0.0.1"
+module "internal_apim" {
+  source = "../../modules/internal_apim/v1.0.0.1"
 
   name                = var.name
   location            = var.location
@@ -164,7 +164,7 @@ module "mbb_internal_apim" {
 | location | Azure region | `string` | n/a | yes |
 | resource_group_name | Resource group for APIM deployment | `string` | n/a | yes |
 | publisher_email | APIM publisher email | `string` | n/a | yes |
-| publisher_name | APIM publisher name | `string` | `"Maybank"` | no |
+| publisher_name | APIM publisher name | `string` | `""` | no |
 | sku_name | APIM SKU name | `string` | `"Developer_1"` | no |
 | global_policy_vars | Global policy parameter object for JWT/rate-limit/quota controls | `object` | n/a | yes |
 | api_version_sets | API version set definitions | `map(object)` | `{}` | no |
@@ -226,12 +226,12 @@ module "mbb_internal_apim" {
 
 ## Security Policies (Hardcoded & Non-Negotiable)
 
-All security settings are intentionally hardcoded to ensure compliance with Maybank's security baseline. Users **cannot override** these settings.
+All security settings are intentionally hardcoded to ensure compliance with security baseline. Users **cannot override** these settings.
 
 | Policy | Description |
 |--------|-------------|
-| **Enforce HTTPS-only** | MBB policy -Enforces HTTPS-only communication for all APIs to ensure encrypted data transmission and prevent insecure HTTP access.  |
-| **TLS 1.2+**** | MBB policy – All gateway, management, and portal endpoints enforce encrypted communication. No plaintext or legacy TLS protocols accepted. |
+| **Enforce HTTPS-only** | policy -Enforces HTTPS-only communication for all APIs to ensure encrypted data transmission and prevent insecure HTTP access.  |
+| **TLS 1.2+**** | policy – All gateway, management, and portal endpoints enforce encrypted communication. No plaintext or legacy TLS protocols accepted. |
 
 ---------------
 # Internal APIM v1.0.0.1 — Pre-Deployment, Configuration, and Post-Deployment Guide
@@ -330,14 +330,14 @@ dns_option = "Azure Private DNS Zones"
 **Zones to create** :
 
 primary_dns_zone     = "privatelink.azure-api.net" \
-custom_dns_zone      = "internal.maybank.local" \
+custom_dns_zone      = "internal.example.local" \
 custom_dns_zone_linked_to_vnet = true
 
 
-NOTE : This is the resource id for MBB Malaysia private dns zone - /subscriptions/66f0d854-131d-4a6d-8ba0-6e289d4b540d/resourceGroups/mbb-rg-private-network-pd-myw-01/providers/Microsoft.Network/privateDnsZones/privatelink.azure-api.net
+NOTE : This is the resource id for Malaysia private dns zone - /subscriptions/66f0d854-131d-4a6d-8ba0-6e289d4b540d/resourceGroups/{org}-rg-private-network-pd-myw-01/providers/Microsoft.Network/privateDnsZones/privatelink.azure-api.net
  
- - This is hosted in the subscription mbb-plt-sub-network-prd-myw-01
- - This is in the resourcegroup : mbb-rg-private-network-pd-myw-01
+ - This is hosted in the subscription {org}-plt-sub-network-prd-myw-01
+ - This is in the resourcegroup : {org}-rg-private-network-pd-myw-01
 
   This is not for every entity. The respective dns zone details for the entity can be taken from the respective entitie's management group
 
@@ -365,8 +365,8 @@ certificate_properties = {
   format              = "PFX/PKCS12"
   key_algorithm       = "RSA 2048-bit (minimum)"
   validity_period     = "365 days"
-  subject_cn          = "*.internal.maybank.local"
-  subject_alt_names   = ["api.internal.maybank.local", "mgmt.internal.maybank.local", "portal.internal.maybank.local"]
+  subject_cn          = "*.internal.example.local"
+  subject_alt_names   = ["api.internal.example.local", "mgmt.internal.example.local", "portal.internal.example.local"]
   tls_version_minimum = "1.2"
   expiration_check    = "At least 90 days validity"
 }
@@ -386,13 +386,13 @@ Logger needs to be created and linked with app insights
 
 ## 2. Module Configuration Examples
 
-Use these examples to pass configuration values to the `mbb_internal_apim` module (v1.0.0.1).
+Use these examples to pass configuration values to the `internal_apim` module (v1.0.0.1).
 
 ### 2.1 Minimal Configuration (Production-Ready Internal APIM)
 
 ```hcl
 module "internal_apim" {
-  source = "./modules/mbb_internal_apim/v1.0.0.1"
+  source = "./modules/internal_apim/v1.0.0.1"
 
   # Identity and Location
   name                = "apim-internal-prod-sea-01"
@@ -401,7 +401,7 @@ module "internal_apim" {
 
   # Publisher Details
   publisher_name  = "Platform Engineering"
-  publisher_email = "platform-eng@maybank.com"
+  publisher_email = "platform-eng@example.com"
 
   # APIM SKU and VNet Mode (ALL REQUIRED FOR INTERNAL)
   sku_name              = "Premium_1"
@@ -434,7 +434,7 @@ location            = "Southeast Asia"
 resource_group_name = "rg-apim-internal-prod-sea-01"
 
 publisher_name  = "Platform Engineering"
-publisher_email = "platform-eng@maybank.com"
+publisher_email = "platform-eng@example.com"
 
 sku_name                      = "Premium_1"
 virtual_network_type          = "Internal"
@@ -450,7 +450,7 @@ tags = {
 
 ```hcl
 module "internal_apim" {
-  source = "./modules/mbb_internal_apim/v1.0.0.1"
+  source = "./modules/internal_apim/v1.0.0.1"
 
   # Core Configuration
   name                = "apim-internal-prod-sea-01"
@@ -458,7 +458,7 @@ module "internal_apim" {
   resource_group_name = azurerm_resource_group.apim_rg.name
 
   publisher_name  = "Platform Engineering"
-  publisher_email = "platform-eng@maybank.com"
+  publisher_email = "platform-eng@example.com"
 
   # APIM Mode and SKU
   sku_name                      = "Premium_1"  # Premium supports VNet injection
@@ -487,7 +487,7 @@ module "internal_apim" {
   hostname_configuration = {
     proxy = [
       {
-        host_name            = "api.internal.maybank.local"
+        host_name            = "api.internal.example.local"
         key_vault_id         = azurerm_key_vault.apim_kv.id
         certificate_name     = "gateway-cert"
         default_ssl_binding  = true
@@ -497,7 +497,7 @@ module "internal_apim" {
     
     management = [
       {
-        host_name        = "mgmt.internal.maybank.local"
+        host_name        = "mgmt.internal.example.local"
         key_vault_id     = azurerm_key_vault.apim_kv.id
         certificate_name = "mgmt-cert"
         negotiate_client_certificate = false
@@ -506,7 +506,7 @@ module "internal_apim" {
     
     portal = [
       {
-        host_name        = "portal.internal.maybank.local"
+        host_name        = "portal.internal.example.local"
         key_vault_id     = azurerm_key_vault.apim_kv.id
         certificate_name = "portal-cert"
         negotiate_client_certificate = false
@@ -515,7 +515,7 @@ module "internal_apim" {
 
     scm = [
       {
-        host_name        = "api.internal.maybank.local"
+        host_name        = "api.internal.example.local"
         key_vault_id     = azurerm_key_vault.apim_kv.id
         certificate_name = "gateway-cert"
         negotiate_client_certificate = false
@@ -581,7 +581,7 @@ resource "azurerm_api_management_api" "orders_api" {
   display_name   = "Orders API"
   path           = "orders"
   protocols      = ["https"]
-  service_url    = "https://backend-orders.internal.maybank.local"  # Internal backend
+  service_url    = "https://backend-orders.internal.example.local"  # Internal backend
   
   subscription_required = true
   

@@ -585,11 +585,11 @@ virtual_networks = {
       }
     }
 
-    # DNS forwarded to the SEA hub DNS Private Resolver inbound endpoint so the
+    # DNS forwarded to the hub DNS Private Resolver inbound endpoint so the
     # spoke resolves the shared private DNS zones (vault_core, backup_azure, ...)
-    # through the hub. Region-specific: SEA = 10.247.130.196 (MYW was 10.247.2.196).
+    # through the hub. Injected by the workflow from the issue form's DNS Resolver IP.
     dns_servers = {
-      dns_servers = ["10.247.130.196"]
+      dns_servers = [""]
     }
 
     subnets = {

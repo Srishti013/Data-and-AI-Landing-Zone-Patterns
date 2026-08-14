@@ -86,7 +86,7 @@ resource "azurerm_api_management" "this" {
   sku_name            = var.sku_name
   # Client certificate settings
   # client_certificate_enabled = var.client_certificate_enabled
-  client_certificate_enabled = false // mbb security policy to disabled client certificate authentication 
+  client_certificate_enabled = false // {org} security policy to disabled client certificate authentication 
   # Gateway settings
   # gateway_disabled = var.gateway_disabled
   gateway_disabled = false
@@ -256,7 +256,7 @@ resource "azurerm_api_management" "this" {
       # tls_rsa_with_aes256_gcm_sha384_ciphers_enabled      = security.value.tls_rsa_with_aes256_gcm_sha384_ciphers_enabled
       # triple_des_ciphers_enabled                          = security.value.triple_des_ciphers_enabled
 
-      #MBB Security policy to enable TLS 1.2 & above security policy & to disable weak ciphers and protocols. The values from tfvars will be ignored and set as per the security policy.
+      #Security policy to enable TLS 1.2 & above security policy & to disable weak ciphers and protocols. The values from tfvars will be ignored and set as per the security policy.
 
       backend_ssl30_enabled = false
       backend_tls10_enabled = false

@@ -83,7 +83,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| Azure Event Grid System Topic | [mbb_event_system_topic](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/user/main/modules/mbb_event_system_topic/v1.0.0.0) | 1.0.0.0 |
+| Azure Event Grid System Topic | [event_system_topic](https://github.com/your-org/iac-modules/tree/user/main/modules/event_system_topic/v1.0.0.0) | 1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -92,13 +92,13 @@
 - used in main terraform configuration file by team that are consuming the product (main.tf)
 
 ```main.tf
-module "mbb_eventgrid_system_topic" {
+module "eventgrid_system_topic" {
   for_each = var.eventgrid_system_topics
 
   providers = {
     azurerm = azurerm.dev_myw_sub
   }
-  source = "./modules/mbb_event_system_topic/v1.0.0.0"
+  source = "./modules/event_system_topic/v1.0.0.0"
 
   env                = each.value.env
   org                = each.value.org
@@ -181,10 +181,10 @@ module "mbb_eventgrid_system_topic" {
 
 ```tfvars
 eventgrid_system_topics = {
-  "mbb-egst-data-dev-myw-01" = {
+  "{org}-egst-data-dev-myw-01" = {
 
     env                = "dev"
-    org                = "mbb"
+    org                = "{org}"
     region_code        = "myw"
     base_name          = ""
     additional_name    = ""
@@ -201,17 +201,17 @@ eventgrid_system_topics = {
 
     # Mandatory Business Tags
     app_name            = "AI Base Infrastructure"
-    app_support         = "mss_ceat@maybank.com"
+    app_support         = "mss_ceat@example.com"
     business_unit       = "GTD-ISD"
     business_owner      = "Head of Cloud Engineering and Automation"
     type                = "Development"
     cost_center         = "383-80572"
     data_classification = "Business Sensitive"
     compliance          = "BNM RMIT"
-    app_id              = "MBB-SEA-NET01-00001"
+    app_id              = "-SEA-NET01-00001"
 
     # Mandatory DevOps Tags
-    product_name    = "mbb_eventgrid_namespace"
+    product_name    = "eventgrid_namespace"
     product_version = "1.0.0.0"
 
     # Mandatory Finance Tags
@@ -227,13 +227,13 @@ eventgrid_system_topics = {
     # Optional Tags
     description         = "Base Infra EventGrid Namespace for development environment"
     region              = "MYW"
-    notification_emails = ["mss_ceat@maybank.com"]
+    notification_emails = ["mss_ceat@example.com"]
     role_assignments    = {}
     additional_tags     = {}
 
-    storage_account_key         = "mbb-sa-egst-data-dev-myw-01"
-    umi_key                     = "mbb-uami-egst-data-dev-myw-01"
-    resource_group_key          = "mbb-rg-dataingestion-dev-myw-01"
+    storage_account_key         = "{org}-sa-egst-data-dev-myw-01"
+    umi_key                     = "{org}-uami-egst-data-dev-myw-01"
+    resource_group_key          = "{org}-rg-dataingestion-dev-myw-01"
     eventgrid_system_topic_type = "Microsoft.Storage.StorageAccounts"
 
     eventgrid_system_topic_identity = {
@@ -241,15 +241,15 @@ eventgrid_system_topics = {
     }
 
     event_subscriptions = {
-      mbb-evgts-data-dev-myw-01 = {
-        eventgrid_system_topic_event_subscription_name                  = "mbb-evgts-data-dev-myw-01"
-        resource_group_key                                              = "mbb-rg-dataingestion-dev-myw-01"
+      {org}-evgts-data-dev-myw-01 = {
+        eventgrid_system_topic_event_subscription_name                  = "{org}-evgts-data-dev-myw-01"
+        resource_group_key                                              = "{org}-rg-dataingestion-dev-myw-01"
         eventgrid_system_topic_event_subscription_expiration_time_utc   = "2026-12-31T23:59:59Z"
         eventgrid_system_topic_event_subscription_event_delivery_schema = "EventGridSchema"
 
         eventgrid_system_topic_event_subscription_storage_queue_endpoint = {
-          storage_account_key                   = "mbb-sa-egst-data-dev-myw-01"
-          queue_name                            = "mbb-egst-queue-01"
+          storage_account_key                   = "{org}-sa-egst-data-dev-myw-01"
+          queue_name                            = "{org}-egst-queue-01"
           queue_message_time_to_live_in_seconds = 3600
         }
       }

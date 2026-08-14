@@ -33,7 +33,7 @@ variable "app_code" {
 
 variable "bu" {
   type        = string
-  description = "(Required) Business unit code. Example: IT or mbb."
+  description = "(Required) Business unit code. Example: IT or {org}."
 }
 
 # -
@@ -217,8 +217,8 @@ variable "region" {
 # -
 variable "org" {
   type        = string
-  description = "(Optional) Company/business unit code. Example: `mbb`."
-  default     = "mbb"
+  description = "(Optional) Company/business unit code. Example: `{org}`."
+  default     = "{org}"
 }
 
 variable "region_code" {
@@ -314,7 +314,7 @@ variable "diagnostic_settings" {
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
   }))
-  # default     = {} // commented to force user input for diagnostic settings #mbb policy (Security pattern)
+  # default     = {} // commented to force user input for diagnostic settings #{org} policy (Security pattern)
   description = <<DESCRIPTION
 A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
@@ -566,7 +566,7 @@ variable "private_endpoints" {
       private_ip_address = string
     })), {})
   }))
-  # default     = {} // commented to force user input for private endpoint creation #mbb policy (Security pattern)
+  # default     = {} // commented to force user input for private endpoint creation #{org} policy (Security pattern)
   description = <<DESCRIPTION
 A map of private endpoints to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
@@ -601,7 +601,7 @@ variable "public_network_access_enabled" {
   default     = false
   description = "Specifies whether public access is permitted."
 }
-// commenting this section for mbb policy definitions. The default value is hardcoded to true
+// commenting this section for {org} policy definitions. The default value is hardcoded to true
 # variable "purge_protection_enabled" {
 #   type        = bool
 #   default     = true

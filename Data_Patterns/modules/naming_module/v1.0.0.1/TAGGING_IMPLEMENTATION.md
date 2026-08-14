@@ -1,8 +1,8 @@
-# MBB Naming Module - Tagging Implementation Summary
+# Naming Module - Tagging Implementation Summary
 
 ## Changes Made
 
-The mbb_naming_module has been updated to enforce a comprehensive tagging strategy aligned with Maybank's governance requirements.
+The naming_module has been updated to enforce a comprehensive tagging strategy aligned with governance requirements.
 
 ## What Was Added
 
@@ -72,29 +72,29 @@ Existing functionality preserved:
 
 ```hcl
 module "naming" {
-  source = "../../mbb_naming_module/v1.0.0.0"
+  source = "../../naming_module/v1.0.0.0"
 
   # Existing naming parameters
   env                = "dev"
-  org                = "mbb"
+  org                = "{org}"
   region_code        = "sea"
   base_name          = "app"
   resource_type_code = "rg"
   au                 = "00121"
   app_code           = "webapp"
   bu                 = "it"
-  owner              = "owner@maybank.com"
+  owner              = "owner@example.com"
 
   # NEW: Mandatory Business Tags
   app_name       = "My Application"
-  app_support    = "support@maybank.com"
+  app_support    = "support@example.com"
   business_unit  = "IT Department"
   country        = "MY"
   business_owner = "John Doe"
   type           = "Application"
 
   # NEW: Mandatory DevOps Tags
-  product_name    = "mbb_resource_group"
+  product_name    = "resource_group"
   product_version = "1.0.0"
 
   # NEW: Mandatory Finance Tags
@@ -128,7 +128,7 @@ resource "azurerm_resource_group" "this" {
 
 ## Migration Guide
 
-### For Existing Modules Using mbb_naming_module
+### For Existing Modules Using naming_module
 
 1. **Add mandatory tag variables** to your module calls
 2. **Update module calls** with the new required tags
@@ -152,7 +152,7 @@ resource "azurerm_resource_group" "this" {
 ## Next Steps
 
 1. ✅ Test the module with a sample deployment
-2. ✅ Update dependent modules (like mbb_resource_group)
+2. ✅ Update dependent modules (like resource_group)
 3. ✅ Document migration path for existing deployments
 4. ✅ Create Terraform validation tests
 

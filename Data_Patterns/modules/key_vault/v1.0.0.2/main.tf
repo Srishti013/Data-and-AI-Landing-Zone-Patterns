@@ -80,14 +80,14 @@ resource "azurerm_key_vault" "this" {
   sku_name            = var.sku_name
   tenant_id           = var.tenant_id
   # enable_rbac_authorization       = !var.legacy_access_policies_enabled //RBAC default from AVM
-  enable_rbac_authorization       = true //mbb policy to enforce RBAC polcies 
+  enable_rbac_authorization       = true //{org} policy to enforce RBAC polcies 
   enabled_for_deployment          = var.enabled_for_deployment
   enabled_for_disk_encryption     = var.enabled_for_disk_encryption
   enabled_for_template_deployment = var.enabled_for_template_deployment
   # public_network_access_enabled   = var.public_network_access_enabled //Public network access default from AVM
-  public_network_access_enabled = false //mbb policy to disable public access
+  public_network_access_enabled = false //{org} policy to disable public access
   # purge_protection_enabled        = var.purge_protection_enabled  //purge protection default from AVM
-  purge_protection_enabled   = true //mbb policy to enable purge protection
+  purge_protection_enabled   = true //{org} policy to enable purge protection
   soft_delete_retention_days = var.soft_delete_retention_days
   tags                       = module.module_kv.tags
 

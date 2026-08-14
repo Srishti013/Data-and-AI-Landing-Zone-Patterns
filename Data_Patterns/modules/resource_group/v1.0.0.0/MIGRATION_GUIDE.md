@@ -1,8 +1,8 @@
-# MBB Resource Group Module - Updated for Comprehensive Tagging
+# Resource Group Module - Updated for Comprehensive Tagging
 
 ## Overview
 
-The `mbb_resource_group` module has been updated to integrate with the enhanced `mbb_naming_module` that enforces comprehensive tagging standards.
+The `resource_group` module has been updated to integrate with the enhanced `naming_module` that enforces comprehensive tagging standards.
 
 ## What Changed
 
@@ -23,7 +23,7 @@ Added comprehensive mandatory tag variables:
 - `type` - Infrastructure or business service type
 
 #### DevOps Tags
-- `product_name` - Terraform module name (defaults to "mbb_resource_group")
+- `product_name` - Terraform module name (defaults to "resource_group")
 - `product_version` - Module version
 
 #### Finance Tags
@@ -69,22 +69,22 @@ Added optional tag variables for resource groups:
 
 ```hcl
 module "resource_group" {
-  source = "path/to/mbb_resource_group/v1.0.0.0"
+  source = "path/to/resource_group/v1.0.0.0"
 
   # Naming parameters
   env                = "dev"
-  org                = "mbb"
+  org                = "{org}"
   region_code        = "sea"
   base_name          = "myapp"
   au                 = "00121"
   app_code           = "webapp"
   bu                 = "it"
-  owner              = "devops@maybank.com"
+  owner              = "devops@example.com"
   resource_type_code = "rg"
 
   # Mandatory Business Tags
   app_name       = "My Application"
-  app_support    = "support@maybank.com"
+  app_support    = "support@example.com"
   business_unit  = "IT Department"
   country        = "MY"
   business_owner = "John Doe"
@@ -113,7 +113,7 @@ module "resource_group" {
   # Optional tags
   tier                = "web-tier"
   backup_policy       = "Daily"
-  notification_emails = "alerts@maybank.com"
+  notification_emails = "alerts@example.com"
 }
 ```
 
@@ -121,20 +121,20 @@ module "resource_group" {
 
 ```hcl
 module "resource_group_minimal" {
-  source = "path/to/mbb_resource_group/v1.0.0.0"
+  source = "path/to/resource_group/v1.0.0.0"
 
   # Basic naming
   env                = "dev"
   au                 = "00121"
   app_code           = "app"
   bu                 = "it"
-  owner              = "owner@maybank.com"
+  owner              = "owner@example.com"
   resource_type_code = "rg"
   base_name          = "minimal"
 
   # Mandatory tags (minimal required)
   app_name            = "Minimal App"
-  app_support         = "support@maybank.com"
+  app_support         = "support@example.com"
   business_unit       = "IT"
   country             = "MY"
   business_owner      = "John Doe"
@@ -158,7 +158,7 @@ module "resource_group_minimal" {
 2. **Remove manual tag definitions** - tags now come from the naming module
 3. **Review default values** - some tags have sensible defaults:
    - `type` = "Infrastructure"
-   - `product_name` = "mbb_resource_group"
+   - `product_name` = "resource_group"
    - `compliance_required` = "No"
    - `compliance` = "None"
    - `status` = "Live"
@@ -185,7 +185,7 @@ module "rg" {
   
   # NEW: All mandatory tags required
   app_name            = "My App"
-  app_support         = "support@maybank.com"
+  app_support         = "support@example.com"
   business_unit       = "IT"
   # ... etc
 }
@@ -214,6 +214,6 @@ See the [examples/comprehensive-tagging](./examples/comprehensive-tagging/) dire
 ## Support
 
 For questions or issues:
-1. Review the naming module documentation: `mbb_naming_module/v1.0.0.0/examples/TAGGING_STRATEGY.md`
+1. Review the naming module documentation: `naming_module/v1.0.0.0/examples/TAGGING_STRATEGY.md`
 2. Check the examples in this module
-3. Refer to the Maybank governance standards
+3. Refer to the governance standards

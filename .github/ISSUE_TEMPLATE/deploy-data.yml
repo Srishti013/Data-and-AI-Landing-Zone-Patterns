@@ -240,3 +240,12 @@ body:
       description: CIDR prefix for the consumption data subnet, within range 2 (e.g. 10.247.153.64/26)
     validations:
       required: true
+
+  - type: input
+    id: dns_resolver_ip
+    attributes:
+      label: DNS Resolver IP
+      description: Inbound IP of the hub DNS Private Resolver. Spoke VNets use it as their DNS server. Read it from the hub resolver's inbound endpoint (it is dynamically assigned, not fixed).
+      placeholder: "10.247.130.196"
+    validations:
+      required: true

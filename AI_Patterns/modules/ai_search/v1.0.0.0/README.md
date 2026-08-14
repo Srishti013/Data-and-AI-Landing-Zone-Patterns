@@ -85,7 +85,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| Azure AI Search | [mbb_ai_search](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/user/main/modules/mbb_ai_search/v1.0.0.0) | 1.0.0.0 |
+| Azure AI Search | [ai_search](https://github.com/your-org/iac-modules/tree/user/main/modules/ai_search/v1.0.0.0) | 1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -101,7 +101,7 @@ module "ai_search_service" {
     azurerm = azurerm.dev_myw_sub
   }
 
-  source             = "./modules/mbb_ai_search/v1.0.0.0"
+  source             = "./modules/ai_search/v1.0.0.0"
   env                = each.value.env
   org                = each.value.org
   region_code        = each.value.region_code
@@ -191,9 +191,9 @@ module "ai_search_service" {
 
 ```tfvars
 search_services = {
-  "mbb-srch-dev-myw-01" = {
+  "{org}-srch-dev-myw-01" = {
     env                = "dev"
-    org                = "mbb"
+    org                = "{org}"
     region_code        = "myw"
     base_name          = ""
     additional_name    = ""
@@ -210,17 +210,17 @@ search_services = {
 
     # Mandatory Business Tags
     app_name            = "AI Base Infrastructure"
-    app_support         = "mss_ceat@maybank.com"
+    app_support         = "mss_ceat@example.com"
     business_unit       = "GTD-ISD"
     business_owner      = "Head of Cloud Engineering and Automation"
     type                = "Development"
     cost_center         = "383-80572"
     data_classification = "Business Sensitive"
     compliance          = "BNM RMIT"
-    app_id              = "MBB-MYW-NET01-00001"
+    app_id              = "-MYW-NET01-00001"
 
     # Mandatory DevOps Tags
-    product_name    = "mbb_ai_search"
+    product_name    = "ai_search"
     product_version = "1.0.0.0"
 
     # Mandatory Finance Tags
@@ -236,16 +236,16 @@ search_services = {
     # Optional Tags
     description         = "Base Infra AI Search for development environment"
     region              = "MYW"
-    notification_emails = ["mss_ceat@maybank.com"]
+    notification_emails = ["mss_ceat@example.com"]
     role_assignments    = {}
     additional_tags     = {}
 
 
-    # name                          = "mbb-xxxx"
+    # name                          = "{org}-xxxx"
     # location                      = "southeastasia"
-    rg_key                        = "mbb-xxx"
-    umi_key                       = "mbb-xxx"
-    resource_group_name           = "mbb-xxx"
+    rg_key                        = "{org}-xxx"
+    umi_key                       = "{org}-xxx"
+    resource_group_name           = "{org}-xxx"
     sku                           = "standard"
     public_network_access_enabled = false
     local_authentication_enabled  = false
@@ -255,13 +255,13 @@ search_services = {
       system_assigned = true
     }
     private_endpoints = {
-      "mbb-pe-srch-dev-myw-01" = {
-        name                   = "mbb-xxxx"
-        vnet_key               = "mbb-xxxx"
-        subnet_key             = "mbb-sxxx"
+      "{org}-pe-srch-dev-myw-01" = {
+        name                   = "{org}-xxxx"
+        vnet_key               = "{org}-xxxx"
+        subnet_key             = "{org}-sxxx"
         subresource_name       = "searchService"
         dns_zone_keys          = ["search-zone"]
-        network_interface_name = "mbb-xxx"
+        network_interface_name = "{org}-xxx"
       }
     }
 

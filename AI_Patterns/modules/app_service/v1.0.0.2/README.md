@@ -20,8 +20,8 @@
 
 ### v1.0.0.2
 
-- Updated Maybank-hardened version of Azure App Service workload deployment module (`mbb_app_service`).
-- Enforces Maybank security baseline for HTTPS-only traffic and private endpoint based access patterns.
+- Updated hardened version of Azure App Service workload deployment module (`app_service`).
+- Enforces security baseline for HTTPS-only traffic and private endpoint based access patterns.
 
 ## Upgrade Path
 
@@ -33,15 +33,15 @@
 
 - This Terraform module deploys Azure App Service workloads for `webapp`, `functionapp`, and `logicapp` scenarios.
 - It supports Windows and Linux workloads, deployment slots, private endpoints, custom domains, authentication settings, diagnostic settings, managed identities, application settings, connection strings, certificates, and optional Application Insights integration.
-- Naming and location are derived from the Maybank naming module rather than direct `name` and `location` inputs.
-- This version is aligned to the Maybank security baseline with hardened defaults for secure transport and private access.
+- Naming and location are derived from the naming module rather than direct `name` and `location` inputs.
+- This version is aligned to the security baseline with hardened defaults for secure transport and private access.
 
 ## Note
 
 - `kind` must be one of `functionapp`, `webapp`, or `logicapp`.
 - `os_type` must be `Linux` or `Windows`.
 - This module expects an existing App Service Plan via `service_plan_resource_id`.
-- Security-sensitive defaults in this version are intentionally opinionated to support Maybank standards.
+- Security-sensitive defaults in this version are intentionally opinionated to support standards.
 
 ## Network Topology (wherever applicable)
 
@@ -101,7 +101,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_app_service | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_app_service) | v1.0.0.2 |
+| app_service | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/app_service) | v1.0.0.2 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -109,7 +109,7 @@
 
 ```main.tf
 module "app_service" {
-  source = "../../modules/mbb_app_service/v1.0.0.2"
+  source = "../../modules/app_service/v1.0.0.2"
 
   # Required workload parameters
   kind                     = var.kind

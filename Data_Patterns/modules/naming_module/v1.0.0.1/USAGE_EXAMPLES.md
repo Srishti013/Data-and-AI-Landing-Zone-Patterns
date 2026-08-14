@@ -1,10 +1,10 @@
-# Example Usage of MBB Naming Module v1.0.0.1
+# Example Usage of Naming Module v1.0.0.1
 
 ## Basic Resource Group Example
 
 ```hcl
 module "naming" {
-  source = "../mbb_naming_module/v1.0.0.1"
+  source = "../naming_module/v1.0.0.1"
 
   # Required Naming Variables
   resource_type_code = "rg"
@@ -37,7 +37,7 @@ resource "azurerm_resource_group" "example" {
 
 ```hcl
 module "naming_storage" {
-  source = "../mbb_naming_module/v1.0.0.1"
+  source = "../naming_module/v1.0.0.1"
 
   # Required Naming Variables
   resource_type_code = "st"

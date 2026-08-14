@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated module interface toward Maybank governance and lifecycle metadata alignment.
+- Updated module interface toward governance and lifecycle metadata alignment.
 - No resource, data source, output, or provider-constraint changes between `v1.0.0.0` and `v1.0.0.1`.
 
 ### Removed

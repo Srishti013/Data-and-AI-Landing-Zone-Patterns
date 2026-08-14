@@ -33,7 +33,7 @@ variable "resource_type_code" {
 
 variable "product_version" {
   type        = string
-  description = "(Required) mbb product version. Example: `1.0.0`."
+  description = "(Required) {org} product version. Example: `1.0.0`."
 }
 
 variable "app_code" {
@@ -43,7 +43,7 @@ variable "app_code" {
 
 variable "bu" {
   type        = string
-  description = "(Required) Bussiness unit code. Example: IT or mbb."
+  description = "(Required) Bussiness unit code. Example: IT or {org}."
 }
 
 # -
@@ -309,13 +309,13 @@ variable "platform_area" {
 # -
 variable "org" {
   type        = string
-  description = "(Optional) <CN> company/businness unit code. Example: `mbb`."
-  default     = "mbb"
+  description = "(Optional) <CN> company/businness unit code. Example: `{org}`."
+  default     = "{org}"
 }
 
 variable "region_code" {
   type        = string
-  description = "(Optional) mbb region code.<br></br>&#8226; Value of `region_code` must be one of: `[sea,ea,eu,sg,myw,idc]`."
+  description = "(Optional) {org} region code.<br></br>&#8226; Value of `region_code` must be one of: `[sea,ea,eu,sg,myw,idc]`."
   validation {
     condition     = contains(["ea", "sea", "eu", "myw", "sg", "idc"], var.region_code)
     error_message = "Value of \"region_code\" must be one of: [ea,sea,eu,myw,sg,idc]."

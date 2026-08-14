@@ -20,7 +20,7 @@
 
 ### v1
 
-- Initial version to deploy Azure API Management policy templates (`mbb_apim_policies`).
+- Initial version to deploy Azure API Management policy templates (`apim_policies`).
 
 ## Upgrade Path
 
@@ -31,14 +31,14 @@
 ## Overview
 
 - This module provides a library of reusable, pre-approved XML policy templates for Azure API Management.
-- Templates are parameterised using `${}` substitution variables and rendered at deployment time via the `mbb_apim_api` module's `policy_template` + `policy_vars` inputs.
+- Templates are parameterised using `${}` substitution variables and rendered at deployment time via the `apim_api` module's `policy_template` + `policy_vars` inputs.
 - Policies cover correlation ID propagation, JWT validation, mTLS, IP filtering, rate limiting, quota, CORS, URI rewriting, security headers, and backend timeout/retry with logging.
 - Two global mandated policy files are included for internal and external APIM instances.
 
 ## Note
 
 - This module contains only XML template files — it does not deploy any Terraform resources directly.
-- Templates must be referenced by path from the consuming module (e.g., `mbb_apim_api`) using `${path.module}`-relative paths.
+- Templates must be referenced by path from the consuming module (e.g., `apim_api`) using `${path.module}`-relative paths.
 
 ## Network Topology (wherever applicable)
 
@@ -51,7 +51,7 @@
 ## Azure Services Needed (Pre-Requisites)
 
 - Existing Azure API Management service
-- Existing APIM APIs and operations (managed via `mbb_apim_api`)
+- Existing APIM APIs and operations (managed via `apim_api`)
 
 ## Optional Azure services Used (Customer Choice)
 
@@ -70,7 +70,7 @@
 
 ## Overview
 
-- Reference policy template files from the `mbb_apim_api` module using the `policy.policy_template` and `policy.policy_vars` inputs on an API or operation.
+- Reference policy template files from the `apim_api` module using the `policy.policy_template` and `policy.policy_vars` inputs on an API or operation.
 
 ## Pre-requisites
 
@@ -85,7 +85,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_apim_policies | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_apim_policies) | v1.0.0.0 |
+| apim_policies | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/apim_policies) | v1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -93,7 +93,7 @@
 
 ```main.tf
 module "apim_api" {
-  source = "../../modules/mbb_apim_api/v1.0.0.0"
+  source = "../../modules/apim_api/v1.0.0.0"
 
   apim_name           = var.apim_name
   resource_group_name = var.resource_group_name
@@ -106,7 +106,7 @@ module "apim_api" {
 
       # API-level policy — correlation ID propagation
       policy = {
-        policy_template = "${path.module}/../../modules/mbb_apim_policies/v1.0.0.0/01-correlation.xml"
+        policy_template = "${path.module}/../../modules/apim_policies/v1.0.0.0/01-correlation.xml"
         policy_vars = {
           correlation_variable_name = "corrId"
           correlation_header_name   = "x-correlation-id"
@@ -122,7 +122,7 @@ module "apim_api" {
 
           # Operation-level policy — rate limiting
           policy = {
-            policy_template = "${path.module}/../../modules/mbb_apim_policies/v1.0.0.0/05-rate-limit-by-key.xml"
+            policy_template = "${path.module}/../../modules/apim_policies/v1.0.0.0/05-rate-limit-by-key.xml"
             policy_vars = {
               rate_limit_calls               = "100"
               rate_limit_period              = "60"
@@ -208,12 +208,12 @@ Not applicable — this module contains XML policy templates only and has no Ter
 
 ## Overview
 
-This is the Maybank (MBB) standardized implementation of **Azure API Management Policies** module.  
+This is the () standardized implementation of **Azure API Management Policies** module.  
 This module enforces reusable **policy templates, fragments, and policy documents** across APIM instances
 
 ## What's in v1.0.0.0
 
-Initial MBB baseline release for enterprise APIM policy management with hardcoded security baselines.
+Initial baseline release for enterprise APIM policy management with hardcoded security baselines.
 
 
 
@@ -236,7 +236,7 @@ The following requirements are needed by this module:
 
 - Terraform >= 1.9, < 2.0
 - Azure Provider >= 4.0
-- Existing APIM instance (created by `mbb_internal_apim` or `mbb_External_apim`)
+- Existing APIM instance (created by `internal_apim` or `External_apim`)
 - Required providers as defined in `versions.tf`
 
 ---

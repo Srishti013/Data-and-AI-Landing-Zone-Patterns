@@ -20,7 +20,7 @@
 
 ### v1
 
-- Initial version to deploy Azure App Service workloads (`mbb_app_service`).
+- Initial version to deploy Azure App Service workloads (`app_service`).
 
 ## Upgrade Path
 
@@ -32,7 +32,7 @@
 
 - This Terraform module deploys Azure App Service workloads for `webapp`, `functionapp`, and `logicapp` scenarios.
 - It supports Windows and Linux workloads, deployment slots, private endpoints, custom domains, authentication settings, diagnostic settings, managed identities, application settings, connection strings, certificates, and optional Application Insights integration.
-- Naming and location are derived from the Maybank naming module rather than direct `name` and `location` inputs.
+- Naming and location are derived from the naming module rather than direct `name` and `location` inputs.
 
 ## Note
 
@@ -97,7 +97,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_app_service | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_app_service) | v1.0.0.0 |
+| app_service | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/app_service) | v1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -105,7 +105,7 @@
 
 ```main.tf
 module "app_service" {
-  source = "../../modules/mbb_app_service/v1.0.0.0"
+  source = "../../modules/app_service/v1.0.0.0"
 
   # Required workload parameters
   kind                     = var.kind

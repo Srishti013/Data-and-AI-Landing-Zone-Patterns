@@ -83,7 +83,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| Azure Bing Search| [mbb_bing_resource](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/user/main/modules/mbb_bing_resource/v1.0.0.0) | 1.0.0 |
+| Azure Bing Search| [bing_resource](https://github.com/your-org/iac-modules/tree/user/main/modules/bing_resource/v1.0.0.0) | 1.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -92,10 +92,10 @@
 - used in main terraform configuration file by team that are consuming the product (main.tf)
 
 ```main.tf
-module "mbb_bing_resource" {
+module "bing_resource" {
   for_each = var.bing_accounts
 
-  source = "./modules/mbb_bing_resource/v1.0.0.0"
+  source = "./modules/bing_resource/v1.0.0.0"
 
   providers = {
     azurerm = azurerm.dev_myw_sub
@@ -169,9 +169,9 @@ module "mbb_bing_resource" {
 
 ```tfvars
 bing_accounts = {
-  mbb-bing-aea-dev-global-01 = {
+  {org}-bing-aea-dev-global-01 = {
     env                = "dev"
-    org                = "mbb"
+    org                = "{org}"
     region_code        = "myw"
     base_name          = ""
     additional_name    = ""
@@ -202,8 +202,8 @@ bing_accounts = {
     # Optional Tags
     region              = "global"
     description         = "Bing Custom Search"
-    notification_emails = ["mss_ceat@maybank.com"]
-    app_id              = "MBB-MYW-NET01-00001"
+    notification_emails = ["mss_ceat@example.com"]
+    app_id              = "-MYW-NET01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -215,7 +215,7 @@ bing_accounts = {
     maintenance_window  = "Sun-02:00Z"
     last_vm_accessed    = "TBD"
 
-    resource_group_key = "mbb-rg-aea-dev-myw-01"
+    resource_group_key = "{org}-rg-aea-dev-myw-01"
     sku_name           = "G2"
     kind               = "Bing.GroundingCustomSearch"
     location           = "global"

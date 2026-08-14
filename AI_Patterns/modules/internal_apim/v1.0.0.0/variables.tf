@@ -55,7 +55,7 @@ variable "app_code" {
 
 variable "bu" {
   type        = string
-  description = "(Required) Business unit code. Example: IT or mbb."
+  description = "(Required) Business unit code. Example: IT or {org}."
 }
 
 # -
@@ -253,8 +253,8 @@ variable "region" {
 # -
 variable "org" {
   type        = string
-  description = "(Optional) Company/business unit code. Example: `mbb`."
-  default     = "mbb"
+  description = "(Optional) Company/business unit code. Example: `{org}`."
+  default     = "{org}"
 }
 
 variable "region_code" {
@@ -739,7 +739,7 @@ variable "certificate" {
   }
 }
 
-# variable "client_certificate_enabled" { //removed so that the client certificate authenticatiin isnt allowed MBB
+# variable "client_certificate_enabled" { //removed so that the client certificate authenticatiin isnt allowed 
 #   type        = bool
 #   default     = false
 #   description = "Enforce a client certificate to be presented on each request to the gateway. This is only supported when SKU type is Consumption."
@@ -1180,13 +1180,13 @@ variable "protocols" {
   description = "Protocol settings for the API Management service."
 }
 
-# variable "public_ip_address_id" { // removed to disable public access - MBB
+# variable "public_ip_address_id" { // removed to disable public access - 
 #   type        = string
 #   default     = null
 #   description = "ID of a standard SKU IPv4 Public IP. Only supported on Premium and Developer tiers when deployed in a virtual network."
 # }
 
-# variable "public_network_access_enabled" { // removed to disable public access MBB
+# variable "public_network_access_enabled" { // removed to disable public access 
 #   type        = bool
 #   default     = true
 #   description = "Is public access to the API Management service allowed? This only applies to the Management plane, not the API gateway or Developer portal."

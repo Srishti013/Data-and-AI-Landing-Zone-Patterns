@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added Maybank governance and lifecycle metadata inputs for key vault module usage.
+- Added governance and lifecycle metadata inputs for key vault module usage.
 
 ### Changed
 

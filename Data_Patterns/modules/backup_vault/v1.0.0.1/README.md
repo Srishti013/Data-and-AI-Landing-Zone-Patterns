@@ -31,7 +31,7 @@
 ## Overview
 
 - This module deploys Azure Data Protection Backup Vault and optional backup policies/instances for multiple workload types.
-- The vault name, location, and baseline tags are generated through `mbb_naming_module`.
+- The vault name, location, and baseline tags are generated through `naming_module`.
 - The module supports lock, RBAC, diagnostic settings, resource guard association, and customer-managed key encryption.
 
 ## Note
@@ -94,7 +94,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_backup_vault | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_backup_vault) | v1.0.0.1 |
+| backup_vault | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/backup_vault) | v1.0.0.1 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -102,7 +102,7 @@
 
 ```main.tf
 module "backup_vault" {
-  source = "../../modules/mbb_backup_vault/v1.0.0.1"
+  source = "../../modules/backup_vault/v1.0.0.1"
 
   resource_group_name = var.resource_group_name
   datastore_type      = "VaultStore"
@@ -201,7 +201,7 @@ service             = "Backup"
 | diagnostic_settings | Diagnostic settings map for vault telemetry export | `map(object)` | `{}` | no |
 | tags | Additional tags merged with naming module tags | `map(string)` | module-defined | no |
 | env | Naming module environment code | `string` | n/a | yes |
-| org | Naming module organization code | `string` | `"mbb"` | no |
+| org | Naming module organization code | `string` | `"{org}"` | no |
 | region_code | Naming module region code | `string` | module-defined | no |
 | base_name | Naming module base name | `string` | `null` | no |
 | additional_name | Naming module additional suffix | `string` | `null` | no |

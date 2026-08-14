@@ -30,7 +30,7 @@
 
 ## Overview
 
-- This module deploys Azure Managed Redis using azurerm_managed_redis and standardized naming from mbb_naming_module.
+- This module deploys Azure Managed Redis using azurerm_managed_redis and standardized naming from naming_module.
 - It supports configurable SKU tiers, high availability, public network access policy, optional managed identity, and optional customer-managed key settings.
 - It allows detailed default database controls including clustering, eviction policy, persistence, and Redis modules.
 
@@ -95,7 +95,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_managed_redis_cache | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_managed_redis_cache) | v1.0.0.1 |
+| managed_redis_cache | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/managed_redis_cache) | v1.0.0.1 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -103,7 +103,7 @@
 
 ```main.tf
 module "managed_redis" {
-  source = "../../modules/mbb_managed_redis_cache/v1.0.0.1"
+  source = "../../modules/managed_redis_cache/v1.0.0.1"
 
   resource_group_name = var.resource_group_name
   sku_name            = "Balanced_B3"

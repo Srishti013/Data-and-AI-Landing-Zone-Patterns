@@ -71,10 +71,10 @@ provider "azurerm" {
 }
 
 # TEMP-DISABLED (demo 2026-07-21): the central LAW lives in mgmt sub
-# mbb-plt-sub-mgmt-prd-<region>-01, which the deploy SPN has NO access to (that
+# {org}-plt-sub-mgmt-prd-<region>-01, which the deploy SPN has NO access to (that
 # sub is not in the IAM request). law_sub was therefore filtered out of
 # local.filtered_subscriptions -> "Invalid index" at plan. Re-enable this block
-# once the SPN gets Log Analytics Reader on mbb-law-ops-pd-<region>-01.
+# once the SPN gets Log Analytics Reader on {org}-law-ops-pd-<region>-01.
 # See also data.tf (workspace data source) and main.tf (App Insights + SQL).
 # provider "azurerm" {
 #   alias                           = "law_sub"

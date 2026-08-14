@@ -85,7 +85,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| Azure Data Factory | [mbb_data_factory](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/user/main/modules/mbb_data_factory/v1.0.0.0) | 1.0.0.0 |
+| Azure Data Factory | [data_factory](https://github.com/your-org/iac-modules/tree/user/main/modules/data_factory/v1.0.0.0) | 1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -96,7 +96,7 @@
 ```main.tf
 module "data_factories" {
   for_each = var.data_factories
-  source   = "./modules/mbb_data_factory/v1.0.0.0"
+  source   = "./modules/data_factory/v1.0.0.0"
 
   providers = {
     azurerm = azurerm.dev_myw_sub
@@ -214,13 +214,13 @@ module "data_factories" {
 
 ```tfvars
 data_factories = {
-  "mbb-adf-data-dev-myw-01" = {
+  "{org}-adf-data-dev-myw-01" = {
     location           = "malaysiawest"
-    name               = "mbb-adf-data-dev-myw-01"
-    resource_group_key = "mbb-rg-dataingestion-dev-myw-01"
+    name               = "{org}-adf-data-dev-myw-01"
+    resource_group_key = "{org}-rg-dataingestion-dev-myw-01"
 
     env                = "dev"
-    org                = "mbb"
+    org                = "{org}"
     region_code        = "myw"
     base_name          = ""
     additional_name    = ""
@@ -249,13 +249,13 @@ data_factories = {
 
     region              = "MYW"
     description         = "Data Factory dev deployment"
-    notification_emails = ["mss_ceat@maybank.com"]
+    notification_emails = ["mss_ceat@example.com"]
 
     managed_identities = {
       system_assigned            = true
       user_assigned_resource_ids = []
     }
-    umi_keys = ["mbb-uami-adf-data-dev-myw-01"]
+    umi_keys = ["{org}-uami-adf-data-dev-myw-01"]
 
     public_network_enabled          = false
     managed_virtual_network_enabled = false
@@ -263,22 +263,22 @@ data_factories = {
 
     private_endpoints = {
       adf_pe = {
-        name                        = "mbb-pe-adf-data-dev-myw-01"
+        name                        = "{org}-pe-adf-data-dev-myw-01"
         subnet_key                  = "pe_subnet"
         dns_zone_keys               = ["adf"]
         private_dns_zone_group_name = "default"
-        network_interface_name      = "mbb-pe-adf-data-dev-myw-01-nic"
+        network_interface_name      = "{org}-pe-adf-data-dev-myw-01-nic"
       }
     }
     azure_integration_runtime_azure = {
       azure_ir_01 = {
-        name     = "mbb-azure-ir-data-dev-myw-01"
+        name     = "{org}-azure-ir-data-dev-myw-01"
         location = "malaysiawest"
       }
     }
     integration_runtime_self_hosted = {
       self_hosted_ir_01 = {
-        name     = "mbb-selfhosted-ir-data-dev-myw-01"
+        name     = "{org}-selfhosted-ir-data-dev-myw-01"
         location = "malaysiawest"
       }
     }

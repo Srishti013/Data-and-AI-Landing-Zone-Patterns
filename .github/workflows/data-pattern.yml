@@ -13,7 +13,7 @@ jobs:
   Extract-Parameters-from-Issue:
     if: startsWith(github.event.issue.title, '[DEPLOY-DATA]:')
     name: Extract Parameters from Issue
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     outputs:
@@ -89,6 +89,7 @@ jobs:
         DATA_SUBNET_PREFIX=$(awk '/^### Data Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         INT_SUBNET_PREFIX=$(awk '/^### Internal Data Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         CONSUMPTION_SUBNET_PREFIX=$(awk '/^### Consumption Data Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
+        DNS_RESOLVER_IP=$(awk '/^### DNS Resolver IP$/{getline; getline; print; exit}' issue.txt | xargs)
 
         echo "SUBSCRIPTION=$SUBSCRIPTION" >> $GITHUB_ENV
         echo "SUBSCRIPTION_ID=$SUBSCRIPTION_ID" >> $GITHUB_ENV
@@ -116,6 +117,7 @@ jobs:
         echo "DATA_SUBNET_PREFIX=$DATA_SUBNET_PREFIX" >> $GITHUB_ENV
         echo "INT_SUBNET_PREFIX=$INT_SUBNET_PREFIX" >> $GITHUB_ENV
         echo "CONSUMPTION_SUBNET_PREFIX=$CONSUMPTION_SUBNET_PREFIX" >> $GITHUB_ENV
+        echo "DNS_RESOLVER_IP=$DNS_RESOLVER_IP" >> $GITHUB_ENV
         echo "env_short=${ENV_SHORT}" >> $GITHUB_OUTPUT
         echo "region_code=${REGION_CODE}" >> $GITHUB_OUTPUT
 
@@ -155,7 +157,7 @@ jobs:
         DATA_SUBNET_PREFIX: ${{ env.DATA_SUBNET_PREFIX }}
         INT_SUBNET_PREFIX: ${{ env.INT_SUBNET_PREFIX }}
         BASTION_CIDR: ${{ vars.BASTION_CIDR }}
-        DNS_RESOLVER_IP: ${{ vars.DNS_RESOLVER_IP }}
+        DNS_RESOLVER_IP: ${{ env.DNS_RESOLVER_IP }}
         SQL_ADMIN_UPN: ${{ vars.SQL_ADMIN_UPN }}
         SQL_ADMIN_OBJECT_ID: ${{ vars.SQL_ADMIN_OBJECT_ID }}
         FABRIC_ADMIN_UPN: ${{ vars.FABRIC_ADMIN_UPN }}
@@ -213,7 +215,7 @@ jobs:
         retention-days: 1
 
   terraform:
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     needs: [Extract-Parameters-from-Issue]
@@ -277,7 +279,7 @@ jobs:
         run: terraform -chdir="Data_Patterns" apply -auto-approve -parallelism=1 tfplan
 
   checkov:
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: terraform
     steps:
       - name: Checkout code
@@ -295,7 +297,7 @@ jobs:
           --output cli --output json
 
   format:
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: checkov
     steps:
       - name: Checkout code
@@ -305,7 +307,7 @@ jobs:
         run: terraform fmt -check -recursive "Data_Patterns/"
 
   lint:
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: format
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -328,7 +330,7 @@ jobs:
           tflint
 
   security:
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: lint
     steps:
       - name: Checkout code
@@ -350,7 +352,7 @@ jobs:
 
   close-issue:
     name: Close Issue on Success
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: [terraform, checkov, format, lint, security]
     if: success()
     env:

@@ -342,7 +342,7 @@ variable "app_code" {
 
 variable "bu" {
   type        = string
-  description = "(Required) Business unit code. Example: IT or mbb."
+  description = "(Required) Business unit code. Example: IT or {org}."
 }
 
 # -
@@ -463,8 +463,8 @@ variable "status" {
 # -
 variable "org" {
   type        = string
-  description = "(Optional) Company/business unit code. Example: `mbb`."
-  default     = "mbb"
+  description = "(Optional) Company/business unit code. Example: `{org}`."
+  default     = "{org}"
 }
 
 variable "region_code" {

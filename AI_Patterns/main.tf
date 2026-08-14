@@ -1020,8 +1020,8 @@ module "ai_foundry_account" {
     }
   }
 
-  # AI Foundry Projects - the reference's only projects are mbb-proj-aea /
-  # mbb-proj-espi, which belong to the excluded AEA/ESPI app tier. Per the SEA
+  # AI Foundry Projects - the reference's only projects are {org}-proj-aea /
+  # {org}-proj-espi, which belong to the excluded AEA/ESPI app tier. Per the SEA
   # scope (base infra only - no app infra) any project whose key contains
   # "aea"/"espi" is filtered out, so the account is provisioned with zero
   # projects today. Mirrors the app-tier exclusion used for private_endpoints;
@@ -1318,7 +1318,7 @@ module "ai_foundry_rai_policy" {
 ## Azure Container Registry (Common AI resource)
 ##
 ## Premium SKU (module default). The private endpoint (sheet:
-## mbb-pe-cr-aishared-...) is created here as a NIC only - the private DNS zone
+## {org}-pe-cr-aishared-...) is created here as a NIC only - the private DNS zone
 ## group is left unmanaged because DNS wiring depends on hub peering and is
 ## deferred to the peering stage.
 ##############################
@@ -1673,7 +1673,7 @@ module "managed_redis" {
   resource_type_code = each.value.resource_type_code
 
   # Optional naming variables
-  org             = lookup(each.value, "org", "mbb")
+  org             = lookup(each.value, "org", "")
   region_code     = lookup(each.value, "region_code", "sea")
   base_name       = lookup(each.value, "base_name", null)
   additional_name = lookup(each.value, "additional_name", null)
@@ -1764,7 +1764,7 @@ module "managed_redis" {
 resource "azurerm_monitor_diagnostic_setting" "managed_redis_audit" {
   for_each = var.managed_redis_instances
 
-  name                           = replace(each.key, "mbb-redis-", "mbb-diag-audit-redis-")
+  name                           = replace(each.key, "-redis-", "-diag-audit-redis-")
   target_resource_id             = "${module.managed_redis[each.key].resource_id}/databases/default"
   log_analytics_workspace_id     = data.azurerm_log_analytics_workspace.central[0].id
   log_analytics_destination_type = "Dedicated"

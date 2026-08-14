@@ -1,27 +1,27 @@
-# Quick Start - Updated MBB Resource Group Module
+# Quick Start - Updated Resource Group Module
 
 ## What's New? 🆕
 
-The `mbb_resource_group` module now enforces **comprehensive tagging** with 25+ mandatory tags across Business, DevOps, Finance, Governance, and Operation categories.
+The `resource_group` module now enforces **comprehensive tagging** with 25+ mandatory tags across Business, DevOps, Finance, Governance, and Operation categories.
 
 ## Minimal Working Example
 
 ```hcl
 module "my_rg" {
-  source = "path/to/mbb_resource_group/v1.0.0.0"
+  source = "path/to/resource_group/v1.0.0.0"
 
   # --- Basic Naming ---
   env                = "dev"
   au                 = "00121"
   app_code           = "myapp"
   bu                 = "it"
-  owner              = "owner@maybank.com"
+  owner              = "owner@example.com"
   resource_type_code = "rg"
   base_name          = "application"
 
   # --- Mandatory Business Tags ---
   app_name       = "My Application"
-  app_support    = "support@maybank.com"  # Must be valid email
+  app_support    = "support@example.com"  # Must be valid email
   business_unit  = "IT Department"
   country        = "MY"
   business_owner = "John Doe"
@@ -48,10 +48,10 @@ module "my_rg" {
 ## What You Get
 
 This creates a resource group with:
-- ✅ **Standardized name** following mbb conventions
+- ✅ **Standardized name** following {org} conventions
 - ✅ **Azure location** mapped from region code
 - ✅ **25+ tags** automatically applied and validated
-- ✅ **Compliance** with Maybank governance standards
+- ✅ **Compliance** with governance standards
 
 ## Common Optional Tags
 
@@ -65,14 +65,14 @@ Add these if needed for your resource group:
   description         = "My application resource group"
   backup_policy       = "Daily"
   disaster_recovery   = "RTO-4h"
-  notification_emails = "alerts@maybank.com"
+  notification_emails = "alerts@example.com"
 ```
 
 ## Default Values
 
 These tags have defaults (override if needed):
 - `type` = "Infrastructure"
-- `product_name` = "mbb_resource_group"
+- `product_name` = "resource_group"
 - `compliance_required` = "No"
 - `compliance` = "None"
 - `status` = "Live"
@@ -89,7 +89,7 @@ These tags have defaults (override if needed):
 
 - **📖 Full Migration Guide**: [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md)
 - **📋 Update Summary**: [UPDATE_SUMMARY.md](./UPDATE_SUMMARY.md)
-- **💡 Tagging Strategy**: `../../mbb_naming_module/v1.0.0.0/examples/TAGGING_STRATEGY.md`
+- **💡 Tagging Strategy**: `../../naming_module/v1.0.0.0/examples/TAGGING_STRATEGY.md`
 - **🔧 Examples**: [examples/comprehensive-tagging/](./examples/comprehensive-tagging/)
 
 ## Need Help?

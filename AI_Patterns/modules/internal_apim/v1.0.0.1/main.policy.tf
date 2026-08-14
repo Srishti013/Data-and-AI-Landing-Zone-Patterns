@@ -3,7 +3,7 @@
 
 # Service-Level Policy - applies to all APIs
 resource "azurerm_api_management_policy" "this" {
-  # count = var.policy != null ? 1 : 0 // mbb - Do NOT use conditional creation. This ensures to never Make Policy Optional
+  # count = var.policy != null ? 1 : 0 // {org} - Do NOT use conditional creation. This ensures to never Make Policy Optional
 
   api_management_id = azurerm_api_management.this.id
   # xml_content       = var.policy.xml_content

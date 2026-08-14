@@ -1,6 +1,6 @@
-# MBB Data Landing Zone (`Data_Patterns`)
+# Data Landing Zone (`Data_Patterns`)
 
-Consolidated, single-stack Terraform for the MBB **Data Landing Zone**, deployed
+Consolidated, single-stack Terraform for the **Data Landing Zone**, deployed
 through a GitHub **issue-template** workflow — the same pattern used by the AI
 landing zone (`data&AI_Patterns` + `.github/workflows/data-AI-pattern.yml`).
 
@@ -66,8 +66,8 @@ substituted and keep their literal values.
 
 ## State backend
 
-`storage_account_name=mbbsatfmgmtpdmyw02`, `container_name=mbbtfstatelz`,
-`resource_group_name=mbb-rg-mgmt-pd-myw-01`, key
+`storage_account_name={org}satfmgmtpdmyw02`, `container_name={org}tfstatelz`,
+`resource_group_name={org}-rg-mgmt-pd-myw-01`, key
 `dataApp-<env_short>-<region_code>.tfstate` (one state per env+region).
 
 ## Environment / region mapping
@@ -86,12 +86,12 @@ substituted and keep their literal values.
   to a different address space — they are not rewritten by the workflow.
 - **Event Grid System Topic** (ADLS `BlobCreated` → AI ESPI storage queue) is
   **cross-subscription**: the target queue + its storage account live in the AI
-  landing-zone subscription (`mbb-ai-sub-tier4-<env>-<region>-01`). It is wired
+  landing-zone subscription (`{org}-ai-sub-tier4-<env>-<region>-01`). It is wired
   per the build sheet, but requires: (a) the AI ESPI storage/queue to already
   exist in the target environment, and (b) the deploying identity to have role-
   assignment rights in the AI subscription. The AI sub GUID in
   `role_assignments_config_egst` / the queue endpoint defaults to the **SIT** AI
-  sub — update it (and the `mbb-uami-egst-data-...` scope) for other environments,
+  sub — update it (and the `{org}-uami-egst-data-...` scope) for other environments,
   or comment the two blocks out for a standalone test where the AI queue is absent.
 - **Purview MSI** role assignments and the **self-hosted IR** cross-env link use
   literal ids for the reference environment. Update `principal_id` /

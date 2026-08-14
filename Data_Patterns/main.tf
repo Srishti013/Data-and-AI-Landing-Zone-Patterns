@@ -1,5 +1,5 @@
 # =============================================================================
-# MBB Data Landing Zone - consolidated single-stack pattern.
+# Data Landing Zone - consolidated single-stack pattern.
 #
 # This mirrors data&AI_Patterns (the AI landing zone) but for the DATA landing
 # zone. It consolidates the five standalone reference roots

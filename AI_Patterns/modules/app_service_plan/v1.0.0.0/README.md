@@ -20,7 +20,7 @@
 
 ### v1
 
-- Initial version to deploy Azure App Service Plan (`mbb_app_service_plan`).
+- Initial version to deploy Azure App Service Plan (`app_service_plan`).
 
 ## Upgrade Path
 
@@ -31,7 +31,7 @@
 ## Overview
 
 - This Terraform module deploys an Azure App Service Plan for App Service, Function App, and Logic App Standard workloads.
-- It supports Linux, Windows, and WindowsContainer operating systems, optional App Service Environment deployment, optional resource lock, RBAC assignments, and Maybank naming and tagging standards.
+- It supports Linux, Windows, and WindowsContainer operating systems, optional App Service Environment deployment, optional resource lock, RBAC assignments, and naming and tagging standards.
 - Resource name and location are derived from the naming module rather than direct `name` and `location` inputs.
 
 ## Note
@@ -88,7 +88,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_app_service_plan | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_app_service_plan) | v1.0.0.0 |
+| app_service_plan | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/app_service_plan) | v1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -96,7 +96,7 @@
 
 ```main.tf
 module "app_service_plan" {
-  source = "../../modules/mbb_app_service_plan/v1.0.0.0"
+  source = "../../modules/app_service_plan/v1.0.0.0"
 
   resource_group_name = var.resource_group_name
   os_type             = var.os_type
@@ -195,7 +195,7 @@ budget_id           = "83254"
 | criticality | Workload criticality | `string` | n/a | yes |
 | environment | Environment tag value | `string` | n/a | yes |
 | budget_id | Budget or GL code used by Finance | `string` | n/a | yes |
-| org | Company or business unit code | `string` | `"mbb"` | no |
+| org | Company or business unit code | `string` | `"{org}"` | no |
 | region_code | Region code | `string` | `"sea"` | no |
 | additional_tags | Additional tags to merge with module tags | `map(string)` | `null` | no |
 

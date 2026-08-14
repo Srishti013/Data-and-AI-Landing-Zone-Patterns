@@ -26,7 +26,7 @@
 ## Upgrade Path
 
 - Upgrade supported from v1.0.0.1 to v1.0.0.3.
-- Update module source from modules/mbb_key_vault/v1.0.0.1 to modules/mbb_key_vault/v1.0.0.3.
+- Update module source from modules/key_vault/v1.0.0.1 to modules/key_vault/v1.0.0.3.
 - Input contract change:
   - Removed input: purge_protection_enabled.
 
@@ -34,7 +34,7 @@
 
 ## Overview
 
-- This module deploys Azure Key Vault and applies standardized naming/tags using mbb_naming_module.
+- This module deploys Azure Key Vault and applies standardized naming/tags using naming_module.
 - It supports Key Vault contacts, keys, secrets, private endpoints, role assignments, diagnostics, and management locks.
 - Key and secret lifecycle resources are managed through embedded submodules.
 
@@ -104,7 +104,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_key_vault | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_key_vault) | v1.0.0.3 |
+| key_vault | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/key_vault) | v1.0.0.3 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -112,7 +112,7 @@
 
 ```main.tf
 module "key_vault" {
-  source = "../../modules/mbb_key_vault/v1.0.0.3"
+  source = "../../modules/key_vault/v1.0.0.3"
 
   name                = "kv-platform-prod-sea-01"
   location            = "southeastasia"

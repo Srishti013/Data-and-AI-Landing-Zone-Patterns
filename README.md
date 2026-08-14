@@ -60,10 +60,10 @@ project can adopt it by setting a handful of repo variables — no code edits.
 
 > This kit deploys the Data/AI **spokes**. It assumes the platform **connectivity hub** and **Log Analytics Workspace** are already in place (create them however your org normally does).
 
-1. **Connectivity hub** — a VNet `{org}-vnet-pvt-network-pd-{region_code}-01` in RG `{org}-rg-private-network-pd-{region_code}-01`, with the privatelink DNS zones (vaultcore, database, blob, dfs, queue, file, openai, cognitiveservices, services.ai, documents, search, azurecr, azure-api.net) linked to it, and a DNS Private Resolver inbound endpoint (its IP → `DNS_RESOLVER_IP`).
+1. **Connectivity hub** — a VNet `{org}-vnet-pvt-network-pd-{region_code}-01` in RG `{org}-rg-private-network-pd-{region_code}-01`, with the privatelink DNS zones (vaultcore, database, blob, dfs, queue, file, openai, cognitiveservices, services.ai, documents, search, azurecr, azure-api.net) linked to it, and a DNS Private Resolver inbound endpoint (its IP goes in the deploy issue form's **DNS Resolver IP** field).
 2. **Log Analytics Workspace** — `{org}-law-ops-pd-{region_code}-01` in RG `{org}-rg-mgmt-pd-{region_code}-01`.
 3. **Terraform state** — a Storage Account + container + resource group.
-4. **Self-hosted runner** — an Ubuntu VM in the hub's PE subnet (so private-endpoint DNS resolves during `apply`). Bootstrap it with `scripts/runner-cloud-init.yaml` (installs terraform, az, jq, checkov, tflint, tfsec + the runner agent) and register it with label `vmss-sea`.
+4. **Self-hosted runner** — an Ubuntu VM in the hub's PE subnet (so private-endpoint DNS resolves during `apply`). Bootstrap it with `scripts/runner-cloud-init.yaml` (installs terraform, az, jq, checkov, tflint, tfsec + the runner agent). By default the workflows target any `self-hosted, Linux, X64` runner; to pin them to a specific runner pool, set the `RUNNER_LABELS` repo variable (JSON array, e.g. `["self-hosted","Linux","X64","my-pool"]`) and register the runner with those labels.
 
 ---
 
@@ -84,11 +84,11 @@ project can adopt it by setting a handful of repo variables — no code edits.
 |---|---|
 | `WORKLOAD_SUBSCRIPTION_ID` | Subscription the spoke deploys into |
 | `TFSTATE_STORAGE_ACCOUNT` / `TFSTATE_CONTAINER` / `TFSTATE_RESOURCE_GROUP` | State backend |
-| `DNS_RESOLVER_IP` | Hub DNS resolver inbound IP (spokes' `dns_servers`) |
 | `BASTION_CIDR` | AzureBastionSubnet CIDR (inert if no bastion) |
 | `SQL_ADMIN_UPN` / `SQL_ADMIN_OBJECT_ID` | Azure AD SQL admin (both spokes) |
 | `FABRIC_ADMIN_UPN` *(optional)* | Fabric capacity admin (falls back to `SQL_ADMIN_UPN`) |
 | `PURVIEW_ID` *(optional)* | If set, links ADF to your Purview account; empty = no Purview |
+| `RUNNER_LABELS` *(optional)* | JSON array of runner labels to target (default `["self-hosted","Linux","X64"]`) |
 
 **SPN RBAC**: Contributor + User Access Administrator on the workload sub; Network + Private DNS Zone Contributor on the hub; Log Analytics Contributor on management; Storage Blob Data Contributor on the state account.
 

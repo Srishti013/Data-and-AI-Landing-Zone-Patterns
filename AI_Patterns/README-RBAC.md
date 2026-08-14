@@ -12,17 +12,17 @@ substitutes at deploy time (e.g. `{env}`→`dev`, `{region_code}`→`sea`, `{ite
 
 | Identity (UMI) | Belongs to | Used for |
 |----------------|-----------|----------|
-| `mbb-id-aif-aishared` | **Shared AI Foundry identity** — the Foundry account (and both projects) | Control-plane + data-plane access to Storage, Cosmos, Search; CMK on the Foundry KV |
-| `mbb-id-sa-aishared` | Storage account (aishared) | CMK wrap/unwrap on the shared KV |
-| `mbb-id-sa-aifoundry` | Storage account (aifoundry) | CMK wrap/unwrap on the shared KV |
-| `mbb-id-cosmos-aicommon` | Cosmos DB (aicommon) | CMK wrap/unwrap on the shared KV |
-| `mbb-id-redis-aicommon` | Managed Redis (aicommon) | CMK wrap/unwrap on the shared KV |
-| `mbb-id-cr-aishared` | Container Registry (aishared) | CMK wrap/unwrap on the shared KV |
-| `mbb-uami-rsv-aishared` | Recovery Services Vault (aishared) | CMK wrap/unwrap on the shared KV |
-| `mbb-uami-bvault-aishared` | Backup Vault (aishared) | CMK wrap/unwrap on the shared KV |
-| `mbb-uami-bvault-aifoundry` | Backup Vault (aifoundry) | CMK wrap/unwrap on the Foundry KV |
+| `{org}-id-aif-aishared` | **Shared AI Foundry identity** — the Foundry account (and both projects) | Control-plane + data-plane access to Storage, Cosmos, Search; CMK on the Foundry KV |
+| `{org}-id-sa-aishared` | Storage account (aishared) | CMK wrap/unwrap on the shared KV |
+| `{org}-id-sa-aifoundry` | Storage account (aifoundry) | CMK wrap/unwrap on the shared KV |
+| `{org}-id-cosmos-aicommon` | Cosmos DB (aicommon) | CMK wrap/unwrap on the shared KV |
+| `{org}-id-redis-aicommon` | Managed Redis (aicommon) | CMK wrap/unwrap on the shared KV |
+| `{org}-id-cr-aishared` | Container Registry (aishared) | CMK wrap/unwrap on the shared KV |
+| `{org}-uami-rsv-aishared` | Recovery Services Vault (aishared) | CMK wrap/unwrap on the shared KV |
+| `{org}-uami-bvault-aishared` | Backup Vault (aishared) | CMK wrap/unwrap on the shared KV |
+| `{org}-uami-bvault-aifoundry` | Backup Vault (aifoundry) | CMK wrap/unwrap on the Foundry KV |
 
-**Key Vaults:** `mbb-kv-aishared` (shared — holds most CMK keys) and `mbb-kv-aifoundry`
+**Key Vaults:** `{org}-kv-aishared` (shared — holds most CMK keys) and `{org}-kv-aifoundry`
 (dedicated — holds the Foundry account CMK key).
 
 ---
@@ -30,25 +30,25 @@ substitutes at deploy time (e.g. `{env}`→`dev`, `{region_code}`→`sea`, `{ite
 ## Layer 1 — CMK Key Vault crypto roles
 
 Config: `role_assignments_config_cmk` · Module: [`module "role_assignments_cmk"`](main.tf#L341)
-(`mbb_role_assignments`). Each entry grants a resource's UMI a **key-vault crypto role** on the
+(`role_assignments`). Each entry grants a resource's UMI a **key-vault crypto role** on the
 CMK Key Vault so the resource can wrap/unwrap its customer-managed encryption key. Scope =
 `module.key_vault[scope_key].resource_id`.
 
 | Key | Identity | Scope (Key Vault) | Role |
 |-----|----------|-------------------|------|
-| `cmk-sa-aishared` | `mbb-id-sa-aishared` | `mbb-kv-aishared` | Key Vault Crypto Service Encryption User |
-| `cmk-sa-aifoundry` | `mbb-id-sa-aifoundry` | `mbb-kv-aishared` | Key Vault Crypto Service Encryption User |
-| `cmk-aif-aifoundry` | `mbb-id-aif-aishared` | `mbb-kv-aifoundry` | Key Vault Crypto Service Encryption User |
-| **`cmk-aif-aifoundry-crypto-user`** | `mbb-id-aif-aishared` | `mbb-kv-aifoundry` | **Key Vault Crypto User** |
-| `cmk-cosmos-aicommon` | `mbb-id-cosmos-aicommon` | `mbb-kv-aishared` | Key Vault Crypto Service Encryption User |
-| `cmk-redis-aicommon` | `mbb-id-redis-aicommon` | `mbb-kv-aishared` | Key Vault Crypto Service Encryption User |
-| `cmk-cr-aishared` | `mbb-id-cr-aishared` | `mbb-kv-aishared` | Key Vault Crypto Service Encryption User |
-| `cmk-rsv-aishared` | `mbb-uami-rsv-aishared` | `mbb-kv-aishared` | Key Vault Crypto Service Encryption User |
-| `cmk-bvault-aishared` | `mbb-uami-bvault-aishared` | `mbb-kv-aishared` | Key Vault Crypto Service Encryption User |
-| `cmk-bvault-aifoundry` | `mbb-uami-bvault-aifoundry` | `mbb-kv-aifoundry` | Key Vault Crypto Service Encryption User |
+| `cmk-sa-aishared` | `{org}-id-sa-aishared` | `{org}-kv-aishared` | Key Vault Crypto Service Encryption User |
+| `cmk-sa-aifoundry` | `{org}-id-sa-aifoundry` | `{org}-kv-aishared` | Key Vault Crypto Service Encryption User |
+| `cmk-aif-aifoundry` | `{org}-id-aif-aishared` | `{org}-kv-aifoundry` | Key Vault Crypto Service Encryption User |
+| **`cmk-aif-aifoundry-crypto-user`** | `{org}-id-aif-aishared` | `{org}-kv-aifoundry` | **Key Vault Crypto User** |
+| `cmk-cosmos-aicommon` | `{org}-id-cosmos-aicommon` | `{org}-kv-aishared` | Key Vault Crypto Service Encryption User |
+| `cmk-redis-aicommon` | `{org}-id-redis-aicommon` | `{org}-kv-aishared` | Key Vault Crypto Service Encryption User |
+| `cmk-cr-aishared` | `{org}-id-cr-aishared` | `{org}-kv-aishared` | Key Vault Crypto Service Encryption User |
+| `cmk-rsv-aishared` | `{org}-uami-rsv-aishared` | `{org}-kv-aishared` | Key Vault Crypto Service Encryption User |
+| `cmk-bvault-aishared` | `{org}-uami-bvault-aishared` | `{org}-kv-aishared` | Key Vault Crypto Service Encryption User |
+| `cmk-bvault-aifoundry` | `{org}-uami-bvault-aifoundry` | `{org}-kv-aifoundry` | Key Vault Crypto Service Encryption User |
 
 > **⚠️ The two Foundry-KV grants are both required.** A CMK-encrypted Foundry account needs its
-> UMI (`mbb-id-aif-aishared`) to hold **both** roles on `mbb-kv-aifoundry`:
+> UMI (`{org}-id-aif-aishared`) to hold **both** roles on `{org}-kv-aifoundry`:
 > - **Key Vault Crypto Service Encryption User** — at-rest wrap/unwrap (the account creates fine).
 > - **Key Vault Crypto User** — full key data-plane (encrypt/decrypt/sign/wrap/unwrap/get). This
 >   is the role the **gpt-5.1 model-deployment content-safety validation** path uses. Without it,
@@ -60,20 +60,20 @@ CMK Key Vault so the resource can wrap/unwrap its customer-managed encryption ke
 ## Layer 2 — AI Foundry control-plane roles (resource-group scope)
 
 Config: `role_assignments_config_foundry` · Module: [`module "role_assignments_foundry"`](main.tf#L369)
-(`mbb_role_assignments`). Grants the **shared Foundry identity** the ARM control-plane roles it
+(`role_assignments`). Grants the **shared Foundry identity** the ARM control-plane roles it
 needs on the `aishared` / `aicommon` resource groups. Scope =
 `module.resource_group[scope_key].resource_id` (RG-scoped, so it covers every resource in that RG).
 
 | Key | Identity | Scope (Resource Group) | Role |
 |-----|----------|------------------------|------|
-| `aif-aishared_on_aishared_rg_search` | `mbb-id-aif-aishared` | `mbb-rg-aishared` | Search Service Contributor |
-| `aif-aishared_on_aishared_rg_cosmos_operator` | `mbb-id-aif-aishared` | `mbb-rg-aishared` | Cosmos DB Operator |
-| `aif-aishared_on_aicommon_rg_cosmos_operator` | `mbb-id-aif-aishared` | `mbb-rg-aicommon` | Cosmos DB Operator |
-| `aif-aishared_on_aishared_rg_blob_contributor` | `mbb-id-aif-aishared` | `mbb-rg-aishared` | Storage Blob Data Contributor |
-| `aif-aishared_on_aishared_rg_blob_owner` | `mbb-id-aif-aishared` | `mbb-rg-aishared` | Storage Blob Data Owner |
+| `aif-aishared_on_aishared_rg_search` | `{org}-id-aif-aishared` | `{org}-rg-aishared` | Search Service Contributor |
+| `aif-aishared_on_aishared_rg_cosmos_operator` | `{org}-id-aif-aishared` | `{org}-rg-aishared` | Cosmos DB Operator |
+| `aif-aishared_on_aicommon_rg_cosmos_operator` | `{org}-id-aif-aishared` | `{org}-rg-aicommon` | Cosmos DB Operator |
+| `aif-aishared_on_aishared_rg_blob_contributor` | `{org}-id-aif-aishared` | `{org}-rg-aishared` | Storage Blob Data Contributor |
+| `aif-aishared_on_aishared_rg_blob_owner` | `{org}-id-aif-aishared` | `{org}-rg-aishared` | Storage Blob Data Owner |
 
 > The RG-scoped Storage Blob grants cover the Foundry account's BYO storage
-> (`mbb-sa-aifoundry`, which lives in `mbb-rg-aishared`) — no per-resource storage grant needed.
+> (`{org}-sa-aifoundry`, which lives in `{org}-rg-aishared`) — no per-resource storage grant needed.
 
 ---
 
@@ -85,13 +85,13 @@ Config: `cosmosdb_sql_role_assignments` · Resource:
 
 | Key | Identity | Scope (Cosmos account) | Role |
 |-----|----------|------------------------|------|
-| `aif-aishared_on_cosmos-aicommon` | `mbb-id-aif-aishared` | `mbb-cosmos-aicommon` (account scope) | Cosmos DB Built-in Data Contributor (`…/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002`) |
+| `aif-aishared_on_cosmos-aicommon` | `{org}-id-aif-aishared` | `{org}-cosmos-aicommon` (account scope) | Cosmos DB Built-in Data Contributor (`…/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002`) |
 
 ---
 
 ## Layer 4 — Inline Key Vault role assignments (data-plane, optional)
 
-The `mbb_key_vault` module accepts an inline `role_assignments` map per vault (resolved by
+The `key_vault` module accepts an inline `role_assignments` map per vault (resolved by
 literal `principal_id` **or** `umi_key`) — see the `merge()` in [main.tf](main.tf#L270).
 **Currently none are defined** in `variables.tfvars`, so this layer is empty; it exists for
 future per-vault data-plane grants (e.g. Key Vault Secrets User) without touching module code.
@@ -103,7 +103,7 @@ future per-vault data-plane grants (e.g. Key Vault Secrets User) without touchin
 - **`time_sleep.rbac_wait_cmk` (60s)** — [main.tf](main.tf#L356) waits after the CMK role
   assignments before any CMK consumer (Storage/ACR/Redis/Cosmos/Backup/Foundry) performs key
   operations, so Azure AD RBAC has propagated to the key vault data plane.
-- The `mbb_key_vault` module also sets `wait_for_rbac_before_key_operations = { create = "60s" }`
+- The `key_vault` module also sets `wait_for_rbac_before_key_operations = { create = "60s" }`
   so the runner identity can create key material after its own vault RBAC lands.
 - `module.role_assignments_cmk` depends on `user_managed_identities` + `key_vault`;
   `module.role_assignments_foundry` depends on `user_managed_identities` + `resource_group`.
@@ -124,4 +124,4 @@ Vault Administrator** for data-plane key operations. See the main
 The dev-ai-latest `ai_rbac` stack also grants **AEA/ESPI app-layer** roles (function apps → AI
 Search / Cosmos / Storage). These are **intentionally excluded** here — this pattern deploys the
 shared base infra only, consolidating the reference's three per-project identities into the single
-shared `mbb-id-aif-aishared` identity.
+shared `{org}-id-aif-aishared` identity.

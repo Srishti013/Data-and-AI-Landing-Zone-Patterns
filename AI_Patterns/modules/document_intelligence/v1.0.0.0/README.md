@@ -30,7 +30,7 @@
 ## Overview
 
 - The Cognitive Services Account manages the resource type for various Azure AI resource implementations, including Azure AI Foundry, Azure OpenAI, Azure Speech, Azure Vision and others. Each service shares the same control plane but exposes a different subset of developer APIs. Azure AI Foundry (kind = AIServices) provides the superset of capabilities.
-- Naming and location are derived from the Maybank naming module rather than direct `name` and `location` inputs.
+- Naming and location are derived from the naming module rather than direct `name` and `location` inputs.
 
 
 ## Note
@@ -90,7 +90,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_document_intelligence | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_document_intelligence) | v1.0.0.0 |
+| document_intelligence | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/document_intelligence) | v1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -101,7 +101,7 @@
 ```main.tf
 module "document_intelligence" {
   for_each = var.document_intelligence
-  source   = "./modules/mbb_document_intelligence/v1.0.0.0"
+  source   = "./modules/document_intelligence/v1.0.0.0"
   providers = {
     azurerm = azurerm.uat_myw_sub
   }
@@ -191,9 +191,9 @@ module "document_intelligence" {
 
 ```tfvars
 document_intelligence = {
-  mbb-di-espi-uat-sea-01 = {
+  {org}-di-espi-uat-sea-01 = {
     env                = "uat"
-    org                = "mbb"
+    org                = "{org}"
     region_code        = "sea"
     base_name          = ""
     additional_name    = ""
@@ -224,8 +224,8 @@ document_intelligence = {
     # Optional Tags
     region              = "SEA"
     description         = "Document AI"
-    notification_emails = ["mss_ceat@maybank.com"]
-    app_id              = "MBB-MYW-NET01-00001"
+    notification_emails = ["mss_ceat@example.com"]
+    app_id              = "-MYW-NET01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -237,14 +237,14 @@ document_intelligence = {
     maintenance_window  = "Sun-02:00Z"
     last_vm_accessed    = "TBD"
 
-    # name = "mbb-di-espi-uat-myw-01"
-    resource_group_key = "mbb-rg-espi-uat-myw-01"
+    # name = "{org}-di-espi-uat-myw-01"
+    resource_group_key = "{org}-rg-espi-uat-myw-01"
     # location = "southeastasia"
     sku_name = "S0"
     kind     = "FormRecognizer"
-    umi_key  = "mbb-uami-di-espi-uat-sea-01"
+    umi_key  = "{org}-uami-di-espi-uat-sea-01"
 
-    custom_subdomain_name         = "mbb-di-espi-uat-sea-01"
+    custom_subdomain_name         = "{org}-di-espi-uat-sea-01"
     local_auth_enabled            = true
     public_network_access_enabled = false
 
@@ -262,7 +262,7 @@ document_intelligence = {
     #   environment         = "uat"
     #   business_unit       = "data"
     #   app_name            = "document-intelligence"
-    #   owner               = "mbb"
+    #   owner               = "{org}"
     #   cost_center         = "12345"
     #   data_classification = "internal"
     # }

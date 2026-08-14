@@ -901,7 +901,7 @@ variable "functions_extension_version" {
 #   type        = bool
 #   default     = false
 #   description = "Should the Function App only be accessible over HTTPS?"
-# } // diabling this because the mbb security policy requires https only
+# } // diabling this because the {org} security policy requires https only
 
 variable "instance_memory_in_mb" {
   type        = number
@@ -1091,7 +1091,7 @@ variable "private_endpoints_manage_dns_zone_group" {
 #   default     = true
 #   description = "Should the Function App be accessible from the public network? Defaults to `true`."
 # }
-//Commenting this out because mbb security policy requires public network access to be disabled
+//Commenting this out because {org} security policy requires public network access to be disabled
 
 variable "role_assignments" {
   type = map(object({
@@ -1581,7 +1581,7 @@ variable "app_code" {
 
 variable "bu" {
   type        = string
-  description = "(Required) Business unit code. Example: IT or mbb."
+  description = "(Required) Business unit code. Example: IT or {org}."
 }
 
 # -
@@ -1763,8 +1763,8 @@ variable "region" {
 # -
 variable "org" {
   type        = string
-  description = "(Optional) Company/business unit code. Example: `mbb`."
-  default     = "mbb"
+  description = "(Optional) Company/business unit code. Example: `{org}`."
+  default     = "{org}"
 }
 
 variable "region_code" {

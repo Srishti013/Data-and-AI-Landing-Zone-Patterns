@@ -30,7 +30,7 @@
 
 ## Overview
 
-- This module deploys an Azure Cosmos DB account (NoSQL/SQL API by default) using the Maybank naming module.
+- This module deploys an Azure Cosmos DB account (NoSQL/SQL API by default) using the naming module.
 - It supports SQL database and SQL container provisioning, network restrictions, private endpoints, optional multi-region failover, and restore configuration.
 - Security defaults include TLS 1.2, local authentication disabled, public network access disabled, and metadata write restrictions via keys.
 
@@ -91,7 +91,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_cosmosdb_account | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_cosmosdb_account) | v1.0.0.0 |
+| cosmosdb_account | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/cosmosdb_account) | v1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -99,7 +99,7 @@
 
 ```main.tf
 module "cosmosdb_account" {
-  source = "../../modules/mbb_cosmosdb_account/v1.0.0.0"
+  source = "../../modules/cosmosdb_account/v1.0.0.0"
 
   resource_group_name           = var.resource_group_name
   public_network_access_enabled = false

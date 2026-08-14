@@ -8,8 +8,8 @@ variable "env" {
 
 variable "org" {
   type        = string
-  description = "(Optional) Company/Business unit code. Example: `mbb`."
-  default     = "mbb"
+  description = "(Optional) Company/Business unit code. Example: `{org}`."
+  default     = "{org}"
 }
 
 variable "region_code" {
@@ -56,7 +56,7 @@ variable "app_code" {
 
 variable "bu" {
   type        = string
-  description = "(Required) Business unit code. Example: IT or mbb."
+  description = "(Required) Business unit code. Example: IT or {org}."
 }
 
 variable "owner" {
@@ -143,7 +143,7 @@ variable "product_name" {
 
 variable "product_version" {
   type        = string
-  description = "(Required) mbb product version. Example: `1.0.0`."
+  description = "(Required) {org} product version. Example: `1.0.0`."
 }
 
 # -

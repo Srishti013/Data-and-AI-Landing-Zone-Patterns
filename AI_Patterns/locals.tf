@@ -2,7 +2,7 @@ locals {
   # Azure location resolved from the issue-injected region_code (same mapping the
   # workflow uses: "Southeast Asia"->sea, "Malaysia West"->myw). Used where a raw
   # azurerm `location` string is required (e.g. private endpoints) instead of the
-  # naming-module-derived location the MBB modules compute internally.
+  # naming-module-derived location the modules compute internally.
   location_by_region_code = {
     ea  = "eastasia"
     sea = "southeastasia"

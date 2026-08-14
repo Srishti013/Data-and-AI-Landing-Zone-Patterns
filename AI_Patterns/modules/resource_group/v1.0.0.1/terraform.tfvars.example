@@ -1,4 +1,4 @@
-# Example terraform.tfvars for MBB Resource Group Module v1.0.0.1
+# Example terraform.tfvars for Resource Group Module v1.0.0.1
 
 # Required Naming Variables
 env      = "p"

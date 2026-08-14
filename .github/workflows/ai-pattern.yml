@@ -13,7 +13,7 @@ jobs:
   Extract-Parameters-from-Issue:
     if: startsWith(github.event.issue.title, '[DEPLOY-AI]:')
     name: Extract Parameters from Issue
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     outputs:
@@ -95,6 +95,7 @@ jobs:
         VM_SUBNET=$(awk '/^### VM Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         FOUNDRY_AGT_SUBNET=$(awk '/^### Foundry Agent Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         FOUNDRY_PE_SUBNET=$(awk '/^### Foundry PE Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
+        DNS_RESOLVER_IP=$(awk '/^### DNS Resolver IP$/{getline; getline; print; exit}' issue.txt | xargs)
 
         echo "SUBSCRIPTION=$SUBSCRIPTION" >> $GITHUB_ENV
         echo "SUBSCRIPTION_ID=$SUBSCRIPTION_ID" >> $GITHUB_ENV
@@ -126,6 +127,7 @@ jobs:
         echo "VM_SUBNET=$VM_SUBNET" >> $GITHUB_ENV
         echo "FOUNDRY_AGT_SUBNET=$FOUNDRY_AGT_SUBNET" >> $GITHUB_ENV
         echo "FOUNDRY_PE_SUBNET=$FOUNDRY_PE_SUBNET" >> $GITHUB_ENV
+        echo "DNS_RESOLVER_IP=$DNS_RESOLVER_IP" >> $GITHUB_ENV
         echo "LOCATION=$LOCATION" >> $GITHUB_ENV
 
         echo "env_short=${ENV_SHORT}" >> $GITHUB_OUTPUT
@@ -166,7 +168,7 @@ jobs:
         FOUNDRY_AGT_SUBNET: ${{ env.FOUNDRY_AGT_SUBNET }}
         FOUNDRY_PE_SUBNET: ${{ env.FOUNDRY_PE_SUBNET }}
         BASTION_CIDR: ${{ vars.BASTION_CIDR }}
-        DNS_RESOLVER_IP: ${{ vars.DNS_RESOLVER_IP }}
+        DNS_RESOLVER_IP: ${{ env.DNS_RESOLVER_IP }}
         LOCATION: ${{ env.LOCATION }}
         TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       run: |
@@ -236,7 +238,7 @@ jobs:
         retention-days: 1
 
   terraform:
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
     needs: [Extract-Parameters-from-Issue]
@@ -301,7 +303,7 @@ jobs:
         run: terraform -chdir="AI_Patterns" apply -auto-approve -parallelism=1 tfplan
 
   checkov:
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: terraform
     steps:
       - name: Checkout code
@@ -317,7 +319,7 @@ jobs:
 
   close-issue:
     name: Close Issue on Success
-    runs-on: [self-hosted, Linux, X64, vmss-sea]
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: [terraform, checkov]
     if: success()
     env:

@@ -438,7 +438,7 @@ variable "app_code" {
 
 variable "bu" {
   type        = string
-  description = "(Required) Business unit code. Example: `IT` or `mbb`."
+  description = "(Required) Business unit code. Example: `IT` or `{org}`."
 }
 
 # -
@@ -446,8 +446,8 @@ variable "bu" {
 # -
 variable "org" {
   type        = string
-  description = "(Optional) <CN> company/business unit code. Example: `mbb`."
-  default     = "mbb"
+  description = "(Optional) <CN> company/business unit code. Example: `{org}`."
+  default     = "{org}"
 }
 
 variable "country" {
@@ -458,7 +458,7 @@ variable "country" {
 
 variable "region_code" {
   type        = string
-  description = "(Optional) mbb region code.<br></br>&#8226; Value of `region_code` must be one of: `[ea,sea,eu,myw,sg]`."
+  description = "(Optional) {org} region code.<br></br>&#8226; Value of `region_code` must be one of: `[ea,sea,eu,myw,sg]`."
   validation {
     condition     = contains(["ea", "sea", "eu", "myw", "sg"], var.region_code)
     error_message = "Value of \"region_code\" must be one of: [ea,sea,eu,myw,sg]."

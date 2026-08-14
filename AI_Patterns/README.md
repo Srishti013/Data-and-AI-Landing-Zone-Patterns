@@ -38,7 +38,7 @@ from the network team. Current sizing (agreed with networking):
 | Foundry | `/25` | Agent `/25` (Microsoft.App/environments delegation) |
 | Foundry | `/27` | Private Endpoint `/27` |
 
-- Both VNets peer to the SEA hub `mbb-vnet-pvt-network-pd-sea-01`, so the ranges **must not
+- Both VNets peer to the SEA hub `{org}-vnet-pvt-network-pd-sea-01`, so the ranges **must not
   overlap any existing spoke** (check live hub peerings before requesting/using a range).
 - **Never reuse an iterator whose Key Vaults were previously soft-deleted** — purge protection
   keeps them for 90 days, and recreating a soft-deleted KV name *recovers* the vault + its keys,
@@ -58,7 +58,7 @@ Verify with `az provider show -n Microsoft.App --query registrationState` (repea
 ### 3. Azure Policy exemptions (aishared resource group)
 The born-injected agent stack performs backend storage deployments with defaults that the
 MAS-Singapore governance denies. Without exemptions the account hangs in **Creating**.
-Request exemptions on the `mbb-rg-aishared-<env>-sea-<iterator>` RG for:
+Request exemptions on the `{org}-rg-aishared-<env>-sea-<iterator>` RG for:
 
 - `MAS_Policy_Custom_050_03` — Storage Account Access Key Setting DENY
 - `b2982f36-99f2-4db5-8eff-283140c09693` — Storage accounts should disable public network access
@@ -66,7 +66,7 @@ Request exemptions on the `mbb-rg-aishared-<env>-sea-<iterator>` RG for:
 
 ### 4. CMK Key Vault data-plane roles (account UMI)
 The Foundry account is CMK-encrypted. Its user-assigned identity must hold **both** crypto
-roles on the CMK Key Vault (`mbb-kv-aifoundry-*`), or gpt-5.1 model deployment fails
+roles on the CMK Key Vault (`{org}-kv-aifoundry-*`), or gpt-5.1 model deployment fails
 *"Failed to validate policies for model gpt-5.1"*:
 
 | Role | Purpose |
@@ -80,19 +80,19 @@ Both are provisioned by `role_assignments_config_cmk` in [variables.tfvars](vari
 Both SEA firewall policies whitelist the AI LZ by supernet, so **any `10.248.0.0/16` range is
 already permitted** (no per-env firewall change):
 
-- Internal `mbb-afwp-nw-pd-sea-01` — `Allow_AI_Foundry_to_Internet` / `_to_AzurePlatformDNS` / `_to_DNS_Resolver`
-- Edge `mbb-afwp-nw-pd-sea-02` — `Allow_AI_Foundry_CoreEndpoints` / `_to_ServiceTags` + APIM rules
+- Internal `{org}-afwp-nw-pd-sea-01` — `Allow_AI_Foundry_to_Internet` / `_to_AzurePlatformDNS` / `_to_DNS_Resolver`
+- Edge `{org}-afwp-nw-pd-sea-02` — `Allow_AI_Foundry_CoreEndpoints` / `_to_ServiceTags` + APIM rules
 
 If a deployment uses a range **outside** `10.248.0.0/16`, the source must be added to these rules.
 
 ### 6. Hub private DNS zone + SPN permission (internal APIM)
 - The `azure-api.net` private DNS zone must exist in the network hub RG
-  `mbb-rg-private-network-pd-<region>-01`. The pattern self-registers the internal APIM's
+  `{org}-rg-private-network-pd-<region>-01`. The pattern self-registers the internal APIM's
   A-records into it and links the shared VNet, resolving the `:3443` control-plane endpoint.
-- The deploy SPN needs **Private DNS Zone Contributor** on `mbb-plt-sub-network-prd-sea-01`.
+- The deploy SPN needs **Private DNS Zone Contributor** on `{org}-plt-sub-network-prd-sea-01`.
 
 ### 7. Deploy service principal roles
-The region-scoped deploy SPN (`mbb-spn-ailz-nonprd-sea-01`) needs, across the workload subs:
+The region-scoped deploy SPN (`{org}-spn-ailz-nonprd-sea-01`) needs, across the workload subs:
 Contributor, RBAC Administrator, Key Vault Administrator, Storage Blob Data Contributor; on
 the network sub: Private DNS Zone Contributor + Network Contributor; on the mgmt sub: Log
 Analytics Contributor (central ops LAW is resolved at plan time) + Storage Blob Data Contributor.
@@ -141,7 +141,7 @@ flowchart TD
 ### Deployment target
 | Field | Allowed values |
 |-------|----------------|
-| Subscription | `mbb-ai-sub-tier4-{dev,sit,uat}-sea-01`, `tst-sub-sea-01` |
+| Subscription | `{org}-ai-sub-tier4-{dev,sit,uat}-sea-01`, `tst-sub-sea-01` |
 | Environment | `Dev`, `SIT`, `UAT`, `Prod` |
 | Region | `Malaysia West`, `Southeast Asia` |
 
@@ -179,16 +179,16 @@ Application Support Email).
 - **Azure auth:** OIDC (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`) — no stored passwords.
 - **Module registry:** `vendored under each stack's `modules/` folder,
   versions pinned in [modulesdataai.json](../modulesdataai.json).
-- **Terraform backend:** storage `mbbsatfprdmyw01`, container `tfstatealz`, RG
-  `mbb-rg-devops-pd-myw-01`, state key `aiApp-<env>-<region_code>.tfstate`.
+- **Terraform backend:** storage `{org}satfprdmyw01`, container `tfstatealz`, RG
+  `{org}-rg-devops-pd-myw-01`, state key `aiApp-<env>-<region_code>.tfstate`.
 
 ### Subscription name → ID mapping (in the workflow)
 
 | Subscription name | Azure subscription ID |
 |-------------------|-----------------------|
-| `mbb-ai-sub-tier4-dev-sea-01` | `9662b56a-a3b5-48a1-b0f6-8862241a57ca` |
-| `mbb-ai-sub-tier4-sit-sea-01` | `dc1c5599-6863-47a3-81a3-8ef93cf61599` |
-| `mbb-ai-sub-tier4-uat-sea-01` | `736c1205-3a01-4220-ac51-8d7415709f66` |
+| `{org}-ai-sub-tier4-dev-sea-01` | `9662b56a-a3b5-48a1-b0f6-8862241a57ca` |
+| `{org}-ai-sub-tier4-sit-sea-01` | `dc1c5599-6863-47a3-81a3-8ef93cf61599` |
+| `{org}-ai-sub-tier4-uat-sea-01` | `736c1205-3a01-4220-ac51-8d7415709f66` |
 | `tst-sub-sea-01` | `681852db-ca84-4356-943f-d1175fc3281e` |
 
 ---

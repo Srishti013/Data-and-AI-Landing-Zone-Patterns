@@ -85,7 +85,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| Azure Azure Container Registry | [mbb_azure_container_registry](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/user/sandeep-ai/modules/mbb_azure_container_registry/v1.0.0.0) | 1.0.0 |
+| Azure Azure Container Registry | [azure_container_registry](https://github.com/your-org/iac-modules/tree/user/sandeep-ai/modules/azure_container_registry/v1.0.0.0) | 1.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -95,7 +95,7 @@
 
 ```main.tf
 module "azure_container_registry" {
-  source   = "./modules/mbb_azure_container_registry/v1.0.0.0"
+  source   = "./modules/azure_container_registry/v1.0.0.0"
   for_each = var.azure_container_registry
 
   providers = {
@@ -176,10 +176,10 @@ module "azure_container_registry" {
 
 ```tfvars
 azure_container_registry = {
-  "mbb-cr-aishared-dev-myw-01" = {
+  "{org}-cr-aishared-dev-myw-01" = {
 
     env                = "dev"
-    org                = "mbb"
+    org                = "{org}"
     region_code        = "myw"
     base_name          = ""
     additional_name    = ""
@@ -210,8 +210,8 @@ azure_container_registry = {
     # Optional Tags
     region              = "myw"
     description         = "Azure Container Registry for development environment"
-    notification_emails = ["mss_ceat@maybank.com"]
-    app_id              = "MBB-MYW-NET01-00001"
+    notification_emails = ["mss_ceat@example.com"]
+    app_id              = "-MYW-NET01-00001"
     auto_delete         = "No"
     delete_after        = "TBD"
     integration_id      = "TBD"
@@ -224,9 +224,9 @@ azure_container_registry = {
     last_vm_accessed    = "TBD"
 
     # location            = "southeastasia"
-    resource_group_key = "mbb-rg-axxxx
+    resource_group_key = "{org}-rg-axxxx
     enable_telemetry   = true
-    umi_key            = "mbb-uamixxx"
+    umi_key            = "{org}-uamixxx"
 
     managed_identities = {
       system_assigned = false
@@ -239,15 +239,15 @@ azure_container_registry = {
 
 
     private_endpoints = {
-      "mbb-pe-cr-aishared-dev-myw-01" = {
-        name                   = "mbb-pe-cxxx"
-        vnet_key               = "mbb-vnxx"
-        subnet_key             = "mbb-sxxx"
+      "{org}-pe-cr-aishared-dev-myw-01" = {
+        name                   = "{org}-pe-cxxx"
+        vnet_key               = "{org}-vnxx"
+        subnet_key             = "{org}-sxxx"
         subresource_name       = "registry"
         dns_zone_key           = "acr"
         location               = "malaysiawest"
-        resource_group_name    = "mbb-xxxx"
-        network_interface_name = "mbb-pxxx"
+        resource_group_name    = "{org}-xxxx"
+        network_interface_name = "{org}-pxxx"
       }
     }
   }
@@ -392,7 +392,7 @@ azure_container_registry = {
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_azure_container_registry | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_azure_container_registry) | v1.0.0.0 |
+| azure_container_registry | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/azure_container_registry) | v1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -400,9 +400,9 @@ azure_container_registry = {
 
 ```main.tf
 module "container_registry" {
-  source = "../../modules/mbb_azure_container_registry/v1.0.0.0"
+  source = "../../modules/azure_container_registry/v1.0.0.0"
 
-  name                = "mbbacrshared001"
+  name                = "{org}acrshared001"
   location            = "southeastasia"
   resource_group_name = var.resource_group_name
   sku                 = "Premium"

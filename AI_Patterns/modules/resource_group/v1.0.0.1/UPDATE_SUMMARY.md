@@ -1,16 +1,16 @@
-# MBB Resource Group Module - Update Summary
+# Resource Group Module - Update Summary
 
 ## Changes Completed ✅
 
-The `mbb_resource_group` module has been successfully updated to integrate with the enhanced `mbb_naming_module` for comprehensive tagging.
+The `resource_group` module has been successfully updated to integrate with the enhanced `naming_module` for comprehensive tagging.
 
 ## Files Modified
 
 ### 1. **main.tf**
-- ✅ Updated `mbb_module_rg` module call to pass all new tag variables
+- ✅ Updated `module_rg` module call to pass all new tag variables
 - ✅ Added all mandatory business, DevOps, finance, governance, and operation tags
 - ✅ Added optional tags (delete_after, tier, app_id, etc.)
-- ✅ Changed tag merging: `module.mbb_module_rg.tags` + `var.tags`
+- ✅ Changed tag merging: `module.module_rg.tags` + `var.tags`
 - ✅ Removed commented-out legacy code
 
 ### 2. **variables.tf**
@@ -53,7 +53,7 @@ Tags are merged in this order:
 
 ### ✅ Sensible Defaults
 - `type` = "Infrastructure"
-- `product_name` = "mbb_resource_group"
+- `product_name` = "resource_group"
 - `compliance_required` = "No"
 - `compliance` = "None"
 - `status` = "Live"
@@ -62,20 +62,20 @@ Tags are merged in this order:
 
 ```hcl
 module "resource_group" {
-  source = "path/to/mbb_resource_group/v1.0.0.0"
+  source = "path/to/resource_group/v1.0.0.0"
 
   # Basic naming
   env                = "dev"
   au                 = "00121"
   app_code           = "webapp"
   bu                 = "it"
-  owner              = "owner@maybank.com"
+  owner              = "owner@example.com"
   resource_type_code = "rg"
   base_name          = "myapp"
 
   # Mandatory Business Tags
   app_name       = "My Application"
-  app_support    = "support@maybank.com"
+  app_support    = "support@example.com"
   business_unit  = "IT Department"
   country        = "MY"
   business_owner = "John Doe"
@@ -134,7 +134,7 @@ This is a **breaking change**. Existing module calls will fail validation withou
 
 ## Benefits
 
-✅ **Governance Compliance** - All resources meet Maybank tagging standards
+✅ **Governance Compliance** - All resources meet tagging standards
 ✅ **Cost Management** - Finance tags enable accurate cost tracking and allocation
 ✅ **Operational Excellence** - Operation tags improve resource lifecycle management
 ✅ **Data Protection** - Governance tags support compliance and data classification
@@ -149,8 +149,8 @@ This is a **breaking change**. Existing module calls will fail validation withou
 
 ## Related Documentation
 
-- **Naming Module Tagging Strategy**: `../../mbb_naming_module/v1.0.0.0/examples/TAGGING_STRATEGY.md`
-- **Naming Module Implementation**: `../../mbb_naming_module/v1.0.0.0/TAGGING_IMPLEMENTATION.md`
+- **Naming Module Tagging Strategy**: `../../naming_module/v1.0.0.0/examples/TAGGING_STRATEGY.md`
+- **Naming Module Implementation**: `../../naming_module/v1.0.0.0/TAGGING_IMPLEMENTATION.md`
 - **Resource Group Migration Guide**: `./MIGRATION_GUIDE.md`
 
 ---

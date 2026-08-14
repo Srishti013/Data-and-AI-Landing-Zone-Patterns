@@ -31,7 +31,7 @@
 ## Overview
 
 - This module deploys an Azure Fabric Capacity resource with configurable capacity SKU.
-- It assigns capacity administrators and applies standardized naming/tagging through `mbb_naming_module`.
+- It assigns capacity administrators and applies standardized naming/tagging through `naming_module`.
 - The module is intended for centralized Microsoft Fabric capacity provisioning in enterprise environments.
 
 ## Note
@@ -87,7 +87,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| mbb_fabric_capacity | [IAC link](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/main/modules/mbb_fabric_capacity) | v1.0.0.0 |
+| fabric_capacity | [IAC link](https://github.com/your-org/iac-modules/tree/main/modules/fabric_capacity) | v1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -95,7 +95,7 @@
 
 ```main.tf
 module "fabric_capacity" {
-  source = "../../modules/mbb_fabric_capacity/v1.0.0.0"
+  source = "../../modules/fabric_capacity/v1.0.0.0"
 
   resource_group_name      = var.resource_group_name
   administration_members   = var.administration_members

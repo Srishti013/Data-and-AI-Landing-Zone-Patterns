@@ -269,3 +269,12 @@ body:
       description: Foundry private endpoints - MUST be in the Foundry /27 range (e.g. 10.248.74.128/27)
     validations:
       required: true
+
+  - type: input
+    id: dns_resolver_ip
+    attributes:
+      label: DNS Resolver IP
+      description: Inbound IP of the hub DNS Private Resolver. Spoke VNets use it as their DNS server. Read it from the hub resolver's inbound endpoint (it is dynamically assigned, not fixed).
+      placeholder: "10.247.130.196"
+    validations:
+      required: true

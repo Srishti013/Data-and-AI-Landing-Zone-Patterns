@@ -85,7 +85,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| Azure SQL Server | [mbb_sql_server](https://github.com/maybank-ghes/mbb-az-iac-modules/tree/user/main/modules/mbb_sql_server/v1.0.0.0) | 1.0.0.0 |
+| Azure SQL Server | [sql_server](https://github.com/your-org/iac-modules/tree/user/main/modules/sql_server/v1.0.0.0) | 1.0.0.0 |
 
 ## Sample pipeline code snippet to use the product
 
@@ -95,7 +95,7 @@
 
 ```main.tf
 module "data_sql_server" {
-  source   = "./modules/mbb_sql_server/v1.0.0.0"
+  source   = "./modules/sql_server/v1.0.0.0"
   for_each = var.sql_servers
 
   providers = {
@@ -188,10 +188,10 @@ module "data_sql_server" {
 
 ```tfvars
 sql_servers = {
-  "mbb-sql-data-dev-myw-01" = {
+  "{org}-sql-data-dev-myw-01" = {
     # Required variables
     env                = "dev"
-    org                = "mbb"
+    org                = "{org}"
     region_code        = "myw"
     base_name          = ""
     additional_name    = ""
@@ -208,17 +208,17 @@ sql_servers = {
 
     # Mandatory Business Tags
     app_name            = "Data Base Infrastructure"
-    app_support         = "mss_ceat@maybank.com"
+    app_support         = "mss_ceat@example.com"
     business_unit       = "GTD-ISD"
     business_owner      = "Head of Cloud Engineering and Automation"
     type                = "Development"
     cost_center         = "383-80572"
     data_classification = "Business Sensitive"
     compliance          = "BNM RMIT"
-    app_id              = "MBB-MYW-SQLS-001"
+    app_id              = "-MYW-SQLS-001"
 
     # Mandatory DevOps Tags
-    product_name    = "mbb_sql_server"
+    product_name    = "sql_server"
     product_version = "1.0.0.0"
 
     # Mandatory Finance Tags
@@ -234,13 +234,13 @@ sql_servers = {
     # Optional Tags
     description         = "Base Infra SQL Server for development data environment"
     region              = "MYW"
-    notification_emails = ["mss_ceat@maybank.com"]
+    notification_emails = ["mss_ceat@example.com"]
     role_assignments    = {}
     additional_tags     = {}
 
     # SQL Server specific configuration
-    resource_group_key  = "mbb-rg-datashared-dev-myw-01"
-    umi_key             = "mbb-uami-sql-data-dev-myw-01"
+    resource_group_key  = "{org}-rg-datashared-dev-myw-01"
+    umi_key             = "{org}-uami-sql-data-dev-myw-01"
     server_version      = "12.0"
     administrator_login = "mysqladmin"
     enable_telemetry    = true
@@ -248,13 +248,13 @@ sql_servers = {
     managed_identities = {
       system_assigned = false
       umi_key = [
-        "mbb-uami-sql-data-dev-myw-01"
+        "{org}-uami-sql-data-dev-myw-01"
       ]
     }
 
     databases = {
-      "mbb-sqldb-data-dev-myw-01" = {
-        name                        = "mbb-sqldb-data-dev-myw-01"
+      "{org}-sqldb-data-dev-myw-01" = {
+        name                        = "{org}-sqldb-data-dev-myw-01"
         create_mode                 = "Default"
         collation                   = "SQL_Latin1_General_CP1_CI_AS"
         license_type                = null
@@ -270,12 +270,12 @@ sql_servers = {
 
     private_endpoints = {
       pe_sqlserver = {
-        name                   = "mbb-pe-sqldb-data-dev-myw-01"
-        vnet_key               = "mbb-vnet-data-dev-myw-01"
-        subnet_key             = "mbb-snet-pe-data-dev-myw-01"
+        name                   = "{org}-pe-sqldb-data-dev-myw-01"
+        vnet_key               = "{org}-vnet-data-dev-myw-01"
+        subnet_key             = "{org}-snet-pe-data-dev-myw-01"
         subresource_name       = "sqlServer"
         dns_zone_key           = "sqlserver"
-        network_interface_name = "mbb-pe-sqldb-data-dev-myw-01-nic"
+        network_interface_name = "{org}-pe-sqldb-data-dev-myw-01-nic"
       }
     }
   }
