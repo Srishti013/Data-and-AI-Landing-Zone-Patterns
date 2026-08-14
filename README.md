@@ -84,7 +84,7 @@ project can adopt it by setting a handful of repo variables — no code edits.
 |---|---|
 | `WORKLOAD_SUBSCRIPTION_ID` | Subscription the spoke deploys into |
 | `TFSTATE_STORAGE_ACCOUNT` / `TFSTATE_CONTAINER` / `TFSTATE_RESOURCE_GROUP` | State backend |
-| `BASTION_CIDR` | AzureBastionSubnet CIDR (inert if no bastion) |
+| `BASTION_CIDR` *(optional)* | AzureBastionSubnet CIDR for the Allow-Bastion-RDP-SSH NSG rule; leave unset to drop that rule entirely (no bastion needed) |
 | `SQL_ADMIN_UPN` / `SQL_ADMIN_OBJECT_ID` | Azure AD SQL admin (both spokes) |
 | `FABRIC_ADMIN_UPN` *(optional)* | Fabric capacity admin (falls back to `SQL_ADMIN_UPN`) |
 | `PURVIEW_ID` *(optional)* | If set, links ADF to your Purview account; empty = no Purview |

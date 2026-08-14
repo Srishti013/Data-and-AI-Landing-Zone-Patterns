@@ -258,7 +258,7 @@ network_security_groups = {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_ranges    = ["22", "3389"]
-        source_address_prefix      = "" # AzureBastionSubnet CIDR in HUB (injected by workflow from BASTION_CIDR)
+        source_address_prefix      = "{bastion_cidr}" # AzureBastionSubnet CIDR in HUB (injected by workflow; rule dropped if BASTION_CIDR unset)
         destination_address_prefix = "*"
       }
     }

@@ -212,12 +212,16 @@ jobs:
         sed -i -E "/\"[^\"]*-snet-agt-aifoundry-/,/^      \}/ s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${FOUNDRY_AGT_SUBNET}\2|" "$TFVARS_FILE"
         sed -i -E "/\"[^\"]*-snet-pe-aifoundry-/,/^      \}/  s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${FOUNDRY_PE_SUBNET}\2|"   "$TFVARS_FILE"
 
-        # Bastion CIDR: replace ONLY the {bastion_cidr} placeholder (the VM subnet
-        # Allow-Bastion-RDP-SSH rule). Do NOT touch other source_address_prefix
-        # values - the APIM/AGW NSG rules use SERVICE TAGS (ApiManagement,
-        # AzureLoadBalancer, VirtualNetwork, GatewayManager) that MUST be preserved
-        # (a global replace here clobbers them and breaks APIM's :3443 check).
-        sed -i "s|{bastion_cidr}|${BASTION_CIDR}|g"  "$TFVARS_FILE"
+        # Bastion NSG rule (optional). Set BASTION_CIDR to inject the hub
+        # AzureBastionSubnet CIDR into the {bastion_cidr} token; leave it unset to
+        # drop the Allow-Bastion-RDP-SSH rule entirely (no bastion => no rule, no var).
+        # Only the {bastion_cidr} token is touched - APIM/AGW rules use service tags
+        # (ApiManagement, AzureLoadBalancer, VirtualNetwork, GatewayManager) that stay intact.
+        if [ -n "$BASTION_CIDR" ]; then
+          sed -i "s|{bastion_cidr}|${BASTION_CIDR}|g" "$TFVARS_FILE"
+        else
+          awk '/Allow-Bastion-RDP-SSH = \{/{inrule=1; next} inrule && /^      \}/{inrule=0; next} inrule{next} {print}' "$TFVARS_FILE" > "$TFVARS_FILE.tmp" && mv "$TFVARS_FILE.tmp" "$TFVARS_FILE"
+        fi
         # Spoke VNet DNS -> hub DNS Private Resolver inbound endpoint.
         sed -i -E "s|(dns_servers[[:space:]]*=[[:space:]]*\[\")[^\"]*(\"\])|\1${DNS_RESOLVER_IP}\2|g"                  "$TFVARS_FILE"
         # Azure location for region-pinned resources.
