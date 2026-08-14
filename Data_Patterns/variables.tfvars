@@ -1284,7 +1284,7 @@ data_factories = {
 
     azure_integration_runtime_azure = {
       azure_ir_01 = {
-        name     = "{org}-azure-ir-data-{env}-{region_code}-{iterator}"
+        name     = "{org}-azure-ir-data-{env}-{region_code}-01"
         location = "auto"
       }
       azure_ir_02 = {
