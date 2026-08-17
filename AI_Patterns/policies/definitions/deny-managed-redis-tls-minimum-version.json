@@ -1,0 +1,17 @@
+{
+  "displayName": "Azure Managed Redis: Require minimum TLS 1.2",
+  "description": "Denies Microsoft.Cache/redisEnterprise/databases whose minimum TLS version is below 1.2. MCSB v2 DP-3.1, NS-8.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Cache/redisEnterprise/databases" },
+        { "field": "Microsoft.Cache/redisEnterprise/databases/minimumTlsVersion", "notEquals": "1.2" }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+  }
+}

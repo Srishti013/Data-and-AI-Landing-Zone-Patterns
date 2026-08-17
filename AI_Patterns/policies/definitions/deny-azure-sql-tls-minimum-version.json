@@ -1,0 +1,17 @@
+{
+  "displayName": "Azure SQL: Enforce minimum TLS version 1.2",
+  "description": "Denies Microsoft.Sql/servers configured with a minimum TLS version other than 1.2. Covers the SQL Database + SQL Server minimum-TLS matrix rows. MCSB v2 DP-3.1, NS-8.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Sql/servers" },
+        { "field": "Microsoft.Sql/servers/minimalTlsVersion", "notEquals": "1.2" }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "displayName": "Azure Application Gateway with WAF: Use the WAF_v2 SKU",
+  "description": "Denies Microsoft.Network/applicationGateways whose sku.tier is not WAF_v2. MCSB v2 NS-6.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Network/applicationGateways" },
+        { "field": "Microsoft.Network/applicationGateways/sku.tier", "notEquals": "WAF_v2" }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+  }
+}

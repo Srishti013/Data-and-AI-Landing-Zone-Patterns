@@ -1,0 +1,17 @@
+{
+  "displayName": "Azure Private DNS: Disable auto-registration on private endpoint zones",
+  "description": "Denies Microsoft.Network/privateDnsZones/virtualNetworkLinks with registrationEnabled set to true. privatelink.* resolver zones must not auto-register VM records. MCSB v2 NS-10.2.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Network/privateDnsZones/virtualNetworkLinks" },
+        { "field": "Microsoft.Network/privateDnsZones/virtualNetworkLinks/registrationEnabled", "equals": true }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+  }
+}
