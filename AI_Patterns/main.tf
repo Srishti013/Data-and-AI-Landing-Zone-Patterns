@@ -795,7 +795,7 @@ module "internal_api_management" {
   # exists before APIM's :3443 self-check runs during provisioning. If APIM still
   # caches a stale (public) resolution, azapi_resource_action.apim_apply_network_update
   # below forces a re-resolution AFTER provisioning to self-heal in the same run.
-  depends_on = [module.resource_group, module.identity_vnet, module.network_security_groups, module.route_tables, azurerm_private_dns_a_record.apim_internal, azurerm_private_dns_zone_virtual_network_link.apim_spoke_azure_api]
+  depends_on = [module.resource_group, module.identity_vnet, module.network_security_groups, module.route_tables, azurerm_private_dns_a_record.apim_internal]
 }
 
 # -----------------------------------------------------------------------------
@@ -851,25 +851,13 @@ resource "azurerm_private_dns_a_record" "apim_internal" {
   records             = [each.value.ip]
 }
 
-# CRITICAL (confirmed live on sit-007): the SEA DNS Private Resolver only returns
-# the private azure-api.net records to a spoke when that SPOKE VNet is ALSO
-# linked to the zone - the hub (inbound-endpoint VNet) link alone is NOT enough.
-# MYW does this for its aifoundry spokes. Without this link the internal APIM
-# resolves its own .management hostname to the PUBLIC IP -> :3443 self-check
-# ConnectFailure -> 422 ManagementApiRequestFailed. Created in the hub zone
-# (network sub) via the azurerm.network provider (SPN has Private DNS Zone
-# Contributor there). registration disabled (resolution-only).
-resource "azurerm_private_dns_zone_virtual_network_link" "apim_spoke_azure_api" {
-  for_each = var.internal_api_management
-
-  provider = azurerm.network
-
-  name                  = "link-to-${each.value.vnet_key}"
-  resource_group_name   = var.existing_private_dns_zones_rg_name
-  private_dns_zone_name = "azure-api.net"
-  virtual_network_id    = module.identity_vnet[each.value.vnet_key].resource_id
-  registration_enabled  = false
-}
+# REMOVED: the azure-api.net -> aishared spoke VNet link. Per Microsoft internal-
+# VNet APIM DNS design guidance (aka.ms/apim internal-vnet, "Critical DNS design
+# guidance"), azure-api.net is a PUBLIC Azure apex domain and must NOT be linked
+# as a private DNS zone to a spoke VNet - doing so makes the zone authoritative in
+# the spoke and shadows the public *.azure-api.net records. The internal APIM's
+# *.azure-api.net records are still served to the aishared VNet via the hub
+# azure-api.net zone link + the DNS Private Resolver.
 
 # ---------------------------------------------------------------------------
 # Foundry spoke-to-zone private DNS VNet links (parity with ex/dev-ai-latest
