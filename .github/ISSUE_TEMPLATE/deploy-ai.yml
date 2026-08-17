@@ -70,7 +70,7 @@ body:
     id: au
     attributes:
       label: AU Code
-      description: Accounting Unit code. Applied as a cost-allocation tag (cost_allocation_unit).
+      description: "Accounting Unit code (numeric, e.g. 00000). Required by the naming module but NOT shown in resource names or the standard tags."
       value: "00000"
     validations:
       required: true
@@ -79,7 +79,7 @@ body:
     id: bu
     attributes:
       label: Business Unit Code
-      description: Short business unit code. Used in resource naming and the business_unit tag.
+      description: "Business unit code (e.g. IT). Required by the naming module but NOT shown in resource names (name = {org}-{type}-{app_code}-{env}-{region_code}). Tagging uses the 'Business Unit' field below."
       value: "it"
     validations:
       required: true
@@ -200,6 +200,21 @@ body:
       label: Application Support Email
       description: Support/distribution email for alerts and ownership. Applied as a tag.
       value: "platform-alerts@example.com"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: "## Governance"
+
+  - type: dropdown
+    id: deploy_policies
+    attributes:
+      label: Deploy AI LZ policies
+      description: "Deploy the Azure Policy guardrail set (MCSB v2, custom + built-in) at SUBSCRIPTION scope alongside this AI LZ. Yes = policy definitions + assignments are applied; No = skip. Default No."
+      options:
+        - "No"
+        - "Yes"
     validations:
       required: true
 

@@ -1,0 +1,23 @@
+{
+  "displayName": "Azure OpenAI Service: Restrict outbound network access",
+  "description": "Denies Microsoft.CognitiveServices OpenAI accounts where restrictOutboundNetworkAccess is not true, limiting data exfiltration paths. Permitted destinations should be declared via allowedFqdnList. MCSB v2 NS-2.3, NS-7.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.CognitiveServices/accounts" },
+        { "field": "kind", "equals": "OpenAI" },
+        { "field": "Microsoft.CognitiveServices/accounts/restrictOutboundNetworkAccess", "notEquals": true }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": {
+      "type": "String",
+      "metadata": { "displayName": "Effect", "description": "Enable or disable the execution of the policy." },
+      "allowedValues": ["Audit", "Deny", "Disabled"],
+      "defaultValue": "Deny"
+    }
+  }
+}

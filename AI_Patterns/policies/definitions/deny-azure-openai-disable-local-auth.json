@@ -1,0 +1,23 @@
+{
+  "displayName": "Azure OpenAI Service: Disable local authentication keys (Entra ID only)",
+  "description": "Denies Microsoft.CognitiveServices OpenAI accounts where disableLocalAuth is not true, forcing all callers to authenticate via Microsoft Entra ID. MCSB v2 IM-1.1, PA-7.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.CognitiveServices/accounts" },
+        { "field": "kind", "equals": "OpenAI" },
+        { "field": "Microsoft.CognitiveServices/accounts/disableLocalAuth", "notEquals": true }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": {
+      "type": "String",
+      "metadata": { "displayName": "Effect", "description": "Enable or disable the execution of the policy." },
+      "allowedValues": ["Audit", "Deny", "Disabled"],
+      "defaultValue": "Deny"
+    }
+  }
+}
