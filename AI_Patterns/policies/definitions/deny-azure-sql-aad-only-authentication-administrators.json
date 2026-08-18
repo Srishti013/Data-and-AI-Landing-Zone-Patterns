@@ -1,0 +1,18 @@
+{
+  "displayName": "Azure SQL: Enforce Azure AD-only authentication (administrators alias)",
+  "description": "Denies Microsoft.Sql/servers whose administrators.azureADOnlyAuthentication is not true. Complements deny-azure-sql-aad-only-authentication (which targets the azureADOnlyAuthentications child) by catching the server administrators write path. MCSB v2 IM-1.1, PA-7.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Sql/servers" },
+        { "field": "Microsoft.Sql/servers/administrators.azureADOnlyAuthentication", "exists": true },
+        { "field": "Microsoft.Sql/servers/administrators.azureADOnlyAuthentication", "notEquals": true }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+  }
+}

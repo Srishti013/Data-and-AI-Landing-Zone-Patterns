@@ -1,0 +1,26 @@
+{
+  "displayName": "Azure SQL: Require private endpoint (private link only)",
+  "description": "Audits Microsoft.Sql/servers that do not have an approved private endpoint connection. Private endpoints attach at the server scope (covers SQL Database + SQL Server private-link matrix rows). Audit-only: a create-time Deny would block the server before its private endpoint exists. MCSB v2 NS-2.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Sql/servers" },
+        {
+          "count": {
+            "field": "Microsoft.Sql/servers/privateEndpointConnections[*]",
+            "where": {
+              "field": "Microsoft.Sql/servers/privateEndpointConnections[*].privateLinkServiceConnectionState.status",
+              "equals": "Approved"
+            }
+          },
+          "less": 1
+        }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Disabled"], "defaultValue": "Audit" }
+  }
+}
