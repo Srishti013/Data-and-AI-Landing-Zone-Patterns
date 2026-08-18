@@ -23,16 +23,18 @@ locals {
   }
 }
 
-resource "azurerm_policy_definition" "custom" {
+# Each custom policy is a JSON document under ./definitions; the caller decodes it
+# and the policy_definition module creates the Custom definition resource.
+module "definition" {
+  source   = "../modules/policy_definition/v1.0.0.0"
   for_each = local.custom_defs
 
   name         = each.key
-  policy_type  = "Custom"
-  mode         = try(each.value.mode, "All")
   display_name = each.value.displayName
+  mode         = try(each.value.mode, "All")
   description  = try(each.value.description, null)
-  policy_rule  = jsonencode(each.value.policyRule)
-  parameters   = try(each.value.parameters, null) != null ? jsonencode(each.value.parameters) : null
+  policy_rule  = each.value.policyRule
+  parameters   = try(each.value.parameters, null)
 }
 
 # Every assignment (built-in or custom) is created through the shared
@@ -47,7 +49,7 @@ module "assignment" {
   name                 = each.value.name
   display_name         = each.value.display_name
   scope                = "/subscriptions/${var.subscription_id}"
-  policy_definition_id = each.value.builtin_id != null ? "/providers/Microsoft.Authorization/policyDefinitions/${each.value.builtin_id}" : azurerm_policy_definition.custom[each.value.custom_key].id
+  policy_definition_id = each.value.builtin_id != null ? "/providers/Microsoft.Authorization/policyDefinitions/${each.value.builtin_id}" : module.definition[each.value.custom_key].id
   parameters           = each.value.parameters_json != null ? jsondecode(each.value.parameters_json) : null
   assign_identity      = contains(local.remediation_effects, each.value.effect)
   location             = contains(local.remediation_effects, each.value.effect) ? var.location : null

@@ -1,6 +1,6 @@
 output "custom_policy_definition_ids" {
   description = "IDs of the custom policy definitions created."
-  value       = { for k, d in azurerm_policy_definition.custom : k => d.id }
+  value       = { for k, m in module.definition : k => m.id }
 }
 
 output "assignment_names" {
