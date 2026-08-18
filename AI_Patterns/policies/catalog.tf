@@ -102,8 +102,10 @@ locals {
     # ----- Azure SQL (Microsoft.Sql/servers[/databases]) - consolidated custom -----
     { name = "sql-deny-pna", display_name = "SQL: Disable public network access", builtin_id = null, custom_key = "deny-azure-sql-public-network-access", effect = "Deny", parameters_json = null },
     { name = "sql-aad-only", display_name = "SQL: Azure AD-only authentication", builtin_id = null, custom_key = "deny-azure-sql-aad-only-authentication", effect = "Deny", parameters_json = null },
+    { name = "sql-aad-only-admins", display_name = "SQL: Azure AD-only authentication (administrators alias)", builtin_id = null, custom_key = "deny-azure-sql-aad-only-authentication-administrators", effect = "Deny", parameters_json = null },
     { name = "sql-tls", display_name = "SQL: Minimum TLS 1.2", builtin_id = null, custom_key = "deny-azure-sql-tls-minimum-version", effect = "Deny", parameters_json = null },
     { name = "sql-outbound", display_name = "SQL: Restrict outbound network access", builtin_id = null, custom_key = "deny-azure-sql-outbound-network-restriction", effect = "Deny", parameters_json = null },
+    { name = "sql-private-endpoint", display_name = "SQL: Require private endpoint (audit)", builtin_id = null, custom_key = "audit-azure-sql-private-endpoint", effect = "Audit", parameters_json = null },
     { name = "sql-tde", display_name = "SQL Database: Transparent Data Encryption", builtin_id = null, custom_key = "deny-azure-sql-database-tde", effect = "Deny", parameters_json = null },
     { name = "sql-backup-redundancy", display_name = "SQL Database: Geo-redundant backup", builtin_id = null, custom_key = "deny-azure-sql-database-backup-redundancy", effect = "Deny", parameters_json = null },
 
