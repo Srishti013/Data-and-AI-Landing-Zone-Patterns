@@ -205,21 +205,6 @@ body:
 
   - type: markdown
     attributes:
-      value: "## Governance"
-
-  - type: dropdown
-    id: deploy_policies
-    attributes:
-      label: Deploy AI LZ policies
-      description: "Deploy the Azure Policy guardrail set (MCSB v2, custom + built-in) at SUBSCRIPTION scope alongside this AI LZ. Yes = policy definitions + assignments are applied; No = skip. Default No."
-      options:
-        - "No"
-        - "Yes"
-    validations:
-      required: true
-
-  - type: markdown
-    attributes:
       value: |
         ## Network Configuration
         Provide the address ranges for **each VNet separately**, one CIDR per line
