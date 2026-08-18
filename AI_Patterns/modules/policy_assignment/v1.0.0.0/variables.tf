@@ -68,6 +68,11 @@ variable "assign_identity" {
   description = "(Optional) Whether or not to assign System Assigned Identity to the Policy Assignment. It is required to enable this for enabling role assignments on Managed Identity."
   default     = false
 }
+variable "remediation_role_name" {
+  type        = string
+  description = "(Optional) Built-in role granted to the assignment's managed identity for remediation when assign_identity is true."
+  default     = "Contributor"
+}
 variable "management_group_set_definition" {
   type        = string
   description = "(Optional) Name of management group from which policy set definition will be fetched. If not provided, will attempt to extract from policy_definition_id for custom initiatives."
