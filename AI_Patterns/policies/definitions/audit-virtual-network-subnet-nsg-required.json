@@ -1,0 +1,23 @@
+{
+  "displayName": "Azure Virtual Network: Every subnet must have a network security group",
+  "description": "Audits Microsoft.Network/virtualNetworks that have at least one subnet without an associated network security group. MCSB v2 NS-1.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Network/virtualNetworks" },
+        {
+          "count": {
+            "field": "Microsoft.Network/virtualNetworks/subnets[*]",
+            "where": { "field": "Microsoft.Network/virtualNetworks/subnets[*].networkSecurityGroup.id", "exists": "false" }
+          },
+          "greater": 0
+        }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Audit" }
+  }
+}

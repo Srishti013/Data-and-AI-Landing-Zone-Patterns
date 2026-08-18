@@ -1,0 +1,17 @@
+{
+  "displayName": "Azure Managed Redis: Enforce customer-managed keys (CMK)",
+  "description": "Audits Microsoft.Cache/redisEnterprise clusters whose encryption key source is not a customer-managed Key Vault key. Audit-only per matrix (platform CMK dependency). MCSB v2 DP-5.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Cache/redisEnterprise" },
+        { "field": "Microsoft.Cache/redisEnterprise/encryption.customerManagedKeyEncryption.keyEncryptionKeyUrl", "exists": "false" }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Audit" }
+  }
+}

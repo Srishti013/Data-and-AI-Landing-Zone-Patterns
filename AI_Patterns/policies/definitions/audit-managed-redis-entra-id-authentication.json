@@ -1,0 +1,17 @@
+{
+  "displayName": "Azure Managed Redis: Require Microsoft Entra ID authentication",
+  "description": "Audits Microsoft.Cache/redisEnterprise/databases where access-key authentication is not Disabled (Entra ID only expected). Audit-only per matrix. MCSB v2 IM-1.1, PA-7.1.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Cache/redisEnterprise/databases" },
+        { "field": "Microsoft.Cache/redisEnterprise/databases/accessKeysAuthentication", "notEquals": "Disabled" }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Audit" }
+  }
+}

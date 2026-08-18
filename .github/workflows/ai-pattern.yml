@@ -20,6 +20,7 @@ jobs:
       env_short:   ${{ steps.extract.outputs.env_short }}
       region_code: ${{ steps.extract.outputs.region_code }}
       iterator:    ${{ steps.extract.outputs.iterator }}
+      deploy_policies: ${{ steps.extract.outputs.deploy_policies }}
 
     steps:
 
@@ -96,6 +97,7 @@ jobs:
         FOUNDRY_AGT_SUBNET=$(awk '/^### Foundry Agent Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         FOUNDRY_PE_SUBNET=$(awk '/^### Foundry PE Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         DNS_RESOLVER_IP=$(awk '/^### DNS Resolver IP$/{getline; getline; print; exit}' issue.txt | xargs)
+        DEPLOY_POLICIES=$(awk '/^### Deploy AI LZ policies$/{getline; getline; print; exit}' issue.txt | xargs)
 
         echo "SUBSCRIPTION=$SUBSCRIPTION" >> $GITHUB_ENV
         echo "SUBSCRIPTION_ID=$SUBSCRIPTION_ID" >> $GITHUB_ENV
@@ -133,6 +135,7 @@ jobs:
         echo "env_short=${ENV_SHORT}" >> $GITHUB_OUTPUT
         echo "region_code=${REGION_CODE}" >> $GITHUB_OUTPUT
         echo "iterator=${ITERATOR}" >> $GITHUB_OUTPUT
+        echo "deploy_policies=${DEPLOY_POLICIES}" >> $GITHUB_OUTPUT
         echo "Environment: $ENV ($ENV_SHORT)"
         echo "Region: $REGION ($REGION_CODE)"
 
@@ -305,6 +308,46 @@ jobs:
         # -parallelism=1 is REQUIRED for AI Foundry: projects/deployments hold an
         # ETag lock on the account, so concurrent PUTs 412/timeout.
         run: terraform -chdir="AI_Patterns" apply -auto-approve -parallelism=1 tfplan
+
+  policies:
+    name: Deploy AI LZ Policies (optional)
+    runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
+    needs: [terraform, Extract-Parameters-from-Issue]
+    if: needs.Extract-Parameters-from-Issue.outputs.deploy_policies == 'Yes'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Terraform Init (policies)
+        env:
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_USE_OIDC: true
+          ENV_SHORT:   ${{ needs.Extract-Parameters-from-Issue.outputs.env_short }}
+          REGION_CODE: ${{ needs.Extract-Parameters-from-Issue.outputs.region_code }}
+        run: |
+          terraform -chdir="AI_Patterns/policies" init \
+            -backend-config="storage_account_name=${{ vars.TFSTATE_STORAGE_ACCOUNT }}" \
+            -backend-config="container_name=${{ vars.TFSTATE_CONTAINER }}" \
+            -backend-config="key=aiPolicies-${ENV_SHORT}-${REGION_CODE}.tfstate" \
+            -backend-config="resource_group_name=${{ vars.TFSTATE_RESOURCE_GROUP }}" \
+            -backend-config="subscription_id=${{ secrets.TFSTATE_SUBSCRIPTION_ID }}"
+
+      - name: Terraform Apply (policies)
+        env:
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_USE_OIDC: true
+        run: |
+          terraform -chdir="AI_Patterns/policies" apply -auto-approve \
+            -var="subscription_id=${{ vars.WORKLOAD_SUBSCRIPTION_ID }}"
 
   checkov:
     runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}

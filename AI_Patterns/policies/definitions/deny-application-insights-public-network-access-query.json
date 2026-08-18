@@ -1,0 +1,17 @@
+{
+  "displayName": "Application Insights: Disable public network access for telemetry queries",
+  "description": "Denies Microsoft.Insights/components whose publicNetworkAccessForQuery is not Disabled. MCSB v2 NS-2.1, NS-2.3.",
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        { "field": "type", "equals": "Microsoft.Insights/components" },
+        { "field": "Microsoft.Insights/components/publicNetworkAccessForQuery", "notEquals": "Disabled" }
+      ]
+    },
+    "then": { "effect": "[parameters('effect')]" }
+  },
+  "parameters": {
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+  }
+}
