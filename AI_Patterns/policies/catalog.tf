@@ -121,11 +121,10 @@ locals {
 
     # ----- Azure Managed Redis (Microsoft.Cache/redisEnterprise) - all custom -----
     { name = "redis-deny-pna", display_name = "Managed Redis: Disable public network access", builtin_id = null, custom_key = "deny-managed-redis-public-network-access", effect = "Deny", parameters_json = null },
-    { name = "redis-tls", display_name = "Managed Redis: Minimum TLS 1.2", builtin_id = null, custom_key = "deny-managed-redis-tls-minimum-version", effect = "Deny", parameters_json = null },
+    { name = "redis-tls", display_name = "Managed Redis: Require encrypted client protocol", builtin_id = null, custom_key = "deny-managed-redis-encrypted-protocol", effect = "Deny", parameters_json = null },
     { name = "redis-privlink", display_name = "Managed Redis: Private link only (audit)", builtin_id = null, custom_key = "audit-managed-redis-private-link-required", effect = "Audit", parameters_json = null },
     { name = "redis-entra", display_name = "Managed Redis: Entra ID auth (audit)", builtin_id = null, custom_key = "audit-managed-redis-entra-id-authentication", effect = "Audit", parameters_json = null },
     { name = "redis-cmk", display_name = "Managed Redis: CMK (audit)", builtin_id = null, custom_key = "audit-managed-redis-cmk", effect = "Audit", parameters_json = null },
-    { name = "redis-ha", display_name = "Managed Redis: High availability (audit)", builtin_id = null, custom_key = "audit-managed-redis-high-availability", effect = "Audit", parameters_json = null },
 
     # ----- Azure Log Analytics (Microsoft.OperationalInsights/workspaces) -----
     { name = "la-disable-local-auth", display_name = "Log Analytics: Entra ID auth only", builtin_id = "e15effd4-2278-4c65-a0da-4d6f6d1890e2", custom_key = null, effect = "Deny", parameters_json = null },

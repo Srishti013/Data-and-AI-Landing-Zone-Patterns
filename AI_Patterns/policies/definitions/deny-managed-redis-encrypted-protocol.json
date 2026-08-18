@@ -1,12 +1,12 @@
 {
-  "displayName": "Azure Managed Redis: Require minimum TLS 1.2",
-  "description": "Denies Microsoft.Cache/redisEnterprise/databases whose minimum TLS version is below 1.2. MCSB v2 DP-3.1, NS-8.1.",
+  "displayName": "Azure Managed Redis: Require encrypted client protocol (TLS)",
+  "description": "Denies Microsoft.Cache/redisEnterprise/databases that allow the Plaintext client protocol. Requires Encrypted (TLS) client connections. MCSB v2 DP-3.1, NS-8.1.",
   "mode": "All",
   "policyRule": {
     "if": {
       "allOf": [
         { "field": "type", "equals": "Microsoft.Cache/redisEnterprise/databases" },
-        { "field": "Microsoft.Cache/redisEnterprise/databases/minimumTlsVersion", "notEquals": "1.2" }
+        { "field": "Microsoft.Cache/redisEnterprise/databases/clientProtocol", "notEquals": "Encrypted" }
       ]
     },
     "then": { "effect": "[parameters('effect')]" }

@@ -35,31 +35,20 @@ resource "azurerm_policy_definition" "custom" {
   parameters   = try(each.value.parameters, null) != null ? jsonencode(each.value.parameters) : null
 }
 
-resource "azurerm_subscription_policy_assignment" "this" {
+# Every assignment (built-in or custom) is created through the shared
+# policy_assignment module. The module detects the subscription scope, attaches a
+# SystemAssigned identity when assign_identity is true, and — for Modify /
+# DeployIfNotExists policies — extracts the policy's own roleDefinitionIds and
+# creates the remediation role assignments automatically.
+module "assignment" {
+  source   = "../modules/policy_assignment/v1.0.0.0"
   for_each = local.assignments
 
   name                 = each.value.name
   display_name         = each.value.display_name
-  subscription_id      = "/subscriptions/${var.subscription_id}"
-  policy_definition_id = each.value.builtin_id != null ? "/providers/Microsoft.Authorization/policyDefinitions/${each.value.builtin_id}" : azurerm_policy_definition.custom[each.value.custom_key].id
-  parameters           = each.value.parameters_json
-  location             = contains(local.remediation_effects, each.value.effect) ? var.location : null
-
-  dynamic "identity" {
-    for_each = contains(local.remediation_effects, each.value.effect) ? [1] : []
-    content {
-      type = "SystemAssigned"
-    }
-  }
-}
-
-# Modify / DeployIfNotExists assignments patch or deploy resources, so their
-# managed identity needs rights. Contributor at subscription scope is broad but
-# functional; can be tightened to per-policy roleDefinitionIds later.
-resource "azurerm_role_assignment" "remediation" {
-  for_each = { for k, a in local.assignments : k => a if contains(local.remediation_effects, a.effect) }
-
   scope                = "/subscriptions/${var.subscription_id}"
-  role_definition_name = "Contributor"
-  principal_id         = azurerm_subscription_policy_assignment.this[each.key].identity[0].principal_id
+  policy_definition_id = each.value.builtin_id != null ? "/providers/Microsoft.Authorization/policyDefinitions/${each.value.builtin_id}" : azurerm_policy_definition.custom[each.value.custom_key].id
+  parameters           = each.value.parameters_json != null ? jsondecode(each.value.parameters_json) : null
+  assign_identity      = contains(local.remediation_effects, each.value.effect)
+  location             = contains(local.remediation_effects, each.value.effect) ? var.location : null
 }
