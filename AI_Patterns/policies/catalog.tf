@@ -146,7 +146,6 @@ locals {
 
     # ----- Private DNS + Virtual Networks -----
     { name = "pdns-registration", display_name = "Private DNS: Disable auto-registration (custom)", builtin_id = null, custom_key = "deny-private-dns-registration-disabled", effect = "Deny", parameters_json = null },
-    { name = "vnet-ddos", display_name = "VNet: DDoS Network Protection", builtin_id = "94de2ad3-e0c1-4caf-ad78-5d47bbc83d3d", custom_key = null, effect = "Modify", parameters_json = null },
     { name = "vnet-private-subnets", display_name = "VNet: Subnets must be private", builtin_id = "7bca8353-aa3b-429b-904a-9229c4385837", custom_key = null, effect = "Deny", parameters_json = null },
     { name = "vnet-subnet-nsg", display_name = "VNet: Every subnet needs an NSG (audit, custom)", builtin_id = null, custom_key = "audit-virtual-network-subnet-nsg-required", effect = "Audit", parameters_json = null },
   ]

@@ -24,6 +24,6 @@ output "scope_type" {
 }
 
 output "role_assignment_ids" {
-  value       = { for k, r in azurerm_role_assignment.remediation : k => r.id }
+  value       = azurerm_role_assignment.remediation[*].id
   description = "The Role Assignment(s) created for policy remediation."
 }
