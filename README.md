@@ -92,6 +92,8 @@ project can adopt it by setting a handful of repo variables — no code edits.
 
 **SPN RBAC**: Contributor + User Access Administrator on the workload sub; Network + Private DNS Zone Contributor on the hub; Log Analytics Contributor on management; Storage Blob Data Contributor on the state account.
 
+> **Optional Azure Policy guardrail layer** (`AI_Patterns/policies`, triggered by `Deploy AI LZ policies = Yes`): the SPN additionally needs **Resource Policy Contributor** on the workload sub to create the policy definitions and subscription assignments. The existing **User Access Administrator** already covers the remediation role assignments that the `Modify` policies create for their managed identities. Contributor alone cannot write to `Microsoft.Authorization/*`, so without Resource Policy Contributor the policy apply fails with `AuthorizationFailed`.
+
 **Resource providers**: register (or use provider `resource_provider_registrations = "extended"`): Microsoft.Network, Storage, KeyVault, ManagedIdentity, Authorization, Insights, OperationalInsights, EventGrid, DataFactory, DataProtection, Sql, RecoveryServices, Fabric, CognitiveServices, ApiManagement, DocumentDB, Search, Cache, ContainerRegistry, App, ContainerService.
 
 ---
