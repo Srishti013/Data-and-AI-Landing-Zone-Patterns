@@ -313,7 +313,10 @@ jobs:
     name: Deploy AI LZ Policies (optional)
     runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: [terraform, Extract-Parameters-from-Issue]
-    if: needs.Extract-Parameters-from-Issue.outputs.deploy_policies == 'Yes'
+    # Runs AFTER the AI LZ job (so Deny guardrails never race resource creation)
+    # but does not require it to succeed, so the policy layer can be exercised
+    # independently (e.g. in a subscription without the full AI LZ hub infra).
+    if: always() && needs.Extract-Parameters-from-Issue.outputs.deploy_policies == 'Yes'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
