@@ -97,6 +97,15 @@ jobs:
         FOUNDRY_AGT_SUBNET=$(awk '/^### Foundry Agent Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         FOUNDRY_PE_SUBNET=$(awk '/^### Foundry PE Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         DNS_RESOLVER_IP=$(awk '/^### DNS Resolver IP$/{getline; getline; print; exit}' issue.txt | xargs)
+        FIREWALL_IP=$(awk '/^### Firewall IP$/{getline; getline; print; exit}' issue.txt | xargs)
+        # Route table default (0.0.0.0/0) next hop: a provided firewall IP routes
+        # egress through it (VirtualAppliance); otherwise egress goes straight to
+        # the Internet (default). Fills the {fw_next_hop_type}/{fw_next_hop_ip} tokens.
+        if [ -n "$FIREWALL_IP" ]; then
+          FW_NEXT_HOP_TYPE="VirtualAppliance"; FW_NEXT_HOP_IP="${FIREWALL_IP}"
+        else
+          FW_NEXT_HOP_TYPE="Internet"; FW_NEXT_HOP_IP=""
+        fi
         DEPLOY_POLICIES=$(awk '/^### Deploy AI LZ policies$/{getline; getline; print; exit}' issue.txt | xargs)
 
         echo "SUBSCRIPTION=$SUBSCRIPTION" >> $GITHUB_ENV
@@ -130,6 +139,8 @@ jobs:
         echo "FOUNDRY_AGT_SUBNET=$FOUNDRY_AGT_SUBNET" >> $GITHUB_ENV
         echo "FOUNDRY_PE_SUBNET=$FOUNDRY_PE_SUBNET" >> $GITHUB_ENV
         echo "DNS_RESOLVER_IP=$DNS_RESOLVER_IP" >> $GITHUB_ENV
+        echo "FW_NEXT_HOP_TYPE=$FW_NEXT_HOP_TYPE" >> $GITHUB_ENV
+        echo "FW_NEXT_HOP_IP=$FW_NEXT_HOP_IP" >> $GITHUB_ENV
         echo "LOCATION=$LOCATION" >> $GITHUB_ENV
 
         echo "env_short=${ENV_SHORT}" >> $GITHUB_OUTPUT
@@ -172,6 +183,8 @@ jobs:
         FOUNDRY_PE_SUBNET: ${{ env.FOUNDRY_PE_SUBNET }}
         BASTION_CIDR: ${{ vars.BASTION_CIDR }}
         DNS_RESOLVER_IP: ${{ env.DNS_RESOLVER_IP }}
+        FW_NEXT_HOP_TYPE: ${{ env.FW_NEXT_HOP_TYPE }}
+        FW_NEXT_HOP_IP: ${{ env.FW_NEXT_HOP_IP }}
         LOCATION: ${{ env.LOCATION }}
         TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       run: |
@@ -197,12 +210,10 @@ jobs:
         sed -i -E "s/(^[[:space:]]*status[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${STATUS}\2/g"                 "$TFVARS_FILE"
         sed -i -E "s/(^[[:space:]]*app_support[[:space:]]*=[[:space:]]*\")[^\"]*(\")/\1${APP_SUPPORT}\2/g"       "$TFVARS_FILE"
 
-        # aishared VNet gets the FIRST range; the dedicated Foundry VNet gets ALL
-        # REMAINING ranges (VNET_B_LIST may be a single prefix or, per Amit's
-        # sizing, TWO prefixes: Foundry /25 for the agent subnet + /27 for the PE
-        # subnet). Both seds inject an HCL list, so one or many prefixes are fine.
-        sed -i -E "/\"[^\"]*-vnet-aishared-/,/^  \}/ s|(address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${VNET_A_LIST}]|" "$TFVARS_FILE"
-        sed -i -E "/\"[^\"]*-vnet-aifoundry-/,/^  \}/ s|(address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${VNET_B_LIST}]|" "$TFVARS_FILE"
+        # Single AI shared VNet holds ALL address ranges (shared + Foundry). The
+        # Shared and Foundry textarea prefixes are combined into VNET_AS_LIST and
+        # injected into the one VNet's address_space (single-VNet, Azure-DNS design).
+        sed -i -E "/\"[^\"]*-vnet-aishared-/,/^  \}/ s|(address_space[[:space:]]*=[[:space:]]*)\[[^]]*\]|\1[${VNET_AS_LIST}]|" "$TFVARS_FILE"
 
         # Class A subnets.
         sed -i -E "/\"[^\"]*-snet-pe-aishared-/,/^      \}/   s|(address_prefix[[:space:]]*=[[:space:]]*\")[^\"]*(\")|\1${PE_SUBNET}\2|"        "$TFVARS_FILE"
@@ -225,8 +236,11 @@ jobs:
         else
           awk '/Allow-Bastion-RDP-SSH = \{/{inrule=1; next} inrule && /^      \}/{inrule=0; next} inrule{next} {print}' "$TFVARS_FILE" > "$TFVARS_FILE.tmp" && mv "$TFVARS_FILE.tmp" "$TFVARS_FILE"
         fi
-        # Spoke VNet DNS -> hub DNS Private Resolver inbound endpoint.
-        sed -i -E "s|(dns_servers[[:space:]]*=[[:space:]]*\[\")[^\"]*(\"\])|\1${DNS_RESOLVER_IP}\2|g"                  "$TFVARS_FILE"
+        # Route table default-route next hop: Internet by default, or the provided
+        # firewall IP (VirtualAppliance). No custom VNet DNS resolver in our IP -
+        # the AI shared VNet uses Azure-provided DNS with the private zones linked.
+        sed -i "s|{fw_next_hop_type}|${FW_NEXT_HOP_TYPE}|g" "$TFVARS_FILE"
+        sed -i "s|{fw_next_hop_ip}|${FW_NEXT_HOP_IP}|g"     "$TFVARS_FILE"
         # Azure location for region-pinned resources.
         sed -i "s|{location}|${LOCATION}|g"          "$TFVARS_FILE"
         # APIM JWT validation tenant.

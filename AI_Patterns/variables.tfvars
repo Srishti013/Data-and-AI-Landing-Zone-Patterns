@@ -41,6 +41,7 @@ existing_private_dns_zones = {
   "ai_services"        = { name = "privatelink.services.ai.azure.com" }
   "azure_cr"           = { name = "privatelink.azurecr.io" }
   "cosmos_sql"         = { name = "privatelink.documents.azure.com" }
+  "search"             = { name = "privatelink.search.windows.net" }
   "redis"              = { name = "privatelink.redis.azure.net" }
   "backup_azure"       = { name = "privatelink.{region_code}.backup.windowsazure.com" }
 }
@@ -585,12 +586,10 @@ virtual_networks = {
       }
     }
 
-    # DNS forwarded to the hub DNS Private Resolver inbound endpoint so the
-    # spoke resolves the shared private DNS zones (vault_core, backup_azure, ...)
-    # through the hub. Injected by the workflow from the issue form's DNS Resolver IP.
-    dns_servers = {
-      dns_servers = [""]
-    }
+    # DNS: Azure-provided (default). No custom hub DNS Private Resolver in our IP -
+    # the created private DNS zones are linked to THIS single VNet
+    # (spoke_dns_zone_links in main.tf) so private endpoints resolve via the
+    # linked zones over Azure DNS.
 
     subnets = {
       "{org}-snet-pe-aishared-{env}-{region_code}-{iterator}" = {
@@ -629,94 +628,10 @@ virtual_networks = {
         #   }
         # ]
       }
-    }
-  }
-
-  # ---------------------------------------------------------------------------
-  # Dedicated AI Foundry VNet (parity with ex/dev-ai-latest). Kept SEPARATE from
-  # the aishared VNet so the network-injected Standard-Agent managed environment
-  # uses AZURE-PROVIDED DNS (NO custom hub resolver) and resolves the account /
-  # Search / Cosmos / Storage / Key Vault private endpoints via the private DNS
-  # zones linked to this VNet (foundry_spoke_zones in main.tf), while resolving
-  # public bootstrap endpoints via Azure DNS. It has its OWN hub peering so the
-  # agent + PE subnets can reach the internal firewall, and its dedicated route
-  # table ({org}-rt-aifoundry-...) forces 0.0.0.0/0 -> firewall so ALL agent egress
-  # is filtered by the firewall FQDN/URL allow-list. The workflow injects the
-  # SECOND (Class B) issue range into this VNet's address_space.
-  # ---------------------------------------------------------------------------
-  "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}" = {
-    env                = ""
-    org                = ""
-    region_code        = ""
-    base_name          = ""
-    additional_name    = ""
-    iterator           = ""
-    au                 = ""
-    app_code           = "aifoundry"
-    bu                 = ""
-    owner              = ""
-    resource_type_code = "vnet"
-    max_length         = 63
-    no_dashes          = false
-    add_random         = false
-    rnd_length         = 4
-
-    # Mandatory Tags
-    environment         = ""
-    business_owner      = ""
-    business_unit       = ""
-    criticality         = ""
-    cost_center         = ""
-    data_classification = ""
-    compliance          = ""
-    app_name            = ""
-    budget_id           = ""
-    status              = ""
-    service             = ""
-
-    # Optional Tags
-    region              = ""
-    description         = "AI Foundry VNET (Standard-Agent network injection)"
-    notification_emails = ["platform-alerts@example.com"]
-    app_id              = "{org}-{region_code}-ID01-00001"
-    auto_delete         = "No"
-    delete_after        = "TBD"
-    integration_id      = "TBD"
-    retention           = "TBD"
-    experiment_phase    = "TBD"
-    sandbox_type        = "TBD"
-    os                  = "TBD"
-    patch_policy        = "Monthly-Standard"
-    maintenance_window  = "Sun-02:00Z"
-    last_vm_accessed    = "TBD"
-
-    # Second (Class B) range from the issue is injected here by the workflow.
-    address_space      = []
-    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
-
-    # Own hub peering (independent of the aishared VNet) so the Foundry agent /
-    # PE subnets have a path to the internal firewall + hub-hosted private DNS
-    # zones. Distinct peering names avoid collision with the aishared peering.
-    peerings = {
-      "to-hub" = {
-        name                                 = "{org}-peer-aifoundry-to-hub-{env}-{region_code}-{iterator}"
-        hub_key                              = "hub"
-        allow_forwarded_traffic              = true
-        allow_virtual_network_access         = true
-        create_reverse_peering               = true
-        reverse_name                         = "{org}-peer-hub-to-aifoundry-{env}-{region_code}-{iterator}"
-        reverse_allow_forwarded_traffic      = true
-        reverse_allow_virtual_network_access = true
-      }
-    }
-
-    # NO dns_servers block => Azure-provided DNS (168.63.129.16). Mirrors
-    # ex/dev-ai-latest: the Standard-Agent managed environment resolves the
-    # account / Search / Cosmos / Storage / Key Vault private endpoints through
-    # the private DNS zones linked to this VNet, and resolves public bootstrap
-    # endpoints via Azure DNS.
-
-    subnets = {
+      # --- Foundry subnets, merged from the former dedicated aifoundry VNet
+      # (single-VNet + Azure-default-DNS design). The agent subnet keeps the
+      # Microsoft.App/environments delegation for Standard-Agent injection. The
+      # workflow injects the Foundry (agent /25 + PE /27) prefixes here. ---
       "{org}-snet-agt-aifoundry-{env}-{region_code}-{iterator}" = {
         name           = "{org}-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
         address_prefix = ""
@@ -1503,7 +1418,7 @@ key_vaults = {
     private_endpoints = {
       pe = {
         name          = "{org}-pe-kv-aifoundry-{env}-{region_code}-{iterator}"
-        vnet_key      = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key      = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
         subnet_key    = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
         dns_zone_keys = ["vault_core"]
       }
@@ -1576,8 +1491,8 @@ route_tables = {
       "internet_traffic_to_firewall" = {
         name                   = "internet_traffic_to_firewall"
         address_prefix         = "0.0.0.0/0"
-        next_hop_type          = "Internet"
-        next_hop_in_ip_address = null
+        next_hop_type          = "{fw_next_hop_type}"
+        next_hop_in_ip_address = "{fw_next_hop_ip}"
       }
       "apim_internet" = {
         name                   = "apim_internet"
@@ -1655,18 +1570,18 @@ route_tables = {
       "internet_traffic_to_firewall" = {
         name                   = "internet_traffic_to_firewall"
         address_prefix         = "0.0.0.0/0"
-        next_hop_type          = "Internet"
-        next_hop_in_ip_address = null
+        next_hop_type          = "{fw_next_hop_type}"
+        next_hop_in_ip_address = "{fw_next_hop_ip}"
       }
     }
 
     subnet_associations = {
       "agt-aifoundry" = {
-        vnet_key   = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
         subnet_key = "{org}-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
       }
       "pe-aifoundry" = {
-        vnet_key   = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
         subnet_key = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
       }
     }
@@ -3151,7 +3066,7 @@ storage_accounts = {
     private_endpoints = {
       "blob" = {
         name             = "{org}-pe-sa-aifoundry-{env}-{region_code}-{iterator}"
-        vnet_key         = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key         = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
         subnet_key       = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
         subresource_name = "blob"
         dns_zone_keys    = ["storage_blob"]
@@ -4341,7 +4256,7 @@ ai_foundry_accounts = {
     network_injections = [
       {
         scenario   = "agent"
-        vnet_key   = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key   = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
         subnet_key = "{org}-snet-agt-aifoundry-{env}-{region_code}-{iterator}"
       }
     ]
@@ -4367,7 +4282,7 @@ ai_foundry_accounts = {
     # subnet, registered into the shared cognitive/openai/ai-services zones.
     private_endpoint = {
       name          = "{org}-pe-aif-aishared-{env}-{region_code}-{iterator}"
-      vnet_key      = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+      vnet_key      = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
       subnet_key    = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
       dns_zone_keys = ["cognitive_services", "openai", "ai_services"]
     }
@@ -4398,6 +4313,16 @@ ai_foundry_projects = {
     umi_key       = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
     displayName   = "{org}-proj-espi"
     description   = "AI Foundry project - ESPI"
+  }
+  # Shared (non-app) Foundry project. Deploys because its key does NOT match the
+  # aea|espi exclusion filter in main.tf, so the account gets one real project.
+  "{org}-proj-shared-{env}-{region_code}-{iterator}" = {
+    foundry_key   = "{org}-aif-aishared-{env}-{region_code}-{iterator}"
+    sku_name      = "S0"
+    identity_type = "UserAssigned"
+    umi_key       = "{org}-id-aif-aishared-{env}-{region_code}-{iterator}"
+    displayName   = "{org}-proj-shared"
+    description   = "AI Foundry shared project"
   }
 }
 
@@ -4789,7 +4714,7 @@ cosmosdb_accounts = {
     private_endpoints = {
       "pe" = {
         name                   = "{org}-pe-cosmos-aifoundry-{env}-{region_code}-{iterator}"
-        vnet_key               = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
         subnet_key             = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
         subresource_name       = "Sql"
         network_interface_name = "{org}-pe-cosmosdb-aifoundry-{env}-{region_code}-{iterator}-nic"
@@ -5261,6 +5186,26 @@ document_intelligence = {
 # standalone private endpoint added in the dedicated private-endpoint phase.
 # Only one instance is kept (the MYW/SEA pair collapses to a single SEA name).
 # =============================================================================
+# Dedicated Azure OpenAI account (kind=OpenAI). Locked down (no public access,
+# Entra-only auth, default-deny ACLs) and reached via a private endpoint
+# registered into the openai + cognitive_services private DNS zones.
+azure_openai_accounts = {
+  "{org}-oai-aishared-{env}-{region_code}-{iterator}" = {
+    name                  = "{org}-oai-aishared-{env}-{region_code}-{iterator}"
+    location              = "{location}"
+    resource_group_key    = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
+    sku_name              = "S0"
+    custom_subdomain_name = "{org}-oai-aishared-{env}-{region_code}-{iterator}"
+
+    private_endpoint = {
+      name          = "{org}-pe-oai-aishared-{env}-{region_code}-{iterator}"
+      vnet_key      = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
+      subnet_key    = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
+      dns_zone_keys = ["openai", "cognitive_services"]
+    }
+  }
+}
+
 search_services = {
   # A single AI Search service pinned to Southeast Asia. The myw-pinned service
   # was dropped for now to keep the whole stack single-region (every run targets
@@ -5339,9 +5284,10 @@ search_services = {
     private_endpoints = {
       "pe-srch" = {
         name                   = "{org}-pe-srch-espi-{env}-sea-{iterator}"
-        vnet_key               = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+        vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
         subnet_key             = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
         network_interface_name = "{org}-pe-srch-espi-{env}-sea-{iterator}-nic"
+        dns_zone_keys          = ["search"]
       }
     }
   }
@@ -7020,7 +6966,7 @@ private_endpoints = {
 
     resource_group_key              = "{org}-rg-aea-{env}-{region_code}-{iterator}"
     network_interface_name          = "{org}-pe-di-aea-{env}-{region_code}-{iterator}-nic"
-    vnet_key                        = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+    vnet_key                        = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
     subnet_key                      = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
     private_connection_resource_ref = "di:{org}-di-aea-{env}-{region_code}-{iterator}"
     subresource_names               = ["account"]
@@ -7069,7 +7015,7 @@ private_endpoints = {
 
     resource_group_key              = "{org}-rg-espi-{env}-{region_code}-{iterator}"
     network_interface_name          = "{org}-pe-di-espi-{env}-{region_code}-{iterator}-nic"
-    vnet_key                        = "{org}-vnet-aifoundry-{env}-{region_code}-{iterator}"
+    vnet_key                        = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
     subnet_key                      = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
     private_connection_resource_ref = "di:{org}-di-espi-{env}-{region_code}-{iterator}"
     subresource_names               = ["account"]

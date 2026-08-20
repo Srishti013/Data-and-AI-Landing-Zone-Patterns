@@ -302,7 +302,16 @@ body:
     id: dns_resolver_ip
     attributes:
       label: DNS Resolver IP
-      description: Inbound IP of the hub DNS Private Resolver. Spoke VNets use it as their DNS server. Read it from the hub resolver's inbound endpoint (it is dynamically assigned, not fixed).
+      description: "Optional / legacy. The AI shared VNet now uses Azure-provided DNS with the private DNS zones linked, so a hub DNS Private Resolver IP is no longer required. Leave blank."
       placeholder: "10.247.130.196"
     validations:
-      required: true
+      required: false
+
+  - type: input
+    id: firewall_ip
+    attributes:
+      label: Firewall IP
+      description: "Optional. Private IP of the hub firewall (Azure Firewall / NVA). If provided, the route table sends 0.0.0.0/0 egress through this IP (VirtualAppliance). Leave blank to route all egress straight to the Internet (default)."
+      placeholder: "10.247.130.4"
+    validations:
+      required: false
