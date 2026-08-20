@@ -439,7 +439,13 @@ module "route_tables" {
 
   # Route table specific configuration
   bgp_route_propagation_enabled = lookup(each.value, "bgp_route_propagation_enabled", true)
-  routes                        = lookup(each.value, "routes", {})
+  # Normalise next_hop_in_ip_address: an empty string (no firewall IP provided,
+  # next hop = Internet) is coerced to null so azurerm_route accepts it.
+  routes = {
+    for rk, r in lookup(each.value, "routes", {}) : rk => merge(r, {
+      next_hop_in_ip_address = try(r.next_hop_in_ip_address, null) == "" ? null : try(r.next_hop_in_ip_address, null)
+    })
+  }
 
   # Subnet associations - resolve each subnet's resource_id from the VNet module
   # output (the same way the Key Vault private endpoints are resolved).
@@ -860,31 +866,26 @@ resource "azurerm_private_dns_a_record" "apim_internal" {
 # azure-api.net zone link + the DNS Private Resolver.
 
 # ---------------------------------------------------------------------------
-# Foundry spoke-to-zone private DNS VNet links (parity with ex/dev-ai-latest
-# `vnet_link`). ex/dev-ai-latest links ONLY the dedicated AI Foundry VNet (which
-# uses Azure-provided DNS) to each account privatelink zone, so the injected
-# Standard-Agent managed environment + Foundry private endpoints resolve via the
-# linked zones. The aishared VNet is intentionally EXCLUDED: it uses the custom
-# hub resolver (10.247.130.196), which already serves those zones, so a VNet link
-# on it would be inert (a custom-DNS VNet bypasses its own linked zones). Scoped
-# here to the aifoundry VNet only (regexall "aifoundry"). vault_core is NOT linked
-# (CMK Key Vault is reached via the account's trusted-services bypass).
+# Spoke-to-zone private DNS VNet links. The AI shared VNet uses Azure-provided
+# DNS (no custom hub resolver in our IP), so EVERY created private DNS zone is
+# linked to it here and private endpoints resolve via the linked zones. The
+# zones are assumed pre-created by the Platform Landing Zone; we only add the
+# VNet links. (azure-api.net is intentionally NOT in existing_private_dns_zones -
+# it is a public apex served to the VNet via the hub link, see APIM note above.)
 # ---------------------------------------------------------------------------
 locals {
-  # Account privatelink zones the Foundry VNet links to (by tfvars key).
-  foundry_spoke_dns_zone_keys = ["cognitive_services", "openai", "ai_services", "storage_blob", "cosmos_sql"]
-
+  # Link EVERY created private DNS zone to the (single) AI shared VNet so private
+  # endpoints resolve over Azure-provided DNS. The zones are assumed pre-created
+  # by the Platform Landing Zone; we only create the VNet links here.
   foundry_spoke_dns_links = {
     for pair in flatten([
       for vnet_key, vnet in var.virtual_networks : [
-        for zk in local.foundry_spoke_dns_zone_keys : {
+        for zk, zone in var.existing_private_dns_zones : {
           key       = "${vnet_key}--${zk}"
           vnet_key  = vnet_key
-          zone_name = var.existing_private_dns_zones[zk].name
+          zone_name = zone.name
         }
-        if contains(keys(var.existing_private_dns_zones), zk)
       ]
-      if length(regexall("aifoundry", vnet_key)) > 0
     ]) : pair.key => pair
   }
 }
@@ -2007,6 +2008,62 @@ module "search_services" {
 
   tags       = lookup(each.value, "tags", null)
   depends_on = [module.resource_group, module.user_managed_identities, module.identity_vnet, module.key_vault, time_sleep.rbac_wait_cmk]
+}
+
+# =============================================================================
+# Azure OpenAI (dedicated Cognitive account, kind=OpenAI)
+# A standalone Azure OpenAI resource, separate from the AI Foundry account:
+# public network access disabled, local auth disabled, default-deny network ACLs,
+# reached only via a private endpoint registered into the openai/cognitive zones.
+# =============================================================================
+resource "azurerm_cognitive_account" "openai" {
+  for_each = var.azure_openai_accounts
+
+  name                  = each.value.name
+  location              = each.value.location
+  resource_group_name   = module.resource_group[each.value.resource_group_key].name
+  kind                  = "OpenAI"
+  sku_name              = each.value.sku_name
+  custom_subdomain_name = each.value.custom_subdomain_name
+
+  public_network_access_enabled = false
+  local_auth_enabled            = false
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  network_acls {
+    default_action = "Deny"
+    bypass         = "AzureServices"
+  }
+
+  tags       = lookup(each.value, "tags", null)
+  depends_on = [module.resource_group]
+}
+
+resource "azurerm_private_endpoint" "openai" {
+  for_each = var.azure_openai_accounts
+
+  name                = each.value.private_endpoint.name
+  location            = each.value.location
+  resource_group_name = module.resource_group[each.value.resource_group_key].name
+  subnet_id           = module.identity_vnet[each.value.private_endpoint.vnet_key].subnets[each.value.private_endpoint.subnet_key].resource_id
+
+  private_service_connection {
+    name                           = "${each.value.private_endpoint.name}-psc"
+    private_connection_resource_id = azurerm_cognitive_account.openai[each.key].id
+    subresource_names              = ["account"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "openai"
+    private_dns_zone_ids = [for k in each.value.private_endpoint.dns_zone_keys : data.azurerm_private_dns_zone.existing_private_dns_zones[k].id]
+  }
+
+  tags       = lookup(each.value, "tags", null)
+  depends_on = [module.identity_vnet, azurerm_private_dns_zone_virtual_network_link.foundry_spoke_zones]
 }
 
 # =============================================================================

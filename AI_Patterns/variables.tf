@@ -237,6 +237,12 @@ variable "app_gateways" {
   default     = {}
 }
 
+variable "azure_openai_accounts" {
+  description = "Dedicated Azure OpenAI (kind=OpenAI) cognitive accounts to create, each reached via a locked-down private endpoint."
+  type        = any
+  default     = {}
+}
+
 variable "private_endpoints" {
   description = "Map of standalone Private Endpoints to create (for resources whose module does not create its own PE)"
   type        = any
