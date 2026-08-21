@@ -365,7 +365,11 @@ jobs:
 
   checkov:
     runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
-    needs: terraform
+    needs: [terraform, policies]
+    # Order is terraform -> policies -> checkov. policies is skipped when
+    # deploy_policies=No, so always() lets checkov run through the skip while
+    # still requiring the deploy itself to have succeeded.
+    if: always() && needs.terraform.result == 'success'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -381,7 +385,7 @@ jobs:
   close-issue:
     name: Close Issue on Success
     runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
-    needs: [terraform, checkov]
+    needs: [terraform, policies, checkov]
     if: success()
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
