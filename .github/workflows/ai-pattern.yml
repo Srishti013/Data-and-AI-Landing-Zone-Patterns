@@ -27,6 +27,15 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    - name: Force workspace to the triggering commit
+      # Self-hosted runners reuse workspaces; a stale tree here would produce a
+      # stale tfvars artifact. Hard-reset to github.sha so the tree is exact.
+      run: |
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        git fetch --no-tags --prune origin "${{ github.sha }}" || git fetch --no-tags --prune origin
+        git reset --hard "${{ github.sha }}"
+        git clean -ffdx
+
     - name: Extract Parameters
       id: extract
       env:
@@ -263,6 +272,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Force workspace to the triggering commit
+        # Self-hosted runners reuse workspaces; hard-reset to github.sha so the
+        # vendored modules / main.tf are exactly the triggering commit.
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git fetch --no-tags --prune origin "${{ github.sha }}" || git fetch --no-tags --prune origin
+          git reset --hard "${{ github.sha }}"
+          git clean -ffdx
 
       - name: Download Updated tfvars
         uses: actions/download-artifact@v4
