@@ -222,31 +222,21 @@ body:
     attributes:
       value: |
         ## Network Configuration
-        Provide the address ranges for **each VNet separately**, one CIDR per line
-        (or comma-separated). Each VNet can have **any number** of ranges.
-        Recommended: **Shared VNet** = one `/23`; **Foundry VNet** = a `/25`
-        (Agent subnet) plus a `/27` (PE subnet). Each subnet prefix below must sit
-        inside its VNet's range(s). All CIDRs must be non-overlapping - both VNets
-        peer to the platform hub, so overlaps are rejected.
+        This landing zone uses a **single VNet**. Provide all of its address ranges,
+        one CIDR per line (or comma-separated) - any number of ranges. Recommended:
+        one `/23` for the general subnets (PE / AGW / APIM / VM) plus a `/25` (Foundry
+        Agent) and a `/27` (Foundry PE). Every subnet prefix below must sit inside one
+        of these ranges. All CIDRs must be non-overlapping (the VNet peers to the hub).
 
   - type: textarea
-    id: shared_vnet_address_ranges
+    id: vnet_address_ranges
     attributes:
-      label: Shared VNet Address Ranges
-      description: "One or more CIDRs for the shared VNet (PE / AGW / APIM / VM subnets). One per line."
+      label: VNet Address Ranges
+      description: "All CIDRs for the single AI VNet (general + Foundry subnets). One CIDR per line."
       placeholder: |
-        10.248.72.0/23
-    validations:
-      required: true
-
-  - type: textarea
-    id: foundry_vnet_address_ranges
-    attributes:
-      label: Foundry VNet Address Ranges
-      description: "One or more CIDRs for the AI Foundry VNet (Agent + PE subnets). One per line."
-      placeholder: |
-        10.248.74.0/25
-        10.248.74.128/27
+        10.248.76.0/23
+        10.248.78.0/25
+        10.248.78.128/27
     validations:
       required: true
 

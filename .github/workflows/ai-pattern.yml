@@ -84,12 +84,10 @@ jobs:
         # VNet can have ANY number of address prefixes. Shared VNet -> aishared;
         # Foundry VNet -> aifoundry. Each textarea holds one CIDR per line (or
         # comma-separated); normalise into an HCL list of the form "a","b",...
-        SHARED_RANGES_RAW=$(awk '/^### Shared VNet Address Ranges$/{flag=1; next} /^### /{flag=0} flag' issue.txt)
-        FOUNDRY_RANGES_RAW=$(awk '/^### Foundry VNet Address Ranges$/{flag=1; next} /^### /{flag=0} flag' issue.txt)
-        VNET_A_LIST=$(printf '%s\n' "$SHARED_RANGES_RAW"  | tr ',' '\n' | tr -d '\r' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' | awk 'NF' | sed -E 's/^/"/; s/$/"/' | paste -sd, -)
-        VNET_B_LIST=$(printf '%s\n' "$FOUNDRY_RANGES_RAW" | tr ',' '\n' | tr -d '\r' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' | awk 'NF' | sed -E 's/^/"/; s/$/"/' | paste -sd, -)
-        # Combined list kept for backward compat with the env passthrough (unused in seds).
-        VNET_AS_LIST=$(printf '%s\n%s\n' "$SHARED_RANGES_RAW" "$FOUNDRY_RANGES_RAW" | tr ',' '\n' | tr -d '\r' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' | awk 'NF' | sed -E 's/^/"/; s/$/"/' | paste -sd, -)
+        # Single VNet: all address ranges come from ONE textarea. Normalise into an
+        # HCL list of the form "a","b",... (one CIDR per line or comma-separated).
+        VNET_RANGES_RAW=$(awk '/^### VNet Address Ranges$/{flag=1; next} /^### /{flag=0} flag' issue.txt)
+        VNET_AS_LIST=$(printf '%s\n' "$VNET_RANGES_RAW" | tr ',' '\n' | tr -d '\r' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' | awk 'NF' | sed -E 's/^/"/; s/$/"/' | paste -sd, -)
         PE_SUBNET=$(awk '/^### PE Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         AGW_SUBNET=$(awk '/^### Application Gateway Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         APIM_SUBNET=$(awk '/^### APIM Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
@@ -130,8 +128,6 @@ jobs:
         echo "STATUS=$STATUS" >> $GITHUB_ENV
         echo "APP_SUPPORT=$APP_SUPPORT" >> $GITHUB_ENV
         echo "VNET_AS_LIST=$VNET_AS_LIST" >> $GITHUB_ENV
-        echo "VNET_A_LIST=$VNET_A_LIST" >> $GITHUB_ENV
-        echo "VNET_B_LIST=$VNET_B_LIST" >> $GITHUB_ENV
         echo "PE_SUBNET=$PE_SUBNET" >> $GITHUB_ENV
         echo "AGW_SUBNET=$AGW_SUBNET" >> $GITHUB_ENV
         echo "APIM_SUBNET=$APIM_SUBNET" >> $GITHUB_ENV
@@ -173,8 +169,6 @@ jobs:
         STATUS: ${{ env.STATUS }}
         APP_SUPPORT: ${{ env.APP_SUPPORT }}
         VNET_AS_LIST: ${{ env.VNET_AS_LIST }}
-        VNET_A_LIST: ${{ env.VNET_A_LIST }}
-        VNET_B_LIST: ${{ env.VNET_B_LIST }}
         PE_SUBNET: ${{ env.PE_SUBNET }}
         AGW_SUBNET: ${{ env.AGW_SUBNET }}
         APIM_SUBNET: ${{ env.APIM_SUBNET }}
