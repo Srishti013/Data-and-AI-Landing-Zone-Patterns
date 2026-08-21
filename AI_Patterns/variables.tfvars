@@ -2042,12 +2042,12 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  "{org}-id-srch-espi-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "{org}-rg-espi-{env}-{region_code}-{iterator}"
+  "{org}-id-srch-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
     env                = ""
     au                 = ""
-    app_code           = "srch-espi"
+    app_code           = "srch-aishared"
     bu                 = ""
     owner              = ""
     resource_type_code = "id"
@@ -5207,22 +5207,18 @@ azure_openai_accounts = {
 }
 
 search_services = {
-  # A single AI Search service pinned to Southeast Asia. The myw-pinned service
-  # was dropped for now to keep the whole stack single-region (every run targets
-  # one region, so its private endpoint stays in-region). `name`/`location` are
-  # hardcoded (the workflow does not rewrite them); `{env}` stays a token so the
-  # same definition works for every environment.
-  "{org}-srch-espi-{env}-sea-{iterator}" = {
-    resource_group_key = "{org}-rg-espi-{env}-{region_code}-{iterator}"
+  # A single shared AI Search service, standard-named (aishared) and region-agnostic
+  # (region_code + location come from the issue). Deployed into the shared RG.
+  "{org}-srch-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
-    # Region is pinned here (not taken from the issue template).
-    name     = "{org}-srch-espi-{env}-sea-{iterator}"
+    name     = "{org}-srch-aishared-{env}-{region_code}-{iterator}"
     location = "{location}"
 
     # Naming module required variables
     env                = ""
     au                 = ""
-    app_code           = "espi"
+    app_code           = "aishared"
     bu                 = ""
     owner              = ""
     resource_type_code = "srch"
@@ -5263,12 +5259,12 @@ search_services = {
     service     = "ai-search-service"
 
     # Optional Tags
-    description         = "AI Search service for ESPI workloads (Southeast Asia)"
+    description         = "Shared AI Search service"
     region              = ""
     notification_emails = ["platform-alerts@example.com"]
 
     # AI Search configuration
-    umi_key                       = "{org}-id-srch-espi-{env}-{region_code}-{iterator}"
+    umi_key                       = "{org}-id-srch-aishared-{env}-{region_code}-{iterator}"
     sku                           = "standard"
     public_network_access_enabled = false
     local_authentication_enabled  = false
@@ -5283,10 +5279,10 @@ search_services = {
     # NIC-only private endpoint (DNS integration deferred until peering).
     private_endpoints = {
       "pe-srch" = {
-        name                   = "{org}-pe-srch-espi-{env}-sea-{iterator}"
+        name                   = "{org}-pe-srch-aishared-{env}-{region_code}-{iterator}"
         vnet_key               = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
         subnet_key             = "{org}-snet-pe-aifoundry-{env}-{region_code}-{iterator}"
-        network_interface_name = "{org}-pe-srch-espi-{env}-sea-{iterator}-nic"
+        network_interface_name = "{org}-pe-srch-aishared-{env}-{region_code}-{iterator}-nic"
         dns_zone_keys          = ["search"]
       }
     }
