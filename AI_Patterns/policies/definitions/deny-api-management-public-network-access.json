@@ -1,6 +1,6 @@
 {
   "displayName": "Azure API Management: Disable public network access",
-  "description": "Denies Microsoft.ApiManagement/service whose publicNetworkAccess is not Disabled (requires a private endpoint or internal VNet deployment). MCSB v2 NS-2.1, NS-2.3.",
+  "description": "Audits Microsoft.ApiManagement/service whose publicNetworkAccess is not Disabled. Audit-only: Internal-mode APIM cannot set publicNetworkAccess=Disabled at creation (no private endpoint) and is already private via the VNet. MCSB v2 NS-2.1, NS-2.3.",
   "mode": "All",
   "policyRule": {
     "if": {
@@ -12,6 +12,6 @@
     "then": { "effect": "[parameters('effect')]" }
   },
   "parameters": {
-    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+    "effect": { "type": "String", "metadata": { "displayName": "Effect" }, "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Audit" }
   }
 }

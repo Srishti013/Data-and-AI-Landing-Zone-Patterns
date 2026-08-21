@@ -53,7 +53,7 @@ locals {
     { name = "ca-env-deny-pna", display_name = "Container Apps Env: Deny public network access (custom)", builtin_id = null, custom_key = "deny-container-apps-env-public-network-access", effect = "Deny", parameters_json = null },
 
     # ----- Azure API Management (Microsoft.ApiManagement/service) -----
-    { name = "apim-deny-pna", display_name = "APIM: Disable public network access", builtin_id = null, custom_key = "deny-api-management-public-network-access", effect = "Deny", parameters_json = null },
+    { name = "apim-deny-pna", display_name = "APIM: Disable public network access", builtin_id = null, custom_key = "deny-api-management-public-network-access", effect = "Audit", parameters_json = null },
     { name = "apim-internal", display_name = "APIM: Deploy into a VNet (internal mode)", builtin_id = "ef619a2c-cc4d-4d03-b2ba-8c94a834d85b", custom_key = null, effect = "Deny", parameters_json = null },
     { name = "apim-mgmt-endpoint", display_name = "APIM: Disable direct management API endpoint", builtin_id = "b741306c-968e-4b67-b916-5675e5c709f4", custom_key = null, effect = "Deny", parameters_json = null },
     { name = "apim-protocols", display_name = "APIM: Encrypted protocols only", builtin_id = "ee7495e7-3ba7-40b6-bfee-c29e22cc75d4", custom_key = null, effect = "Deny", parameters_json = null },
