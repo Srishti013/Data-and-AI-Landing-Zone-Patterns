@@ -2030,7 +2030,17 @@ resource "azurerm_cognitive_account" "openai" {
   local_auth_enabled            = false
 
   identity {
-    type = "SystemAssigned"
+    type         = "SystemAssigned, UserAssigned"
+    identity_ids = [module.user_managed_identities[each.value.umi_key].resource_id]
+  }
+
+  # CMK encryption (opt-in via the entry's customer_managed_key block).
+  dynamic "customer_managed_key" {
+    for_each = try(each.value.customer_managed_key, null) != null ? [each.value.customer_managed_key] : []
+    content {
+      key_vault_key_id   = data.azurerm_key_vault_key.cmk[customer_managed_key.value.key_vault_key].id
+      identity_client_id = module.user_managed_identities[each.value.umi_key].client_id
+    }
   }
 
   network_acls {
@@ -2039,7 +2049,7 @@ resource "azurerm_cognitive_account" "openai" {
   }
 
   tags       = lookup(each.value, "tags", null)
-  depends_on = [module.resource_group]
+  depends_on = [module.resource_group, module.user_managed_identities, module.key_vault, time_sleep.rbac_wait_cmk]
 }
 
 resource "azurerm_private_endpoint" "openai" {

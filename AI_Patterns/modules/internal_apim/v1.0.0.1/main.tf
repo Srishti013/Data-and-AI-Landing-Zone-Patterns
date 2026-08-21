@@ -95,7 +95,7 @@ resource "azurerm_api_management" "this" {
   notification_sender_email = var.notification_sender_email
   # Public IP and network access settings
   # public_ip_address_id          = var.public_ip_address_id
-  public_network_access_enabled = true // Needs to be disabled for Internal APIM but leaving it enabled for now to avoid provisioning failures while testing. Will be set to false post the configuration complete and tested successfully.
+  public_network_access_enabled = false // Internal APIM: gateway/management reachable only via the VNet (satisfies apim-deny-pna).
   # public_network_access_enabled = var.public_network_access_enabled
   tags = var.tags
   # virtual_network_type          = var.virtual_network_type

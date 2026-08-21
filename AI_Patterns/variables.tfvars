@@ -219,6 +219,16 @@ key_vault_keys = {
     key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
     resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
   }
+  "oai-aishared-kv" = {
+    name                = "{org}-cmk-oai-aishared-{env}-{region_code}-{iterator}"
+    key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
+    resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
+  }
+  "srch-aishared-kv" = {
+    name                = "{org}-cmk-srch-aishared-{env}-{region_code}-{iterator}"
+    key_vault_name      = "{org}kvaishared{env}{region_code}{iterator}"
+    resource_group_name = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
+  }
 }
 
 # Grant each consuming UMI the crypto role on the AI Shared Key Vault so the
@@ -268,6 +278,16 @@ role_assignments_config_cmk = {
   }
   "cmk-cr-aishared" = {
     umi_key              = "{org}-id-cr-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
+    role_definition_name = "Key Vault Crypto Service Encryption User"
+  }
+  "cmk-oai-aishared" = {
+    umi_key              = "{org}-id-oai-aishared-{env}-{region_code}-{iterator}"
+    scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
+    role_definition_name = "Key Vault Crypto Service Encryption User"
+  }
+  "cmk-srch-aishared" = {
+    umi_key              = "{org}-id-srch-aishared-{env}-{region_code}-{iterator}"
     scope_key            = "{org}-kv-aishared-{env}-{region_code}-{iterator}"
     role_definition_name = "Key Vault Crypto Service Encryption User"
   }
@@ -1291,6 +1311,30 @@ key_vaults = {
           notify_before_expiry = "P30D"
         }
       }
+      "{org}-cmk-oai-aishared-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-oai-aishared-{env}-{region_code}-{iterator}"
+        key_type        = "RSA"
+        key_size        = 4096
+        key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
+        expiration_date = "2035-12-31T00:00:00Z"
+        rotation_policy = {
+          automatic            = { time_before_expiry = "P30D" }
+          expire_after         = "P365D"
+          notify_before_expiry = "P30D"
+        }
+      }
+      "{org}-cmk-srch-aishared-{env}-{region_code}-{iterator}" = {
+        name            = "{org}-cmk-srch-aishared-{env}-{region_code}-{iterator}"
+        key_type        = "RSA"
+        key_size        = 4096
+        key_opts        = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
+        expiration_date = "2035-12-31T00:00:00Z"
+        rotation_policy = {
+          automatic            = { time_before_expiry = "P30D" }
+          expire_after         = "P365D"
+          notify_before_expiry = "P30D"
+        }
+      }
       "{org}-cmk-rsv-aishared-{env}-{region_code}-{iterator}" = {
         name            = "{org}-cmk-rsv-aishared-{env}-{region_code}-{iterator}"
         key_type        = "RSA"
@@ -2076,6 +2120,43 @@ user_managed_identities = {
 
     region              = ""
     description         = "Managed Identity for the AI Search service"
+    notification_emails = ["platform-alerts@example.com"]
+  }
+
+  "{org}-id-oai-aishared-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
+
+    env                = ""
+    au                 = ""
+    app_code           = "oai-aishared"
+    bu                 = ""
+    owner              = ""
+    resource_type_code = "id"
+
+    org             = ""
+    region_code     = ""
+    base_name       = null
+    additional_name = null
+    iterator        = ""
+    max_length      = 128
+    no_dashes       = false
+    add_random      = false
+    rnd_length      = 4
+
+    environment         = ""
+    business_owner      = ""
+    business_unit       = ""
+    criticality         = ""
+    cost_center         = ""
+    data_classification = ""
+    compliance          = ""
+    app_name            = ""
+    budget_id           = ""
+    status              = ""
+    service             = "ManagedIdentity"
+
+    region              = ""
+    description         = "Managed Identity for the Azure OpenAI account (CMK)"
     notification_emails = ["platform-alerts@example.com"]
   }
 
@@ -5197,6 +5278,11 @@ azure_openai_accounts = {
     sku_name              = "S0"
     custom_subdomain_name = "{org}-oai-aishared-{env}-{region_code}-{iterator}"
 
+    # CMK encryption (satisfies aoai-deny-cmk). UMI is granted the crypto role
+    # on the shared KV; key material lives in {org}-cmk-oai-aishared.
+    umi_key              = "{org}-id-oai-aishared-{env}-{region_code}-{iterator}"
+    customer_managed_key = { key_vault_key = "oai-aishared-kv" }
+
     private_endpoint = {
       name          = "{org}-pe-oai-aishared-{env}-{region_code}-{iterator}"
       vnet_key      = "{org}-vnet-aishared-{env}-{region_code}-{iterator}"
@@ -5268,6 +5354,9 @@ search_services = {
     sku                           = "standard"
     public_network_access_enabled = false
     local_authentication_enabled  = false
+    # CMK enforcement (satisfies srch-deny-cmk). Key material lives in
+    # {org}-cmk-srch-aishared; the search UMI holds the crypto role on the KV.
+    customer_managed_key = { key_vault_key = "srch-aishared-kv" }
     enable_telemetry              = true
     replica_count                 = 3
     allowed_ips                   = []
