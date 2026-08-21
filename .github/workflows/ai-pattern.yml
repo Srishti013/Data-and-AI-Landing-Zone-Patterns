@@ -96,6 +96,9 @@ jobs:
         FOUNDRY_PE_SUBNET=$(awk '/^### Foundry PE Subnet Address Prefix$/{getline; getline; print; exit}' issue.txt | xargs)
         DNS_RESOLVER_IP=$(awk '/^### DNS Resolver IP$/{getline; getline; print; exit}' issue.txt | xargs)
         FIREWALL_IP=$(awk '/^### Firewall IP$/{getline; getline; print; exit}' issue.txt | xargs)
+        # GitHub Issue Forms render a blank OPTIONAL field as the literal string
+        # "_No response_" - normalise that (and empty) to no firewall.
+        if [ "$FIREWALL_IP" = "_No response_" ]; then FIREWALL_IP=""; fi
         # Route table default (0.0.0.0/0) next hop: a provided firewall IP routes
         # egress through it (VirtualAppliance); otherwise egress goes straight to
         # the Internet (default). Fills the {fw_next_hop_type}/{fw_next_hop_ip} tokens.
