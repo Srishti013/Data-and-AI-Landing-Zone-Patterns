@@ -2047,45 +2047,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
-  # --- REMOVED FROM THIS DEPLOYMENT (all AEA/ESPI app-use-case identities) ---
-  /*
-  "{org}-id-di-aea-{env}-{region_code}-{iterator}" = {
-    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
-
-    env                = ""
-    au                 = ""
-    app_code           = "di-aea"
-    bu                 = ""
-    owner              = ""
-    resource_type_code = "id"
-
-    org             = ""
-    region_code     = ""
-    base_name       = null
-    additional_name = null
-    iterator        = ""
-    max_length      = 128
-    no_dashes       = false
-    add_random      = false
-    rnd_length      = 4
-
-    environment         = ""
-    business_owner      = ""
-    business_unit       = ""
-    criticality         = ""
-    cost_center         = ""
-    data_classification = ""
-    compliance          = ""
-    app_name            = ""
-    budget_id           = ""
-    status              = ""
-    service             = "ManagedIdentity"
-
-    region              = ""
-    description         = "Managed Identity for the Document Intelligence account"
-    notification_emails = ["platform-alerts@example.com"]
-  }
-
+  # Shared AI Search identity (active shared resource; the AI Search service
+  # references this). Kept OUT of the removed AEA/ESPI app-layer block below.
   "{org}-id-srch-aishared-{env}-{region_code}-{iterator}" = {
     resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
@@ -2123,6 +2086,8 @@ user_managed_identities = {
     notification_emails = ["platform-alerts@example.com"]
   }
 
+  # Shared Azure OpenAI identity (active shared resource; the CMK-encrypted
+  # OpenAI account references this).
   "{org}-id-oai-aishared-{env}-{region_code}-{iterator}" = {
     resource_group_key = "{org}-rg-aishared-{env}-{region_code}-{iterator}"
 
@@ -2157,6 +2122,45 @@ user_managed_identities = {
 
     region              = ""
     description         = "Managed Identity for the Azure OpenAI account (CMK)"
+    notification_emails = ["platform-alerts@example.com"]
+  }
+
+  # --- REMOVED FROM THIS DEPLOYMENT (all AEA/ESPI app-use-case identities) ---
+  /*
+  "{org}-id-di-aea-{env}-{region_code}-{iterator}" = {
+    resource_group_key = "{org}-rg-aea-{env}-{region_code}-{iterator}"
+
+    env                = ""
+    au                 = ""
+    app_code           = "di-aea"
+    bu                 = ""
+    owner              = ""
+    resource_type_code = "id"
+
+    org             = ""
+    region_code     = ""
+    base_name       = null
+    additional_name = null
+    iterator        = ""
+    max_length      = 128
+    no_dashes       = false
+    add_random      = false
+    rnd_length      = 4
+
+    environment         = ""
+    business_owner      = ""
+    business_unit       = ""
+    criticality         = ""
+    cost_center         = ""
+    data_classification = ""
+    compliance          = ""
+    app_name            = ""
+    budget_id           = ""
+    status              = ""
+    service             = "ManagedIdentity"
+
+    region              = ""
+    description         = "Managed Identity for the Document Intelligence account"
     notification_emails = ["platform-alerts@example.com"]
   }
 
@@ -5260,12 +5264,10 @@ document_intelligence = {
     }
   }
 }
+# --- end of removed Bing/Document-Intelligence block; the OpenAI + AI Search
+# blocks below are ACTIVE shared AI resources (not part of the removed layer) ---
+*/
 
-# =============================================================================
-# AI Search service - ESPI. UserAssigned identity, CMK enforcement disabled and
-# CMK deferred (service-managed key) until peering. Public access disabled;
-# standalone private endpoint added in the dedicated private-endpoint phase.
-# Only one instance is kept (the MYW/SEA pair collapses to a single SEA name).
 # =============================================================================
 # Dedicated Azure OpenAI account (kind=OpenAI). Locked down (no public access,
 # Entra-only auth, default-deny ACLs) and reached via a private endpoint
@@ -5357,9 +5359,9 @@ search_services = {
     # CMK enforcement (satisfies srch-deny-cmk). Key material lives in
     # {org}-cmk-srch-aishared; the search UMI holds the crypto role on the KV.
     customer_managed_key = { key_vault_key = "srch-aishared-kv" }
-    enable_telemetry              = true
-    replica_count                 = 3
-    allowed_ips                   = []
+    enable_telemetry     = true
+    replica_count        = 3
+    allowed_ips          = []
 
     managed_identities = {
       system_assigned = false
@@ -5378,6 +5380,12 @@ search_services = {
   }
 }
 
+# =============================================================================
+# REMOVED FROM THIS DEPLOYMENT (resumed) - App Service Plans, App Services,
+# Function Apps, EGST role assignments, Event Grid System Topics, WAF policies,
+# Application Gateways. Restore by removing the /* ... */ wrapper.
+# =============================================================================
+/*
 # =============================================================================
 # App Service Plans
 # One Standard (S1) plan for the AEA web apps and six Flex Consumption (FC1)
