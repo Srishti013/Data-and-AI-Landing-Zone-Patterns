@@ -25,7 +25,7 @@ project can adopt it by setting a handful of repo variables — no code edits.
 | Azure AI Search (vector caching) | ✅ |
 | AI Foundry hub + model deployments + Responsible-AI policy | ✅ |
 | AI Foundry **Projects per BU** | ⚠️ excluded by default (app-tier filter) — re-enable via `var.ai_foundry_projects` |
-| Azure Policy guardrails ("Policies IP") | ❌ separate governance layer, not in this kit |
+| Azure Policy guardrails ("Policies IP") | ✅ optional layer (`AI_Patterns/policies`) — enable with **Deploy AI LZ policies = Yes** (needs Resource Policy Contributor) |
 
 ---
 
