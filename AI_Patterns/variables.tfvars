@@ -4454,10 +4454,8 @@ ai_foundry_deployments_01 = {
     service             = "CognitiveServices"
 
     # Model deployment configuration - gpt-5.1 (GA GlobalStandard in SEA).
-    # capacity 1000 matches the proven-working ex/dev-ai gpt-5.1 deployment
-    # ({org}-openai-aifoundry-dev-sea-04) exactly. Quota limit is 30000, 0 used.
     sku_name      = "GlobalStandard"
-    capacity      = 1000
+    capacity      = 250
     model_format  = "OpenAI"
     model_name    = "gpt-5.1"
     model_version = "2025-11-13"
@@ -5067,7 +5065,7 @@ managed_redis_instances = {
 
     # Redis configuration
     umi_key                   = "{org}-id-redis-aicommon-{env}-{region_code}-{iterator}"
-    sku_name                  = "Balanced_B1"
+    sku_name                  = "Balanced_B0"
     high_availability_enabled = true
     public_network_access     = "Disabled"
 
