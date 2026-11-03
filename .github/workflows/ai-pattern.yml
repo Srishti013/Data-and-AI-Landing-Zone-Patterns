@@ -404,9 +404,13 @@ jobs:
     name: Close Issue on Success
     runs-on: ${{ vars.RUNNER_LABELS != '' && fromJSON(vars.RUNNER_LABELS) || fromJSON('["self-hosted","Linux","X64"]') }}
     needs: [terraform, policies, checkov]
-    if: success()
+    if: >-
+      always() && !cancelled() &&
+      needs.terraform.result == 'success' &&
+      needs.checkov.result == 'success' &&
+      contains(fromJSON('["success","skipped"]'), needs.policies.result)
     env:
-      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Comment and Close Issue (REST API)
         run: |
