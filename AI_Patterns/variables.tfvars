@@ -5065,7 +5065,7 @@ managed_redis_instances = {
 
     # Redis configuration
     umi_key                   = "{org}-id-redis-aicommon-{env}-{region_code}-{iterator}"
-    sku_name                  = "Balanced_B0"
+    sku_name                  = "Balanced_B3"
     high_availability_enabled = true
     public_network_access     = "Disabled"
 
