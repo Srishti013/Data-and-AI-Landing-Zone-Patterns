@@ -5009,6 +5009,8 @@ sql_servers = {
 # UserAssigned identity; public network access disabled. Customer-managed key
 # is omitted (service-managed encryption) until the hub peering exists.
 # =============================================================================
+managed_redis_instances = {}
+/* Demo: Redis excluded because Southeast Asia allocation failed; restore after capacity returns.
 managed_redis_instances = {
   "{org}-redis-aicommon-{env}-{region_code}-{iterator}" = {
     resource_group_key = "{org}-rg-aicommon-{env}-{region_code}-{iterator}"
@@ -5087,6 +5089,7 @@ managed_redis_instances = {
     }
   }
 }
+*/
 
 # =============================================================================
 # REMOVED FROM THIS DEPLOYMENT - all AEA/ESPI app use cases below:
@@ -7112,6 +7115,7 @@ private_endpoints = {
     subresource_names               = ["account"]
   }
   */
+  /* Demo: Redis private endpoint excluded together with its cache.
   "{org}-pe-redis-aicommon-{env}-{region_code}-{iterator}" = {
     env                = ""
     au                 = ""
@@ -7162,6 +7166,7 @@ private_endpoints = {
     subresource_names               = ["redisEnterprise"]
     dns_zone_keys                   = ["redis"]
   }
+  */
 }
 
 # =============================================================================
